@@ -1,0 +1,21 @@
+.space-column-6 {
+    height: 6px;
+    width: 0;
+}
+.space-column-10 {
+    height: 10px;
+    width: 0;
+}
+.space-column-20 {
+    height: 20px;
+    width: 0;
+}
+
+.space-row-10 {
+    width: 10px;
+    height: 0;
+}
+.space-row-20 {
+    width: 20px;
+    height: 0;
+}
