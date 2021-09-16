@@ -4,6 +4,7 @@ import cn.hutool.core.collection.ListUtil;
 import org.springframework.stereotype.Service;
 import top.aengus.panther.exception.BadRequestException;
 import top.aengus.panther.service.FileService;
+import top.aengus.panther.tool.FileUtil;
 
 import java.io.File;
 import java.util.List;
@@ -27,12 +28,14 @@ public class FileServiceImpl implements FileService {
         if (!imgDirs.containsAll(ListUtil.of(NAME_APP, NAME_COMMON))) {
             throw new BadRequestException("app与common文件夹为必选项");
         }
+        File parentFile = new File(basePath);
+        if (!FileUtil.checkAndCreateDir(parentFile)) {
+            throw new BadRequestException("创建「" + parentFile.getAbsolutePath() + "」文件夹失败，请手动创建");
+        }
         for (String dir : imgDirs) {
             File dirFile = new File(basePath, dir);
-            if (!dirFile.exists()) {
-                dirFile.mkdirs();
-            } else if (!dirFile.isDirectory()) {
-                throw new BadRequestException("存在 " + dir + " 同名文件，请将其删除并重新安装");
+            if (!FileUtil.checkAndCreateDir(dirFile)) {
+                throw new BadRequestException("创建「" + dirFile.getAbsolutePath() + "」文件夹失败，请手动创建");
             }
         }
     }

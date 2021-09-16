@@ -13,9 +13,17 @@ public interface PantherConfigService {
 
     String getSaveRootPath();
 
+    String getAdminUsername();
+
+    String getAdminPassword();
+
     void updateSaveRootPath(String saveRootPath);
 
     void updateHostUrl(String hostUrl);
+
+    void updateAdminPassword(String superAdminPassword);
+
+    void updateAdminUsername(String superAdminUsername);
 
     boolean hasInstalled();
 

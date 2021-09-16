@@ -11,81 +11,158 @@
     <script type="text/javascript" th:src="@{/js/axios.min.js}"></script>
     <script type="text/javascript" th:src="@{/js/request.js}"></script>
     <script type="text/javascript" th:src="@{/js/install/install.js}"></script>
+    <script type="text/javascript" th:src="@{/js/common/common.js}"></script>
 </head>
 <body>
 <div id="app" class="root-container">
     <div class="content">
-        <div class="input-row-container">
-            <p class="label-text">图床域名</p>
-            <div class="space-column-6"></div>
-            <el-input v-model="installParam.hostUrl" placeholder="请输入图床域名" size="large"></el-input>
-            <p class="hint-text">
-                上传图片后，域名将作为上传图片后的地址，安装后可以随意修改
-            </p>
-        </div>
-        <div class="input-row-container">
-            <p class="label-text">图片存储本地路径</p>
-            <div class="space-column-6"></div>
-            <el-input v-model="installParam.saveRootPath" placeholder="图片存储的文件夹，绝对路径" size="large"></el-input>
-            <p class="hint-text">
-                图片存储在服务器的绝对路径，必须是已存在的文件夹. 设置后再次修改需要重启Panther服务
-            </p>
-        </div>
-        <div class="input-row-container">
-            <p class="label-text">图片文件夹</p>
-            <el-checkbox-group v-model="installParam.imgDirs">
-                <el-checkbox label="app" border disabled :value="true"></el-checkbox>
-                <el-checkbox label="common" border disabled :value="true"></el-checkbox>
-                <el-checkbox label="post" border :value="true"></el-checkbox>
-                <el-checkbox label="travel" border></el-checkbox>
-                <el-checkbox label="screenshots" border></el-checkbox>
-            </el-checkbox-group>
-            <p class="hint-text">
-                App上传的图片将默认在app文件夹下的子文件夹中. 选择文件夹后Panther将会自动创建
-            </p>
-        </div>
-        <div class="button-container">
-            <el-button type="primary" @click="onClickInstall" :loading="installing" size="medium" icon="el-icon-arrow-right">
-                {{ installText }}
-            </el-button>
-        </div>
+        <el-form :model="installParam" :rules="rules" ref="installParam" label-width="110px" label-position="right">
+            <el-form-item label="管理员账号" prop="adminUsername">
+                <el-input v-model="installParam.adminUsername"
+                          placeholder="请输入超级管理员用户名"
+                          prefix-icon="el-icon-user"
+                          minlength="6"
+                          maxlength="20"></el-input>
+            </el-form-item>
+            <el-form-item label="管理员密码" label-position="left" prop="adminPassword">
+                <el-input v-model="installParam.adminPassword"
+                          placeholder="请输入超级管理员密码" show-password
+                          prefix-icon="el-icon-lock"
+                          minlength="6"
+                          maxlength="20"></el-input>
+            </el-form-item>
+            <el-form-item label="确认密码" label-position="left" prop="secondPassword">
+                <el-input v-model="secondPassword"
+                          placeholder="请再输入一次密码" show-password
+                          prefix-icon="el-icon-lock"
+                          minlength="6"
+                          maxlength="20"></el-input>
+            </el-form-item>
+            <el-form-item label="图床域名" label-position="left" prop="hostUrl">
+                <el-input v-model="installParam.hostUrl" placeholder="上传图片后，域名将作为上传图片后的地址，安装后可以再次修改" prefix-icon="el-icon-discover"></el-input>
+            </el-form-item>
+            <el-form-item label="图片存储路径" label-position="left" prop="saveRootPath" v-popover:popover>
+                <el-input v-model="installParam.saveRootPath" placeholder="图片存储的文件夹的绝对路径，请使用 / 作为路径分隔符" prefix-icon="el-icon-folder"></el-input>
+            </el-form-item>
+            <el-form-item label="图片文件夹" label-position="left">
+                <el-checkbox-group v-model="installParam.imgDirs">
+                    <el-checkbox label="app" border disabled :value="true"></el-checkbox>
+                    <el-checkbox label="common" border disabled :value="true"></el-checkbox>
+                    <el-checkbox label="post" border :value="true"></el-checkbox>
+                    <el-checkbox label="travel" border></el-checkbox>
+                    <el-checkbox label="screenshots" border></el-checkbox>
+                </el-checkbox-group>
+            </el-form-item>
+            <el-form-item class="button-container" label-width="0">
+                <el-button type="primary" @click="onClickInstall" :loading="installing" size="medium" icon="el-icon-arrow-right">
+                    {{ installText }}
+                </el-button>
+            </el-form-item>
+        </el-form>
     </div>
+    <el-popover ref="popover"
+                placement="top-start"
+                title="提示"
+                content="存储路径传空，将使用jar包运行目录下的uploadImages作为存储目录；若获取失败，则使用用户目录下的panther/uploadImages作为存储目录"
+                trigger="focus"
+                width="400"></el-popover>
 </div>
 </body>
 <script>
     new Vue({
         el: '#app',
-        data: {
-            installParam: {
-                hostUrl: "",
-                saveRootPath: "",
-                imgDirs: ["app", "common", "post"]
-            },
-            installing: false,
-            installText: "开始安装"
+        data() {
+            const validatePassword = (rule, _, callback) => {
+                if (this.secondPassword === '') {
+                    callback(new Error('请再次输入密码'));
+                } else if (this.secondPassword !== this.installParam.adminPassword) {
+                    callback(new Error('两次输入密码不一致!'));
+                } else {
+                    callback();
+                }
+            };
+            return {
+                rules: {
+                    adminUsername: [
+                        { required: true, message: '请输入超级管理员用户名', trigger: ['blur', 'change'] },
+                        { min: 6, max: 20, message: '长度在 6 到 20 个字符', trigger: 'blur' }
+                    ],
+                    adminPassword: [
+                        { required: true, message: '请输入超级管理员密码', trigger: ['blur', 'change'] },
+                        { min: 6, max: 20, message: '长度在 6 到 20 个字符', trigger: 'blur' }
+                    ],
+                    secondPassword: [
+                        { validator: validatePassword, trigger: ['blur', 'change'] },
+                    ],
+                    hostUrl: [
+                        { required: true, message: '请输入图床域名', trigger: 'blur' },
+                    ]
+                },
+                installParam: {
+                    adminUsername: "",
+                    adminPassword: "",
+                    hostUrl: "",
+                    saveRootPath: "",
+                    imgDirs: ["app", "common", "post"]
+                },
+                secondPassword: "",
+                confirmPasswordHint: "",
+                installing: false,
+                installText: "开始安装",
+            }
         },
         methods: {
             onClickInstall() {
+                if (!this.installParam.saveRootPath) {
+                    this.$notify.info({
+                        title: '提示',
+                        message: 'saveRootPath传空，将使用jar包运行目录下的uploadImages作为存储目录，或获取失败，则使用用户目录下的panther/uploadImages作为存储目录',
+                        duration: 0
+                    });
+                }
+
                 this.installing = true;
                 this.installText = "安装中"
                 install(this.installParam).then(response => {
-                    this.$message({
-                        message: response.msg,
-                        type: 'success'
+                    this.$confirm(response.msg, "提示", {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        shutdown().then(_ => {
+                            this.$message({
+                                type: 'success',
+                                message: '已停止，请再次启动Panther!'
+                            });
+                        }).catch(_ => {
+                            this.$message({
+                                type: 'error',
+                                message: '停止失败，请手动停止'
+                            });
+                        })
+                    }).catch(() => {
+                        this.$message({
+                            type: 'info',
+                            message: '请手动重启！'
+                        });
                     });
-                    console.log(response)
                 }).catch(response => {
-                    this.$message.error(response.msg);
+                    this.$notify.error({
+                        title: "安装失败",
+                        message: response.msg,
+                        duration: 0,
+                    })
                 }).finally(() => {
                     this.installing = false;
                     this.installText = "开始安装"
                 })
-            }
+            },
         }
     })
 </script>
 <style>
     body {
+        font-family: Arial, sans-serif;
         background-image: linear-gradient(to right, #a1c4fd 0%, #c2e9fb 100%);
         height: 100%;
         width: 100%;
@@ -95,7 +172,7 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        margin-top: 10vh;
+        margin: 10vh 0;
     }
     .content {
         display: flex;
@@ -103,28 +180,14 @@
         background: rgba(255, 255, 255, .65);
         -webkit-backdrop-filter: blur(10px);
         backdrop-filter: blur(10px);
-        padding: 40px;
+        padding: 48px 30px 18px 30px;
         border-radius: 10px;
-        width: 50%;
-    }
-    .input-row-container {
-        display: flex;
-        flex-direction: column;
-        margin-bottom: 30px;
+        width: 48%;
     }
     .button-container {
         display: flex;
         flex-direction: row;
         justify-content: center;
-    }
-    .label-text {
-        font-size: 16px;
-        margin-bottom: 12px;
-    }
-    .hint-text {
-        margin-top: 6px;
-        font-size: 14px;
-        color: gray;
     }
 </style>
 </html>

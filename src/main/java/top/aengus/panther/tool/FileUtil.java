@@ -58,12 +58,14 @@ public class FileUtil {
                 || filename.endsWith(".tiff"));
     }
 
-    public static void checkAndCreateDir(File dir) {
+    public static boolean checkAndCreateDir(File dir) {
         if (!dir.exists()) {
             if (!dir.mkdir()) {
                 logger.error("创建目录失败: " + dir);
+                return false;
             }
         }
+        return true;
     }
 
 }

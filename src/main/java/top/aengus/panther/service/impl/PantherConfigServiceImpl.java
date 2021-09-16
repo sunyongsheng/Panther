@@ -4,20 +4,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ClassUtils;
+import top.aengus.panther.dao.PantherConfigRepository;
 import top.aengus.panther.exception.BadRequestException;
 import top.aengus.panther.exception.InternalException;
 import top.aengus.panther.model.InstallPantherParam;
+import top.aengus.panther.model.config.PantherConfig;
 import top.aengus.panther.service.FileService;
 import top.aengus.panther.service.PantherConfigService;
-import top.aengus.panther.tool.FileUtil;
-import top.aengus.panther.tool.ImageDirUtil;
-import top.aengus.panther.tool.StringUtil;
-import top.aengus.panther.tool.UrlUtil;
+import top.aengus.panther.tool.*;
 
 import java.io.*;
 import java.net.URL;
 import java.util.Objects;
-import java.util.Properties;
 
 /**
  * @author Aengus Sun (sys6511@126.com)
@@ -28,101 +26,124 @@ import java.util.Properties;
 @Service
 public class PantherConfigServiceImpl implements PantherConfigService {
 
-    private final static String CONFIG_NAME = "panther-config.ini";
-    private final static String BACKUP_CONFIG_NAME = ".panther-config.ini";
+    private static final String KEY_HOST_URL = "host_url";
+    private static final String KEY_SAVE_ROOT_PATH = "save_root_path";
+    private static final String KEY_ADMIN_USERNAME = "admin_username";
+    private static final String KEY_ADMIN_PASSWORD = "admin_password";
+    private static final String KEY_INSTALL_TIME = "install_time";
 
-    private final static String KEY_HOST_URL = "hostUrl";
-    private final static String KEY_SAVE_ROOT_PATH = "saveRootPath";
+    private volatile String hostUrl;
+    private volatile String saveRootPath;
 
-    private final Properties properties = new Properties();
-    private final Properties backupProperties = new Properties();
+    private volatile boolean hasInstalled = false;
 
-    private String hostUrl;
-    private String saveRootPath;
-
-    private boolean hasInstalled = false;
-
+    private final PantherConfigRepository pantherConfigRepository;
     private final FileService fileService;
 
     @Autowired
-    public PantherConfigServiceImpl(FileService fileService) {
+    public PantherConfigServiceImpl(PantherConfigRepository pantherConfigRepository, FileService fileService) {
+        this.pantherConfigRepository = pantherConfigRepository;
         this.fileService = fileService;
-
-        File configFile = new File(CONFIG_NAME);
-        if (configFile.exists()) {
-            try {
-                properties.load(new BufferedInputStream(new FileInputStream(configFile)));
-
-                hostUrl = UrlUtil.ensureNoSuffix(properties.getProperty(KEY_HOST_URL));
-                if (StringUtil.isEmpty(hostUrl)) {
-                    throw new RuntimeException("hostUrl can't be empty, please check " + CONFIG_NAME);
-                }
-
-                saveRootPath = FileUtil.ensureNoSuffix(properties.getProperty(KEY_SAVE_ROOT_PATH));
-                if (StringUtil.isEmpty(saveRootPath)) {
-                    String fallbackPath = getFallbackPath();
-                    saveRootPath = fallbackPath;
-                    storeProperty(KEY_SAVE_ROOT_PATH, fallbackPath);
-                }
-
-                log.info("Load Config...hostUrl=[" + hostUrl + "] saveRootPath=[" + saveRootPath + "]");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        File backupFile = new File(BACKUP_CONFIG_NAME);
-        if (backupFile.exists()) {
-            try {
-                backupProperties.load(new BufferedInputStream(new FileInputStream(backupFile)));
-
-                String backupHostUrl = backupProperties.getProperty(KEY_HOST_URL);
-                if (!hostUrl.equals(UrlUtil.ensureNoSuffix(backupHostUrl)) && StringUtil.isNotEmpty(backupHostUrl)) {
-                    log.warn("Detect hostUrl changed, reset the hostUrl, please change it on the admin manager.");
-                    storeProperty(KEY_HOST_URL, UrlUtil.ensureNoSuffix(backupHostUrl));
-                }
-
-                String backupSaveRootPath = backupProperties.getProperty(KEY_SAVE_ROOT_PATH);
-                if (!saveRootPath.equals(FileUtil.ensureNoSuffix(backupSaveRootPath)) && StringUtil.isNotEmpty(backupSaveRootPath)) {
-                    log.warn("Detect saveRootPath changed, reset the saveRootPath, please change it on the admin manager.");
-                    storeProperty(KEY_SAVE_ROOT_PATH, FileUtil.ensureNoSuffix(backupSaveRootPath));
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        hasInstalled();
     }
 
     @Override
     public String getHostUrl() {
+        preCheckInstall();
+        if (hostUrl == null) {
+            synchronized (this) {
+                if (hostUrl == null) {
+                    PantherConfig config = pantherConfigRepository.findByConfigKey(KEY_HOST_URL);
+                    if (config == null) {
+                        throw new InternalException("出现异常， 请检查数据库");
+                    }
+                    hostUrl = config.getConfigValue();
+                }
+            }
+        }
         return hostUrl;
     }
 
     @Override
     public String getSaveRootPath() {
+        preCheckInstall();
+        if (saveRootPath == null) {
+            synchronized (this) {
+                if (saveRootPath == null) {
+                    PantherConfig config = pantherConfigRepository.findByConfigKey(KEY_SAVE_ROOT_PATH);
+                    if (config == null) {
+                        throw new InternalException("出现异常，请检查数据库");
+                    }
+                    saveRootPath = config.getConfigValue();
+                }
+            }
+        }
         return saveRootPath;
+    }
+
+    @Override
+    public String getAdminUsername() {
+        preCheckInstall();
+        return pantherConfigRepository.findByConfigKey(KEY_ADMIN_USERNAME).getConfigValue();
+    }
+
+    @Override
+    public String getAdminPassword() {
+        preCheckInstall();
+        return pantherConfigRepository.findByConfigKey(KEY_ADMIN_PASSWORD).getConfigValue();
     }
 
     @Override
     public void updateSaveRootPath(String saveRootPath) {
         preCheckInstall();
         saveRootPath = FileUtil.ensureNoSuffix(saveRootPath);
-        File check = new File(saveRootPath);
-        if (!check.exists() || !check.isDirectory()) {
-            throw new BadRequestException("路径不存在或不是目录！");
+        PantherConfig config = findConfigWithCheck(KEY_SAVE_ROOT_PATH, saveRootPath);
+        if (config != null) {
+            File check = new File(saveRootPath);
+            if (!check.exists() || !check.isDirectory()) {
+                throw new BadRequestException("路径不存在或不是目录！");
+            }
+            config.setConfigValue(saveRootPath);
+            config.setUpdateTime(System.currentTimeMillis());
+            pantherConfigRepository.save(config);
+            this.saveRootPath = saveRootPath;
         }
-        this.saveRootPath = saveRootPath;
-        storeProperty(KEY_SAVE_ROOT_PATH, saveRootPath);
-        storeBackupProperty(KEY_SAVE_ROOT_PATH, saveRootPath);
     }
 
     @Override
     public void updateHostUrl(String hostUrl) {
         preCheckInstall();
         hostUrl = UrlUtil.ensureNoSuffix(hostUrl);
-        this.hostUrl = hostUrl;
-        storeProperty(KEY_HOST_URL, hostUrl);
-        storeBackupProperty(KEY_HOST_URL, hostUrl);
+        PantherConfig config = findConfigWithCheck(KEY_HOST_URL, hostUrl);
+        if (config != null) {
+            config.setConfigValue(hostUrl);
+            config.setUpdateTime(System.currentTimeMillis());
+            pantherConfigRepository.save(config);
+            this.hostUrl = hostUrl;
+        }
+    }
+
+    @Override
+    public void updateAdminUsername(String superAdminUsername) {
+        preCheckInstall();
+        PantherConfig config = findConfigWithCheck(KEY_ADMIN_USERNAME, superAdminUsername);
+        if (config != null) {
+            config.setConfigValue(superAdminUsername);
+            config.setUpdateTime(System.currentTimeMillis());
+            pantherConfigRepository.save(config);
+        }
+    }
+
+    @Override
+    public void updateAdminPassword(String superAdminPassword) {
+        preCheckInstall();
+        superAdminPassword = EncryptUtil.encrypt(superAdminPassword);
+        PantherConfig config = findConfigWithCheck(KEY_ADMIN_PASSWORD, superAdminPassword);
+        if (config != null) {
+            config.setConfigValue(superAdminPassword);
+            config.setUpdateTime(System.currentTimeMillis());
+            pantherConfigRepository.save(config);
+        }
     }
 
     @Override
@@ -130,59 +151,71 @@ public class PantherConfigServiceImpl implements PantherConfigService {
         if (hasInstalled) {
             return true;
         }
-        File backupFile = new File(BACKUP_CONFIG_NAME);
-        if (backupFile.exists()) {
-            try {
-                backupProperties.load(new BufferedInputStream(new FileInputStream(backupFile)));
-            } catch (IOException e) {
-                throw new InternalException("服务器出错", e);
-            }
-            hasInstalled = true;
-            return true;
-        } else {
+        PantherConfig pantherConfig = pantherConfigRepository.findByConfigKey(KEY_INSTALL_TIME);
+        if (pantherConfig == null) {
             hasInstalled = false;
             return false;
         }
+        long installTime = Long.parseLong(pantherConfig.getConfigValue());
+        if (installTime >= System.currentTimeMillis()) {
+            hasInstalled = false;
+            return false;
+        }
+        hasInstalled = true;
+        return true;
     }
 
     @Override
     public boolean install(InstallPantherParam param) {
+        if (hasInstalled()) {
+            throw new BadRequestException("Panther已安装，请在超级管理员页面进行重新安装");
+        }
+
         try {
-            File configFile = new File(CONFIG_NAME);
-            if (configFile.exists()) {
-                Properties properties = new Properties();
-                properties.load(new FileInputStream(configFile));
-                if (StringUtil.isNotEmpty(properties.getProperty(KEY_HOST_URL))
-                        || StringUtil.isNotEmpty(properties.getProperty(KEY_SAVE_ROOT_PATH))) {
-                    throw new BadRequestException("Panther已安装，请删除jar包目录下的" + CONFIG_NAME + "文件以重新安装");
-                }
-            } else {
-                if (!configFile.createNewFile()) {
-                    throw new InternalException("创建配置文件失败，请在jar包目录下手动创建" + CONFIG_NAME + "文件并再次点击安装");
-                }
+            if (StringUtil.isEmpty(param.getSaveRootPath())) {
+                param.setSaveRootPath(getFallbackPath());
             }
 
-            File backupFile = new File(BACKUP_CONFIG_NAME);
-            if (backupFile.exists()) {
-                if (!backupFile.delete()) {
-                    throw new BadRequestException("请手动删除jar包目录下的" + BACKUP_CONFIG_NAME + "文件");
-                }
-            }
-            backupFile.createNewFile();
+            long currTime = System.currentTimeMillis();
+            PantherConfig hostUrlConfig = new PantherConfig();
+            hostUrlConfig.setConfigKey(KEY_HOST_URL);
+            hostUrlConfig.setConfigValue(UrlUtil.ensureNoSuffix(param.getHostUrl()));
+            hostUrlConfig.setUpdateTime(currTime);
+            pantherConfigRepository.save(hostUrlConfig);
 
-            properties.load(new FileInputStream(configFile));
-            backupProperties.load(new FileInputStream(backupFile));
+            PantherConfig saveRootPathConfig = new PantherConfig();
+            saveRootPathConfig.setConfigKey(KEY_SAVE_ROOT_PATH);
+            saveRootPathConfig.setConfigValue(FileUtil.ensureNoSuffix(param.getSaveRootPath()));
+            saveRootPathConfig.setUpdateTime(currTime);
+            pantherConfigRepository.save(saveRootPathConfig);
 
-            hasInstalled = true;
+            PantherConfig adminUsernameConfig = new PantherConfig();
+            adminUsernameConfig.setConfigKey(KEY_ADMIN_USERNAME);
+            adminUsernameConfig.setConfigValue(param.getAdminUsername());
+            adminUsernameConfig.setUpdateTime(currTime);
+            pantherConfigRepository.save(adminUsernameConfig);
 
-            updateHostUrl(param.getHostUrl());
-            updateSaveRootPath(param.getSaveRootPath());
+            PantherConfig adminPassword = new PantherConfig();
+            adminPassword.setConfigKey(KEY_ADMIN_PASSWORD);
+            adminPassword.setConfigValue(EncryptUtil.encrypt(param.getAdminPassword()));
+            adminPassword.setUpdateTime(currTime);
+            pantherConfigRepository.save(adminPassword);
+
+            PantherConfig installTimeConfig = new PantherConfig();
+            installTimeConfig.setConfigKey(KEY_INSTALL_TIME);
+            installTimeConfig.setConfigValue(String.valueOf(currTime));
+            installTimeConfig.setUpdateTime(currTime);
+            pantherConfigRepository.save(installTimeConfig);
 
             fileService.initWorkspace(param.getSaveRootPath(), param.getImgDirs());
 
+            hasInstalled = true;
             return true;
-        } catch (IOException e) {
-            log.error("安装出错", e);
+        } catch (Exception e) {
+            if (e instanceof BadRequestException) {
+                throw e;
+            }
+            log.error("安装出现异常", e);
         }
         return false;
     }
@@ -191,6 +224,17 @@ public class PantherConfigServiceImpl implements PantherConfigService {
         if (!hasInstalled) {
             throw new BadRequestException("请先安装Panther");
         }
+    }
+
+    private PantherConfig findConfigWithCheck(String configKey, String originalValue) {
+        PantherConfig config = pantherConfigRepository.findByConfigKey(configKey);
+        if (config == null) {
+            throw new BadRequestException("出现错误，请重新安装");
+        }
+        if (originalValue.equals(config.getConfigValue())) {
+            return null;
+        }
+        return config;
     }
 
     /**
@@ -213,21 +257,4 @@ public class PantherConfigServiceImpl implements PantherConfigService {
         }
     }
 
-    private void storeProperty(String key, String value) {
-        properties.put(key, value);
-        try {
-            properties.store(new FileOutputStream(CONFIG_NAME), "Save Configs File.");
-        } catch (IOException e) {
-            log.error("exception while storeProperty", e);
-        }
-    }
-
-    private void storeBackupProperty(String key, String value) {
-        backupProperties.put(key, value);
-        try {
-            backupProperties.store(new FileOutputStream(BACKUP_CONFIG_NAME), "Save Backup Config File");
-        } catch (IOException e) {
-            log.error("exception while storeBackupProperty", e);
-        }
-    }
 }

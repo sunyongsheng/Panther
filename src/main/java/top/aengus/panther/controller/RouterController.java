@@ -24,4 +24,9 @@ public class RouterController {
         }
     }
 
+    @RequestMapping("/shutdown")
+    public void shutdown() {
+        System.exit(0);
+    }
+
 }
