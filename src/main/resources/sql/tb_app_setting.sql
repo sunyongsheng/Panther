@@ -8,4 +8,4 @@ CREATE TABLE `tb_app_setting`
     `update_time` BIGINT      NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT 'App配置表'
+  DEFAULT CHARSET = utf8mb4 COMMENT 'App配置表';
