@@ -21,7 +21,4 @@ public class CreateAppParam {
     @Email(message = "邮箱地址不合法")
     private String email;
 
-    @Length(min = 6, max = 20, message = "密码长度需在6到20位之间")
-    private String password;
-
 }

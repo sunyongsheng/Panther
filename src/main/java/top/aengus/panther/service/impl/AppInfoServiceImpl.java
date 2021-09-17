@@ -15,7 +15,7 @@ import top.aengus.panther.model.app.AppDTO;
 import top.aengus.panther.model.app.AppInfo;
 import top.aengus.panther.model.app.CreateAppParam;
 import top.aengus.panther.service.AppInfoService;
-import top.aengus.panther.tool.EncryptUtil;
+import top.aengus.panther.service.PantherConfigService;
 import top.aengus.panther.tool.StringUtil;
 
 @Service
@@ -23,11 +23,13 @@ public class AppInfoServiceImpl implements AppInfoService {
 
     private final AppInfoRepository appInfoRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final PantherConfigService pantherConfigService;
 
     @Autowired
-    public AppInfoServiceImpl(AppInfoRepository appInfoRepository, ApplicationEventPublisher eventPublisher) {
+    public AppInfoServiceImpl(AppInfoRepository appInfoRepository, ApplicationEventPublisher eventPublisher, PantherConfigService pantherConfigService) {
         this.appInfoRepository = appInfoRepository;
         this.eventPublisher = eventPublisher;
+        this.pantherConfigService = pantherConfigService;
     }
 
     @Override
@@ -62,7 +64,7 @@ public class AppInfoServiceImpl implements AppInfoService {
         AppInfo appInfo = new AppInfo();
         BeanUtils.copyProperties(param, appInfo);
         appInfo.setAppId(appId);
-        appInfo.setPassword(EncryptUtil.encrypt(param.getPassword()));
+        appInfo.setOwner(pantherConfigService.getAdminUsername());
         appInfo.setCreateTime(System.currentTimeMillis());
         appInfo.setRole(AppRole.NORMAL.getCode());
         appInfo.setStatus(AppStatus.NORMAL.getCode());

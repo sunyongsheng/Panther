@@ -10,7 +10,7 @@ CREATE TABLE `tb_app_info`
     `create_time` BIGINT       NOT NULL DEFAULT 0 COMMENT '创建时间',
     `phone`       VARCHAR(15)  NOT NULL DEFAULT '' COMMENT '联系电话',
     `email`       VARCHAR(20)  NOT NULL DEFAULT '' COMMENT '邮箱',
-    `password`    VARCHAR(512) NOT NULL DEFAULT '' COMMENT '密码',
+    `owner`       VARCHAR(64)  NOT NULL DEFAULT '' COMMENT 'App拥有者',
     `status`      TINYINT      NOT NULL DEFAULT 0 COMMENT 'App状态',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB

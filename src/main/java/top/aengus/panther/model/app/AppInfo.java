@@ -43,8 +43,8 @@ public class AppInfo {
     @Column(name = "email")
     private String email;
 
-    @Column(name = "password")
-    private String password;
+    @Column(name = "owner")
+    private String owner;
 
     @Column(name = "status", columnDefinition = "TINYINT NOT NULL DEFAULT 0")
     private Integer status;
