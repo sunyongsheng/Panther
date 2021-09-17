@@ -33,7 +33,7 @@ public class CreateAppEventListener {
     }
 
     @Async
-    @EventListener
+    @EventListener(CreateAppEvent.class)
     public void handleCreateAppEvent(CreateAppEvent event) {
         if (event.getSource() instanceof AppInfoService) {
             AppInfo appInfo = event.getApp();
