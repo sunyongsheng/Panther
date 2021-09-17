@@ -1,9 +1,10 @@
-package top.aengus.panther.component;
+package top.aengus.panther.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -19,21 +20,21 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-
 @Slf4j
 @Component
-public class ApiRequestFilter extends OncePerRequestFilter {
+@Order(0)
+public class ImageUploadFilter extends OncePerRequestFilter {
 
     private static final String APP_ID = "App-Id";
 
-    private static final String API_URL = "/api/**";
+    private static final String API_URL = "/api/v1/image";
 
     private final AppInfoService appInfoService;
     private final AntPathMatcher antPathMatcher;
     private final UrlPathHelper urlPathHelper;
 
     @Autowired
-    public ApiRequestFilter(AppInfoService appInfoService) {
+    public ImageUploadFilter(AppInfoService appInfoService) {
         this.appInfoService = appInfoService;
         this.antPathMatcher = new AntPathMatcher();
         this.urlPathHelper = new UrlPathHelper();
