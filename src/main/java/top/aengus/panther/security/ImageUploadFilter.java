@@ -6,9 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import org.springframework.util.AntPathMatcher;
-import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.web.util.UrlPathHelper;
 import top.aengus.panther.core.Constants;
 import top.aengus.panther.core.Response;
 import top.aengus.panther.model.app.AppInfo;
@@ -23,26 +20,17 @@ import java.io.IOException;
 @Slf4j
 @Component
 @Order(0)
-public class ImageUploadFilter extends OncePerRequestFilter {
+public class ImageUploadFilter extends AbstractRequestFilter {
 
     private static final String APP_ID = "App-Id";
 
-    private static final String API_URL = "/api/v1/image";
-
     private final AppInfoService appInfoService;
-    private final AntPathMatcher antPathMatcher;
-    private final UrlPathHelper urlPathHelper;
 
     @Autowired
     public ImageUploadFilter(AppInfoService appInfoService) {
         this.appInfoService = appInfoService;
-        this.antPathMatcher = new AntPathMatcher();
-        this.urlPathHelper = new UrlPathHelper();
-    }
 
-    @Override
-    protected boolean shouldNotFilter(@NonNull HttpServletRequest request) {
-        return !antPathMatcher.match(API_URL, urlPathHelper.getRequestUri(request));
+        addInterceptUrl("/api/v1/image");
     }
 
     @Override
