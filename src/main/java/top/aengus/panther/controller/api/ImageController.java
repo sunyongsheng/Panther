@@ -49,13 +49,13 @@ public class ImageController extends ApiV1Controller {
     public Response<List<ImageDTO>> getAllImage(HttpServletRequest request) {
         Response<List<ImageDTO>> response = new Response<>();
         AppInfo appInfo = (AppInfo) request.getAttribute(Constants.REQUEST_APP_INFO_INTERNAL);
-        return response.data(imageService.findAllByAppId(appInfo.getAppId()));
+        return response.success().data(imageService.findAllByAppId(appInfo.getAppId()));
     }
 
     @DeleteMapping("/image/{id}")
     public Response<Boolean> delete(HttpServletRequest request, @PathVariable("id") Long imageId) {
         Response<Boolean> response = new Response<>();
         AppInfo appInfo = (AppInfo) request.getAttribute(Constants.REQUEST_APP_INFO_INTERNAL);
-        return response.data(imageService.deleteImage(imageId, appInfo.getAppId()));
+        return response.success().data(imageService.deleteImage(imageId, appInfo.getAppId()));
     }
 }

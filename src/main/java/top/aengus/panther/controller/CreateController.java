@@ -41,6 +41,6 @@ public class CreateController {
     public Response<String> registerApp(@RequestBody @Validated CreateAppParam appParam) {
         Response<String> response = new Response<>();
         String appId = appInfoService.createApp(appParam);
-        return response.msg("注册成功，请妥善保管AppID").data(appId);
+        return response.success().msg("注册成功，请妥善保管AppID").data(appId);
     }
 }
