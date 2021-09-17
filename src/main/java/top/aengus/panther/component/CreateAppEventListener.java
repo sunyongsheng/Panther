@@ -10,11 +10,8 @@ import top.aengus.panther.model.app.AppInfo;
 import top.aengus.panther.model.setting.CreateAppSettingParam;
 import top.aengus.panther.service.AppInfoService;
 import top.aengus.panther.service.AppSettingService;
+import top.aengus.panther.service.FileService;
 import top.aengus.panther.service.PantherConfigService;
-import top.aengus.panther.tool.FileUtil;
-import top.aengus.panther.tool.ImageDirUtil;
-
-import java.io.File;
 
 /**
  * @author Aengus Sun (sys6511@126.com)
@@ -26,10 +23,12 @@ public class CreateAppEventListener {
 
     private final AppSettingService appSettingService;
     private final PantherConfigService configService;
+    private final FileService fileService;
 
-    public CreateAppEventListener(AppSettingService appSettingService, PantherConfigService configService) {
+    public CreateAppEventListener(AppSettingService appSettingService, PantherConfigService configService, FileService fileService) {
         this.appSettingService = appSettingService;
         this.configService = configService;
+        this.fileService = fileService;
     }
 
     @Async
@@ -55,8 +54,6 @@ public class CreateAppEventListener {
     }
 
     private void generateAppSpace(String appName) {
-        File appRoot = new File(configService.getSaveRootPath(), ImageDirUtil.NAME_APP);
-        File appFile = new File(appRoot, appName);
-        FileUtil.checkAndCreateDir(appFile);
+        fileService.initAppWorkspace(configService.getSaveRootPath(), appName);
     }
 }

@@ -11,6 +11,8 @@ public interface FileService {
 
     void initWorkspace(String basePath, List<String> imgDirs);
 
+    void initAppWorkspace(String basePath, String appName);
+
     List<String> getWorkspaceDirs(String basePath);
 
 }

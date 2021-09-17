@@ -3,6 +3,7 @@ package top.aengus.panther.service.impl;
 import cn.hutool.core.collection.ListUtil;
 import org.springframework.stereotype.Service;
 import top.aengus.panther.exception.BadRequestException;
+import top.aengus.panther.exception.InternalException;
 import top.aengus.panther.service.FileService;
 import top.aengus.panther.tool.FileUtil;
 
@@ -38,6 +39,13 @@ public class FileServiceImpl implements FileService {
                 throw new BadRequestException("创建「" + dirFile.getAbsolutePath() + "」文件夹失败，请手动创建");
             }
         }
+    }
+
+    @Override
+    public void initAppWorkspace(String rootPath, String appName) {
+        File appFile = new File(rootPath, NAME_APP);
+        File appSpecial = new File(appFile, appName);
+        FileUtil.checkAndCreateDir(appSpecial);
     }
 
     @Override
