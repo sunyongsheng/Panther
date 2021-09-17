@@ -8,12 +8,7 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 
 @EntityScan(basePackages = "top.aengus.panther.model")
 @SpringBootApplication
-public class PantherApplication extends SpringBootServletInitializer {
-
-    @Override
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
-        return builder.sources(PantherApplication.class);
-    }
+public class PantherApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(PantherApplication.class, args);

@@ -1,0 +1,46 @@
+import top.aengus.panther.buildSrc.Libs
+
+plugins {
+    id 'java'
+    id 'maven-publish'
+    id "org.springframework.boot" version "2.5.4"
+}
+
+repositories {
+    mavenLocal()
+    maven {
+        url = uri('https://repo.maven.apache.org/maven2/')
+    }
+}
+
+group = 'top.aengus.panther'
+version = '0.0.1'
+description = 'panther'
+java.sourceCompatibility = JavaVersion.VERSION_1_8
+
+dependencies {
+    annotationProcessor Libs.LOMBOK
+
+    implementation Libs.Spring.JDBC
+    implementation Libs.Spring.THYMELEAF
+    implementation Libs.Spring.WEB
+    implementation Libs.Spring.JPA
+    implementation Libs.Spring.VALIDATION
+    developmentOnly Libs.Spring.DEV_TOOLS
+
+    implementation Libs.LOMBOK
+    implementation Libs.HUTOOL
+    runtimeOnly Libs.MYSQL
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from(components.java)
+        }
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}

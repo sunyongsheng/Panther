@@ -38,9 +38,7 @@ public class MvcConfiguration implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new ApiRequestInterceptor())
-                .addPathPatterns("/api/v1/**")
-                .excludePathPatterns("/", "/**/*.css", "/**/*.js", "/**/*.png", "/**/*.jpg",
-                        "/**/*.jpeg", "/**/*.gif", "/**/fonts/*", "/**/*.svg");
+                .addPathPatterns("/api/v1/**");
     }
 
 }
