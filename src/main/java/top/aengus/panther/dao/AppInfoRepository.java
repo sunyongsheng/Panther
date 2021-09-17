@@ -1,5 +1,7 @@
 package top.aengus.panther.dao;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
 import top.aengus.panther.model.app.AppInfo;
 
@@ -11,4 +13,6 @@ public interface AppInfoRepository extends CrudRepository<AppInfo, Integer> {
     AppInfo findByAppId(String appId);
 
     Optional<AppInfo> findByEnglishName(String englishName);
+
+    Page<AppInfo> findAllByOwner(String owner, Pageable pageable);
 }

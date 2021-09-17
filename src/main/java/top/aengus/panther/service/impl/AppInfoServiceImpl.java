@@ -4,6 +4,7 @@ import cn.hutool.core.util.IdUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import top.aengus.panther.dao.AppInfoRepository;
 import top.aengus.panther.enums.AppRole;
@@ -44,6 +45,12 @@ public class AppInfoServiceImpl implements AppInfoService {
             throw new NotFoundException("App不存在！", appId);
         }
         return convertToDto(appInfo);
+    }
+
+    @Override
+    public Page<AppDTO> findDTOsByOwner(String owner, int page, int pageSize) {
+        Pageable pageable = PageRequest.of(page, pageSize);
+        return appInfoRepository.findAllByOwner(owner, pageable).map(this::convertToDto);
     }
 
     @Override
