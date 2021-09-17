@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import top.aengus.panther.core.Response;
 import top.aengus.panther.exception.BadRequestException;
 import top.aengus.panther.exception.InternalException;
+import top.aengus.panther.exception.NoAuthException;
 import top.aengus.panther.exception.NotFoundException;
 
 
@@ -37,6 +38,12 @@ public class GlobalExceptionHandler {
     public Response<Void> internalException(InternalException exception) {
         log.error("[internalException] " + exception.getMessage(), exception);
         return new Response<Void>().msg(exception.getMessage());
+    }
+
+    @ExceptionHandler(NoAuthException.class)
+    public Response<Object> noAuthException(NoAuthException exception) {
+        log.error("[noAuthException] " + exception.getMessage(), exception);
+        return new Response<>().msg(exception.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
