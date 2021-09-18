@@ -13,7 +13,7 @@ object Libs {
     }
 
     const val LOMBOK = "org.projectlombok:lombok:1.18.8"
-    const val HUTOOL = "cn.hutool:hutool-all:5.6.3"
+    const val HUTOOL = "cn.hutool:hutool-all:5.7.0"
     const val MYSQL = "mysql:mysql-connector-java:8.0.16"
-    const val SERVLET = "javax.servlet:javax.servlet-api:3.1.0"
+    const val JWT = "io.jsonwebtoken:jjwt:0.9.0"
 }

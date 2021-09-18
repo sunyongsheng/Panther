@@ -30,6 +30,7 @@ dependencies {
 
     implementation Libs.LOMBOK
     implementation Libs.HUTOOL
+    implementation Libs.JWT
     runtimeOnly Libs.MYSQL
 }
 

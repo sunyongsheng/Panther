@@ -1,9 +1,14 @@
 package top.aengus.panther.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import top.aengus.panther.core.Response;
+import top.aengus.panther.service.PantherConfigService;
+import top.aengus.panther.tool.TokenUtil;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -21,13 +26,25 @@ import java.io.IOException;
 @Order(0)
 public class AdminRequestFilter extends AbstractRequestFilter {
 
-    public AdminRequestFilter() {
+    private final PantherConfigService configService;
+
+    @Autowired
+    public AdminRequestFilter(PantherConfigService configService) {
+        this.configService = configService;
+
         addInterceptUrl("/api/**");
         addExcludeUrl("/api/v1/image");
     }
 
     @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
+        String authorization = request.getHeader("Authorization");
+        if (authorization == null || !TokenUtil.verify(authorization, configService.getAdminUsername())) {
+            log.warn("拦截到请求，地址【{} {}】，无Token", request.getMethod(), request.getRequestURI());
+            ObjectMapper mapper = new ObjectMapper();
+            response.getWriter().write(mapper.writeValueAsString(new Response<String>().noAuth().msg("Token无效！")));
+            return;
+        }
         filterChain.doFilter(request, response);
     }
 }
