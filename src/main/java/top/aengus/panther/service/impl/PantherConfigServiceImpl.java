@@ -34,6 +34,7 @@ public class PantherConfigServiceImpl implements PantherConfigService {
 
     private volatile String hostUrl;
     private volatile String saveRootPath;
+    private volatile String adminUsername;
 
     private volatile boolean hasInstalled = false;
 
@@ -84,7 +85,18 @@ public class PantherConfigServiceImpl implements PantherConfigService {
     @Override
     public String getAdminUsername() {
         preCheckInstall();
-        return pantherConfigRepository.findByConfigKey(KEY_ADMIN_USERNAME).getConfigValue();
+        if (adminUsername == null) {
+            synchronized (this) {
+                if (adminUsername == null) {
+                    PantherConfig config = pantherConfigRepository.findByConfigKey(KEY_ADMIN_USERNAME);
+                    if (config == null) {
+                        throw new InternalException("出现异常，请检查数据库");
+                    }
+                    adminUsername = config.getConfigValue();
+                }
+            }
+        }
+        return adminUsername;
     }
 
     @Override
