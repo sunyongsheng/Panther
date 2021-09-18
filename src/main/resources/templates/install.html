@@ -10,7 +10,6 @@
     <!-- axios必须引入且在request.js之前 -->
     <script type="text/javascript" th:src="@{/js/axios.min.js}"></script>
     <script type="text/javascript" th:src="@{/js/request.js}"></script>
-    <script type="text/javascript" th:src="@{/js/install/install.js}"></script>
     <script type="text/javascript" th:src="@{/js/common/common.js}"></script>
 </head>
 <body>
@@ -123,7 +122,7 @@
 
                 this.installing = true;
                 this.installText = "安装中"
-                install(this.installParam).then(response => {
+                this.install(this.installParam).then(response => {
                     this.$confirm(response.msg, "提示", {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
@@ -157,6 +156,9 @@
                     this.installText = "开始安装"
                 })
             },
+            async install(param) {
+                return axiosClient.post("/install", param);
+            }
         }
     })
 </script>
