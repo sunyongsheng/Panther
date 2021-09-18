@@ -15,5 +15,6 @@ object Libs {
     const val LOMBOK = "org.projectlombok:lombok:1.18.8"
     const val HUTOOL = "cn.hutool:hutool-all:5.7.0"
     const val MYSQL = "mysql:mysql-connector-java:8.0.16"
+    const val XML_BIND = "javax.xml.bind:jaxb-api:2.3.0"
     const val JWT = "io.jsonwebtoken:jjwt:0.9.0"
 }
