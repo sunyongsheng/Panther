@@ -22,7 +22,7 @@ public abstract class AbstractRequestFilter extends OncePerRequestFilter {
     private final Set<String> excludeUrls = new HashSet<>();
 
     private final PathMatcher antPathMatcher;
-    private final UrlPathHelper urlPathHelper;
+    protected final UrlPathHelper urlPathHelper;
 
     public AbstractRequestFilter() {
         this.antPathMatcher = new AntPathMatcher();

@@ -40,14 +40,14 @@ public class ImageUploadFilter extends AbstractRequestFilter {
 
         String appId = request.getHeader(APP_ID);
         if (appId == null || appId.isEmpty()) {
-            log.warn("拦截到请求，地址【{} {}】，无有效AppId", request.getMethod(), request.getRequestURI());
+            log.warn("拦截到上传请求，地址【{} {}】，无有效AppId", request.getMethod(), request.getRequestURI());
             ObjectMapper mapper = new ObjectMapper();
             response.getWriter().write(mapper.writeValueAsString(new Response<String>().noAuth().msg("请使用AppID")));
             return;
         }
         AppInfo appInfo = appInfoService.findByAppId(appId);
         if (appInfo == null) {
-            log.warn("拦截到请求，地址【{} {}】，{}为【{}】", request.getMethod(), request.getRequestURI(), APP_ID, appId);
+            log.warn("拦截到上传请求，地址【{} {}】，{}为【{}】", request.getMethod(), request.getRequestURI(), APP_ID, appId);
             ObjectMapper mapper = new ObjectMapper();
             response.getWriter().write(mapper.writeValueAsString(new Response<String>().noAuth().msg("AppID无效")));
             return;
