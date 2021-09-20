@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
+import top.aengus.panther.core.Constants;
 import top.aengus.panther.service.PantherConfigService;
 import top.aengus.panther.tool.TokenUtil;
 
@@ -37,8 +38,9 @@ public class AdminRouterFilter extends AbstractRequestFilter {
             return;
         }
         String adminUsername = configService.getAdminUsername();
-        if (Arrays.stream(request.getCookies()).noneMatch(cookie -> adminUsername.equals(cookie.getName()) && TokenUtil.verify(cookie.getValue(), adminUsername))) {
-            log.warn("拦截到访问admin页面请求 {} {}", urlPathHelper.getRequestUri(request), request.getMethod());
+        if (request.getCookies() == null ||
+                Arrays.stream(request.getCookies()).noneMatch(cookie -> Constants.ACCESS_TOKEN.equals(cookie.getName()) && TokenUtil.verify(cookie.getValue(), adminUsername))) {
+            log.warn("拦截到访问Admin页面请求 {} {}", urlPathHelper.getRequestUri(request), request.getMethod());
             response.sendRedirect("/login");
             return;
         }

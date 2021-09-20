@@ -42,7 +42,7 @@ public class AdminRequestFilter extends AbstractRequestFilter {
         if (authorization == null || !TokenUtil.verify(authorization, configService.getAdminUsername())) {
             log.warn("拦截到Admin Api请求，地址【{} {}】，无Token", request.getMethod(), request.getRequestURI());
             ObjectMapper mapper = new ObjectMapper();
-            response.getWriter().write(mapper.writeValueAsString(new Response<String>().noAuth().msg("Token无效！")));
+            response.getWriter().write(mapper.writeValueAsString(new Response<String>().noAuth().msg("Token无效，请先登录！")));
             return;
         }
         filterChain.doFilter(request, response);

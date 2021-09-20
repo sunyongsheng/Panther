@@ -4,5 +4,7 @@ public class Constants {
 
     public static final String REQUEST_APP_INFO_INTERNAL = "internal-app-info";
 
+    public static final String ACCESS_TOKEN = "access-token";
+
     public static final String BASE_URL = "https://img.aengus.top";
 }

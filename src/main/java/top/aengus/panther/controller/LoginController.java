@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import top.aengus.panther.core.Constants;
 import top.aengus.panther.core.Response;
 import top.aengus.panther.service.PantherConfigService;
 import top.aengus.panther.tool.EncryptUtil;
@@ -32,8 +33,9 @@ public class LoginController {
         if (adminUsername.equals(username) && adminPassword.equals(EncryptUtil.encrypt(password))) {
             log.info("管理员登录，用户名 {}", username);
             String token = TokenUtil.sign(adminUsername, 7);
-            Cookie cookie = new Cookie(adminUsername, token);
+            Cookie cookie = new Cookie(Constants.ACCESS_TOKEN, token);
             cookie.setMaxAge(7 * 24 * 3600);
+            cookie.setPath("/");
             response.addCookie(cookie);
             return res.success().msg("登录成功").data(token);
         }
