@@ -13,7 +13,8 @@ public interface AppSettingService {
 
     AppSetting findAppSetting(Long appId, String key);
 
-    AppSetting createAppSetting(CreateAppSettingParam param);
+    void createAppSetting(CreateAppSettingParam param);
 
-    AppSetting updateAppSetting(UpdateAppSettingParam param);
+    void updateAppSetting(UpdateAppSettingParam param);
+
 }

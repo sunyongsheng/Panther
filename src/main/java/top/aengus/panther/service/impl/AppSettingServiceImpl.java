@@ -30,21 +30,21 @@ public class AppSettingServiceImpl implements AppSettingService {
     }
 
     @Override
-    public AppSetting createAppSetting(CreateAppSettingParam param) {
+    public void createAppSetting(CreateAppSettingParam param) {
         AppSetting appSetting = new AppSetting();
         BeanUtils.copyProperties(param, appSetting);
         appSetting.setUpdateTime(System.currentTimeMillis());
-        return appSettingRepository.save(appSetting);
+        appSettingRepository.save(appSetting);
     }
 
     @Override
-    public AppSetting updateAppSetting(UpdateAppSettingParam param) {
+    public void updateAppSetting(UpdateAppSettingParam param) {
         AppSetting appSetting = appSettingRepository.findByAppIdAndKey(param.getAppId(), param.getKey());
         if (appSetting == null) {
             appSetting = new AppSetting();
         }
         BeanUtils.copyProperties(param, appSetting);
         appSetting.setUpdateTime(System.currentTimeMillis());
-        return appSettingRepository.save(appSetting);
+        appSettingRepository.save(appSetting);
     }
 }
