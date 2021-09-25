@@ -40,7 +40,7 @@ public class CreateController {
     @PostMapping("/create/app")
     public Response<String> registerApp(@RequestBody @Validated CreateAppParam appParam) {
         Response<String> response = new Response<>();
-        String appId = appInfoService.createApp(appParam);
-        return response.success().msg("注册成功，请妥善保管AppID").data(appId);
+        String appKey = appInfoService.createApp(appParam);
+        return response.success().msg("注册成功，请妥善保管AppKey").data(appKey);
     }
 }

@@ -34,15 +34,15 @@ public class AppInfoServiceImpl implements AppInfoService {
     }
 
     @Override
-    public AppInfo findByAppId(String appId) {
-        return appInfoRepository.findByAppId(appId);
+    public AppInfo findByAppKey(String appKey) {
+        return appInfoRepository.findByAppKey(appKey);
     }
 
     @Override
-    public AppDTO findDTOByAppId(String appId) {
-        AppInfo appInfo = appInfoRepository.findByAppId(appId);
+    public AppDTO findDTOByAppKey(String appKey) {
+        AppInfo appInfo = appInfoRepository.findByAppKey(appKey);
         if (appInfo == null) {
-            throw new NotFoundException("App不存在！", appId);
+            throw new NotFoundException("App不存在！", appKey);
         }
         return convertToDto(appInfo);
     }
@@ -54,8 +54,8 @@ public class AppInfoServiceImpl implements AppInfoService {
     }
 
     @Override
-    public boolean isSuperRoleApp(String appId) {
-        AppInfo appInfo = appInfoRepository.findByAppId(appId);
+    public boolean isSuperRoleApp(String appKey) {
+        AppInfo appInfo = appInfoRepository.findByAppKey(appKey);
         return appInfo != null && appInfo.isSuperRole();
     }
 
@@ -67,23 +67,23 @@ public class AppInfoServiceImpl implements AppInfoService {
         appInfoRepository.findByEnglishName(param.getEnglishName()).ifPresent(app -> {
             throw new BadRequestException("英文名有重复！");
         });
-        String appId = IdUtil.fastSimpleUUID();
+        String appKey = IdUtil.fastSimpleUUID();
         AppInfo appInfo = new AppInfo();
         BeanUtils.copyProperties(param, appInfo);
-        appInfo.setAppId(appId);
+        appInfo.setAppKey(appKey);
         appInfo.setOwner(pantherConfigService.getAdminUsername());
         appInfo.setCreateTime(System.currentTimeMillis());
         appInfo.setRole(AppRole.NORMAL.getCode());
         appInfo.setStatus(AppStatus.NORMAL.getCode());
         eventPublisher.publishEvent(new CreateAppEvent(this, appInfoRepository.save(appInfo)));
-        return appId;
+        return appKey;
     }
 
     @Override
-    public void updateAppAvatar(String appId, String avatarUrl) {
-        AppInfo appInfo = appInfoRepository.findByAppId(appId);
+    public void updateAppAvatar(String appKey, String avatarUrl) {
+        AppInfo appInfo = appInfoRepository.findByAppKey(appKey);
         if (appInfo == null) {
-            throw new NotFoundException("找不到App信息！", appId);
+            throw new NotFoundException("找不到App信息！", appKey);
         }
         appInfo.setAvatarUrl(avatarUrl);
     }

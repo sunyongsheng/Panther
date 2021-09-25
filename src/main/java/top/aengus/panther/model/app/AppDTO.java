@@ -15,7 +15,7 @@ public class AppDTO {
 
     private Long id;
 
-    private String appId;
+    private String appKey;
 
     private AppRole role;
 

@@ -43,8 +43,8 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public List<ImageDTO> findAllByAppId(String appId) {
-        List<ImageModel> imageList = imageRepository.findAllByCreator(appId);
+    public List<ImageDTO> findAllByAppKey(String appKey) {
+        List<ImageModel> imageList = imageRepository.findAllByCreator(appKey);
         List<ImageDTO> res = new ArrayList<>();
         for (ImageModel model : imageList) {
             res.add(convertToDto(model));
@@ -84,7 +84,7 @@ public class ImageServiceImpl implements ImageService {
         imageModel.setRelativePath(relativePath);
         imageModel.setUrl(generateUrl(relativePath));
         imageModel.setUploadTime(System.currentTimeMillis());
-        imageModel.setCreator(appInfo.getAppId());
+        imageModel.setCreator(appInfo.getAppKey());
         imageModel.setSize(image.getSize());
         imageModel.setStatus(ImageStatus.NORMAL.getCode());
         try {

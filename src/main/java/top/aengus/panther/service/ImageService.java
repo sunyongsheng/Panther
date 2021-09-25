@@ -14,7 +14,7 @@ import java.util.List;
  */
 public interface ImageService {
 
-    List<ImageDTO> findAllByAppId(String appId);
+    List<ImageDTO> findAllByAppKey(String appKey);
 
     ImageModel findImageByName(String filename);
 

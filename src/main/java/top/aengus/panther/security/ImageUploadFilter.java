@@ -22,7 +22,7 @@ import java.io.IOException;
 @Order(0)
 public class ImageUploadFilter extends AbstractRequestFilter {
 
-    private static final String APP_ID = "App-Id";
+    private static final String APP_KEY = "App-Key";
 
     private final AppInfoService appInfoService;
 
@@ -38,18 +38,18 @@ public class ImageUploadFilter extends AbstractRequestFilter {
         response.setCharacterEncoding("UTF-8");
         response.setHeader("Content-Type", "application/json;charset=UTF-8");
 
-        String appId = request.getHeader(APP_ID);
-        if (appId == null || appId.isEmpty()) {
-            log.warn("拦截到上传请求，地址【{} {}】，无有效AppId", request.getMethod(), request.getRequestURI());
+        String appKey = request.getHeader(APP_KEY);
+        if (appKey == null || appKey.isEmpty()) {
+            log.warn("拦截到上传请求，地址【{} {}】，无有效AppKey", request.getMethod(), request.getRequestURI());
             ObjectMapper mapper = new ObjectMapper();
-            response.getWriter().write(mapper.writeValueAsString(new Response<String>().noAuth().msg("请使用AppID")));
+            response.getWriter().write(mapper.writeValueAsString(new Response<String>().noAuth().msg("请使用AppKey")));
             return;
         }
-        AppInfo appInfo = appInfoService.findByAppId(appId);
+        AppInfo appInfo = appInfoService.findByAppKey(appKey);
         if (appInfo == null) {
-            log.warn("拦截到上传请求，地址【{} {}】，{}为【{}】", request.getMethod(), request.getRequestURI(), APP_ID, appId);
+            log.warn("拦截到上传请求，地址【{} {}】，{}为【{}】", request.getMethod(), request.getRequestURI(), APP_KEY, appKey);
             ObjectMapper mapper = new ObjectMapper();
-            response.getWriter().write(mapper.writeValueAsString(new Response<String>().noAuth().msg("AppID无效")));
+            response.getWriter().write(mapper.writeValueAsString(new Response<String>().noAuth().msg("AppKey无效")));
             return;
         }
         request.setAttribute(Constants.REQUEST_APP_INFO_INTERNAL, appInfo);

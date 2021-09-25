@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface AppInfoRepository extends CrudRepository<AppInfo, Integer> {
 
-    AppInfo findByAppId(String appId);
+    AppInfo findByAppKey(String appKey);
 
     Optional<AppInfo> findByEnglishName(String englishName);
 

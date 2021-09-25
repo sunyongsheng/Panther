@@ -2,7 +2,7 @@ DROP TABLE IF EXISTS `tb_app_info`;
 CREATE TABLE `tb_app_info`
 (
     `id`          BIGINT       NOT NULL AUTO_INCREMENT,
-    `app_id`      VARCHAR(64)  NOT NULL UNIQUE COMMENT 'AppId',
+    `app_key`     VARCHAR(64)  NOT NULL UNIQUE COMMENT 'AppKey',
     `role`        TINYINT      NOT NULL DEFAULT 0 COMMENT 'App角色',
     `name_zh`     VARCHAR(20)  NOT NULL DEFAULT '' COMMENT '中文名',
     `name_en`     VARCHAR(40)  NOT NULL DEFAULT '' COMMENT '英文名',

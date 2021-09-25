@@ -19,8 +19,8 @@ public class AppInfo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "app_id")
-    private String appId;
+    @Column(name = "app_key")
+    private String appKey;
 
     @Column(name = "role", columnDefinition = "TINYINT NOT NULL DEFAULT 0")
     private Integer role;
