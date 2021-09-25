@@ -17,4 +17,5 @@ object Libs {
     const val MYSQL = "mysql:mysql-connector-java:8.0.16"
     const val XML_BIND = "javax.xml.bind:jaxb-api:2.3.0"
     const val JWT = "io.jsonwebtoken:jjwt:0.9.0"
+    const val COMMON_LANG = "org.apache.commons:commons-text:1.9"
 }

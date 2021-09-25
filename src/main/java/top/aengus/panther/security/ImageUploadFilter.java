@@ -8,8 +8,10 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import top.aengus.panther.core.Constants;
 import top.aengus.panther.core.Response;
-import top.aengus.panther.model.app.AppInfo;
+import top.aengus.panther.enums.TokenStage;
+import top.aengus.panther.model.token.AppToken;
 import top.aengus.panther.service.AppInfoService;
+import top.aengus.panther.service.AppTokenService;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -22,13 +24,15 @@ import java.io.IOException;
 @Order(0)
 public class ImageUploadFilter extends AbstractRequestFilter {
 
-    private static final String APP_KEY = "App-Key";
+    private static final String UPLOAD_TOKEN = "Upload-Token";
 
     private final AppInfoService appInfoService;
+    private final AppTokenService appTokenService;
 
     @Autowired
-    public ImageUploadFilter(AppInfoService appInfoService) {
+    public ImageUploadFilter(AppInfoService appInfoService, AppTokenService appTokenService) {
         this.appInfoService = appInfoService;
+        this.appTokenService = appTokenService;
 
         addInterceptUrl("/api/v1/image");
     }
@@ -38,21 +42,21 @@ public class ImageUploadFilter extends AbstractRequestFilter {
         response.setCharacterEncoding("UTF-8");
         response.setHeader("Content-Type", "application/json;charset=UTF-8");
 
-        String appKey = request.getHeader(APP_KEY);
-        if (appKey == null || appKey.isEmpty()) {
-            log.warn("拦截到上传请求，地址【{} {}】，无有效AppKey", request.getMethod(), request.getRequestURI());
+        String uploadToken = request.getHeader(UPLOAD_TOKEN);
+        if (uploadToken == null || uploadToken.isEmpty()) {
+            log.warn("拦截到上传请求，地址【{} {}】，无有效UploadToken", request.getMethod(), request.getRequestURI());
             ObjectMapper mapper = new ObjectMapper();
-            response.getWriter().write(mapper.writeValueAsString(new Response<String>().noAuth().msg("请使用AppKey")));
+            response.getWriter().write(mapper.writeValueAsString(new Response<String>().noAuth().msg("请使用UploadToken")));
             return;
         }
-        AppInfo appInfo = appInfoService.findByAppKey(appKey);
-        if (appInfo == null) {
-            log.warn("拦截到上传请求，地址【{} {}】，{}为【{}】", request.getMethod(), request.getRequestURI(), APP_KEY, appKey);
+        AppToken appToken = appTokenService.findByTokenAndStage(uploadToken, TokenStage.UPLOAD_V1);
+        if (appToken == null) {
+            log.warn("拦截到上传请求，地址【{} {}】，{}为【{}】", request.getMethod(), request.getRequestURI(), UPLOAD_TOKEN, uploadToken);
             ObjectMapper mapper = new ObjectMapper();
             response.getWriter().write(mapper.writeValueAsString(new Response<String>().noAuth().msg("AppKey无效")));
             return;
         }
-        request.setAttribute(Constants.REQUEST_APP_INFO_INTERNAL, appInfo);
+        request.setAttribute(Constants.REQUEST_APP_INFO_INTERNAL, appInfoService.findById(appToken.getAppId()));
         filterChain.doFilter(request, response);
     }
 

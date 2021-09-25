@@ -9,7 +9,6 @@ import top.aengus.panther.model.app.AppDTO;
 import top.aengus.panther.model.app.AppInfo;
 import top.aengus.panther.model.image.ImageDTO;
 import top.aengus.panther.service.AppInfoService;
-import top.aengus.panther.service.AppSettingService;
 import top.aengus.panther.service.ImageService;
 
 @RestController
@@ -17,13 +16,11 @@ public class AppInfoController extends ApiV1Controller {
 
     private final AppInfoService appInfoService;
     private final ImageService imageService;
-    private final AppSettingService appSettingService;
 
     @Autowired
-    public AppInfoController(AppInfoService appInfoService, ImageService imageService, AppSettingService appSettingService) {
+    public AppInfoController(AppInfoService appInfoService, ImageService imageService) {
         this.appInfoService = appInfoService;
         this.imageService = imageService;
-        this.appSettingService = appSettingService;
     }
 
     @GetMapping("/apps/{owner}")
@@ -48,5 +45,10 @@ public class AppInfoController extends ApiV1Controller {
         ImageDTO result = imageService.saveImage(file, null, appInfo);
         appInfoService.updateAppAvatar(appKey, result.getUrl());
         return response.success().msg("更新成功");
+    }
+
+    @PostMapping("/appInfo/uploadToken")
+    public Response<String> generateUploadToken(@RequestParam("app_key") String appKey) {
+        return new Response<String>().msg("生成Token成功").data(appInfoService.generateUploadToken(appKey));
     }
 }

@@ -8,7 +8,7 @@ import top.aengus.panther.model.app.AppInfo;
 import java.util.Optional;
 
 
-public interface AppInfoRepository extends CrudRepository<AppInfo, Integer> {
+public interface AppInfoRepository extends CrudRepository<AppInfo, Long> {
 
     AppInfo findByAppKey(String appKey);
 

@@ -12,15 +12,18 @@ import top.aengus.panther.model.app.CreateAppParam;
  */
 public interface AppInfoService {
 
+    AppInfo findById(Long id);
+
     AppInfo findByAppKey(String appKey);
 
     AppDTO findDTOByAppKey(String appKey);
 
     Page<AppDTO> findDTOsByOwner(String owner, int page, int pageSize);
 
-    boolean isSuperRoleApp(String appKey);
-
     String createApp(CreateAppParam param);
 
     void updateAppAvatar(String appKey, String avatarUrl);
+
+    String generateUploadToken(String appKey);
+
 }
