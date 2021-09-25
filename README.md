@@ -17,3 +17,10 @@ GRANT ALL ON panther.* TO 'pantherAdmin'@localhost;
 ```
 
 四、访问 `http://localhost:8088/admin` 进行安装，安装后手动重启；
+
+## 流程
+
+1. 管理员登录，获取管理员Token -> `/adminLogin`；
+2. 使用管理员Token: 创建App，获取AppKey -> `/api/v1/app`；
+3. 使用管理员Token与AppKey: 为App生成上传Token -> `/api/v1/app/uploadToken`；
+4. 使用上传Token: 上传图片 -> `/api/v1/image`
