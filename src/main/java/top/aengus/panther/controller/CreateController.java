@@ -19,12 +19,10 @@ import top.aengus.panther.service.PantherConfigService;
 @RestController
 public class CreateController {
 
-    private final AppInfoService appInfoService;
     private final PantherConfigService pantherConfigService;
 
     @Autowired
-    public CreateController(AppInfoService appInfoService, PantherConfigService pantherConfigService) {
-        this.appInfoService = appInfoService;
+    public CreateController(PantherConfigService pantherConfigService) {
         this.pantherConfigService = pantherConfigService;
     }
 
@@ -37,10 +35,4 @@ public class CreateController {
         return new Response<String>().unknownError().msg("安装失败");
     }
 
-    @PostMapping("/create/app")
-    public Response<String> registerApp(@RequestBody @Validated CreateAppParam appParam) {
-        Response<String> response = new Response<>();
-        String appKey = appInfoService.createApp(appParam);
-        return response.success().msg("注册成功，请妥善保管AppKey").data(appKey);
-    }
 }
