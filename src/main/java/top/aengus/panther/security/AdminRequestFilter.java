@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import top.aengus.panther.core.Constants;
 import top.aengus.panther.core.Response;
 import top.aengus.panther.service.PantherConfigService;
 import top.aengus.panther.tool.TokenUtil;
@@ -38,7 +39,7 @@ public class AdminRequestFilter extends AbstractRequestFilter {
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
-        String authorization = request.getHeader("Authorization");
+        String authorization = request.getHeader(Constants.AUTHORIZATION);
         if (authorization == null || !TokenUtil.verify(authorization, configService.getAdminUsername())) {
             log.warn("拦截到Admin Api请求，地址【{} {}】，无Token", request.getMethod(), request.getRequestURI());
             ObjectMapper mapper = new ObjectMapper();

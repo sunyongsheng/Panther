@@ -24,8 +24,6 @@ import java.io.IOException;
 @Order(0)
 public class ImageUploadFilter extends AbstractRequestFilter {
 
-    private static final String UPLOAD_TOKEN = "Upload-Token";
-
     private final AppInfoService appInfoService;
     private final AppTokenService appTokenService;
 
@@ -42,7 +40,7 @@ public class ImageUploadFilter extends AbstractRequestFilter {
         response.setCharacterEncoding("UTF-8");
         response.setHeader("Content-Type", "application/json;charset=UTF-8");
 
-        String uploadToken = request.getHeader(UPLOAD_TOKEN);
+        String uploadToken = request.getHeader(Constants.UPLOAD_TOKEN);
         if (uploadToken == null || uploadToken.isEmpty()) {
             log.warn("拦截到上传请求，地址【{} {}】，无有效UploadToken", request.getMethod(), request.getRequestURI());
             ObjectMapper mapper = new ObjectMapper();
@@ -51,7 +49,7 @@ public class ImageUploadFilter extends AbstractRequestFilter {
         }
         AppToken appToken = appTokenService.findByTokenAndStage(uploadToken, TokenStage.UPLOAD_V1);
         if (appToken == null) {
-            log.warn("拦截到上传请求，地址【{} {}】，{}为【{}】", request.getMethod(), request.getRequestURI(), UPLOAD_TOKEN, uploadToken);
+            log.warn("拦截到上传请求，地址【{} {}】，{}为【{}】", request.getMethod(), request.getRequestURI(), Constants.UPLOAD_TOKEN, uploadToken);
             ObjectMapper mapper = new ObjectMapper();
             response.getWriter().write(mapper.writeValueAsString(new Response<String>().noAuth().msg("AppKey无效")));
             return;
