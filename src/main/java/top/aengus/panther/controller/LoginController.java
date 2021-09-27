@@ -33,7 +33,7 @@ public class LoginController {
         if (adminUsername.equals(username) && adminPassword.equals(EncryptUtil.encrypt(password))) {
             log.info("管理员登录，用户名 {}", username);
             String token = TokenUtil.sign(adminUsername, 7);
-            Cookie cookie = new Cookie(Constants.ACCESS_TOKEN, token);
+            Cookie cookie = new Cookie(Constants.Cookie.ACCESS_TOKEN, token);
             cookie.setMaxAge(7 * 24 * 3600);
             cookie.setPath("/");
             response.addCookie(cookie);

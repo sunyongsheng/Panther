@@ -39,7 +39,7 @@ public class AdminRequestFilter extends AbstractRequestFilter {
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
-        String authorization = request.getHeader(Constants.AUTHORIZATION);
+        String authorization = request.getHeader(Constants.Header.AUTHORIZATION);
         if (authorization == null || !TokenUtil.verify(authorization, configService.getAdminUsername())) {
             log.warn("拦截到Admin Api请求，地址【{} {}】，无Token", request.getMethod(), request.getRequestURI());
             ObjectMapper mapper = new ObjectMapper();

@@ -41,7 +41,7 @@ public class RouterController {
     public String toLoginPage(HttpServletRequest request) {
         String adminUsername = configService.getAdminUsername();
         if (request.getCookies() != null
-                && Arrays.stream(request.getCookies()).anyMatch(cookie -> Constants.ACCESS_TOKEN.equals(cookie.getName()) && TokenUtil.verify(cookie.getValue(), adminUsername))) {
+                && Arrays.stream(request.getCookies()).anyMatch(cookie -> Constants.Cookie.ACCESS_TOKEN.equals(cookie.getName()) && TokenUtil.verify(cookie.getValue(), adminUsername))) {
             log.info("使用Cookie登录，用户名 {}", adminUsername);
             return "redirect:/admin/overview";
         }

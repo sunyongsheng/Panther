@@ -36,7 +36,7 @@ public class ImageController extends ApiV1Controller {
                                      @RequestParam("file") MultipartFile file) {
         Response<ImageDTO> response = new Response<>();
 
-        AppInfo appInfo = (AppInfo) request.getAttribute(Constants.REQUEST_APP_INFO_INTERNAL);
+        AppInfo appInfo = (AppInfo) request.getAttribute(Constants.Header.APP_INFO_INTERNAL);
         return response.success().msg("保存成功").data(imageService.saveImage(file, dirPath, appInfo));
     }
 
@@ -46,14 +46,14 @@ public class ImageController extends ApiV1Controller {
     @GetMapping("/images")
     public Response<List<ImageDTO>> getAllImage(HttpServletRequest request) {
         Response<List<ImageDTO>> response = new Response<>();
-        AppInfo appInfo = (AppInfo) request.getAttribute(Constants.REQUEST_APP_INFO_INTERNAL);
+        AppInfo appInfo = (AppInfo) request.getAttribute(Constants.Header.APP_INFO_INTERNAL);
         return response.success().data(imageService.findAllByAppKey(appInfo.getAppKey()));
     }
 
     @DeleteMapping("/image/{id}")
     public Response<Boolean> delete(HttpServletRequest request, @PathVariable("id") Long imageId) {
         Response<Boolean> response = new Response<>();
-        AppInfo appInfo = (AppInfo) request.getAttribute(Constants.REQUEST_APP_INFO_INTERNAL);
+        AppInfo appInfo = (AppInfo) request.getAttribute(Constants.Header.APP_INFO_INTERNAL);
         return response.success().data(imageService.deleteImage(imageId, appInfo.getAppKey()));
     }
 }

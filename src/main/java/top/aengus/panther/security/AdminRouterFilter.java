@@ -39,7 +39,7 @@ public class AdminRouterFilter extends AbstractRequestFilter {
         }
         String adminUsername = configService.getAdminUsername();
         if (request.getCookies() == null ||
-                Arrays.stream(request.getCookies()).noneMatch(cookie -> Constants.ACCESS_TOKEN.equals(cookie.getName()) && TokenUtil.verify(cookie.getValue(), adminUsername))) {
+                Arrays.stream(request.getCookies()).noneMatch(cookie -> Constants.Cookie.ACCESS_TOKEN.equals(cookie.getName()) && TokenUtil.verify(cookie.getValue(), adminUsername))) {
             log.warn("拦截到访问Admin页面请求 {} {}", urlPathHelper.getRequestUri(request), request.getMethod());
             response.sendRedirect("/login");
             return;

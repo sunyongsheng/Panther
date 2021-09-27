@@ -16,7 +16,7 @@ public class CorsFilter implements Filter {
 
     private static final String[] ALLOW_HEADERS = {
             "Content-Type", "X-CAF-Authorization-Token", "X-TOKEN", "Set-Cookie",
-            Constants.AUTHORIZATION, Constants.UPLOAD_TOKEN
+            Constants.Header.AUTHORIZATION, Constants.Header.UPLOAD_TOKEN
     };
 
     @Override
