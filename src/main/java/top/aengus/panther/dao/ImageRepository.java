@@ -14,6 +14,8 @@ import java.util.List;
  */
 public interface ImageRepository extends PagingAndSortingRepository<ImageModel, Long> {
 
+    long countAllByCreator(String creator);
+
     ImageModel findBySaveName(String saveName);
 
     ImageModel findByIdAndCreator(Long id, String creator);

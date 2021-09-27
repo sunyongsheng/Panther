@@ -43,6 +43,16 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
+    public long countAll() {
+        return imageRepository.count();
+    }
+
+    @Override
+    public long countByAppKey(String appKey) {
+        return imageRepository.countAllByCreator(appKey);
+    }
+
+    @Override
     public List<ImageDTO> findAllByAppKey(String appKey) {
         List<ImageModel> imageList = imageRepository.findAllByCreator(appKey);
         List<ImageDTO> res = new ArrayList<>();

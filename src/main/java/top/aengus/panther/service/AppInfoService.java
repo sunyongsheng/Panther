@@ -12,6 +12,8 @@ import top.aengus.panther.model.app.CreateAppParam;
  */
 public interface AppInfoService {
 
+    long countAll();
+
     AppInfo findById(Long id);
 
     AppInfo findByAppKey(String appKey);

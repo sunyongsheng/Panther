@@ -106,6 +106,29 @@ public class PantherConfigServiceImpl implements PantherConfigService {
     }
 
     @Override
+    public String getRunningDuration() {
+        PantherConfig config = pantherConfigRepository.findByConfigKey(KEY_INSTALL_TIME);
+        if (config == null) {
+            return "未安装";
+        }
+        long duration = (System.currentTimeMillis() - Long.parseLong(config.getConfigValue())) / 1000;
+        if (duration < 60) {
+            return duration + "秒";
+        } else if (duration < 3600) {
+            long minutes = duration / 60;
+            return minutes + "分" + (duration - minutes * 60) + "秒";
+        } else if (duration < 86400) {
+            long hours = duration / 3600;
+            long minutes = (duration - hours * 3600) / 60;
+            return hours + "时" + minutes + "分";
+        } else {
+            long days = duration / 86400;
+            long hours = (duration - days * 86400) / 3600;
+            return days + "天" + hours + "时";
+        }
+    }
+
+    @Override
     public void updateSaveRootPath(String saveRootPath) {
         preCheckInstall();
         saveRootPath = FileUtil.ensureNoSuffix(saveRootPath);

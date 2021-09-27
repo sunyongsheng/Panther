@@ -39,6 +39,11 @@ public class AppInfoServiceImpl implements AppInfoService {
     }
 
     @Override
+    public long countAll() {
+        return appInfoRepository.count();
+    }
+
+    @Override
     public AppInfo findById(Long id) {
         return appInfoRepository.findById(id).orElse(null);
     }

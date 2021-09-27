@@ -1,4 +1,5 @@
-<html>
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
     <title>概览 —— Panther</title>
@@ -12,21 +13,170 @@
 </head>
 <body>
 <div id="app">
-    <i-button @click="show">Click me!</i-button>
-    <Modal v-model="visible" title="Welcome">Welcome to ViewUI</Modal>
+    <el-container>
+        <el-aside>
+            <div class="aside-title">
+                <p>Panther</p>
+            </div>
+            <el-menu default-active="1">
+                <el-menu-item index="1">
+                    <i class="el-icon-data-board"></i>
+                    <span slot="title">概览</span>
+                </el-menu-item>
+                <el-menu-item index="2">
+                    <i class="el-icon-mobile-phone"></i>
+                    <span slot="title">App管理</span>
+                </el-menu-item>
+            </el-menu>
+        </el-aside>
+
+        <el-container>
+            <el-header>
+                <div></div>
+                <el-dropdown class="user-info">
+                    <p style="margin-left: 10px" th:text="${username}"></p>
+                    <el-dropdown-menu slot="dropdown">
+                        <el-dropdown-item>修改密码</el-dropdown-item>
+                        <el-dropdown-item>退出登录</el-dropdown-item>
+                    </el-dropdown-menu>
+                </el-dropdown>
+            </el-header>
+
+            <el-main>
+                <el-row :gutter="20">
+                    <el-col :span="8">
+                        <div class="grid-content bg-teal">
+                            <i class="el-icon-receiving overview-prefix-icon"></i>
+                            <div class="overview-detail">
+                                <div class="overview-detail-title">App总数</div>
+                                <div class="overview-detail-value" th:text="${appCount}"></div>
+                            </div>
+                        </div>
+                    </el-col>
+                    <el-col :span="8">
+                        <div class="grid-content bg-red">
+                            <i class="el-icon-picture-outline-round overview-prefix-icon"></i>
+                            <div class="overview-detail">
+                                <div class="overview-detail-title">图片数量</div>
+                                <div class="overview-detail-value" th:text="${imageCount}"></div>
+                            </div>
+                        </div>
+                    </el-col>
+                    <el-col :span="8">
+                        <div class="grid-content bg-purple">
+                            <i class="el-icon-time overview-prefix-icon"></i>
+                            <div class="overview-detail">
+                                <div class="overview-detail-title">运行时长</div>
+                                <div class="overview-detail-value" th:text="${runTime}"></div>
+                            </div>
+                        </div>
+                    </el-col>
+                </el-row>
+            </el-main>
+
+            <el-footer>
+
+            </el-footer>
+        </el-container>
+    </el-container>
 </div>
+</body>
 <script>
     new Vue({
         el: '#app',
-        data: {
-            visible: false
+        data() {
+            const item = {
+                date: '2016-05-02',
+                name: '王小虎',
+                address: '上海市普陀区金沙江路 1518 弄'
+            };
+            return {
+                tableData: Array(20).fill(item)
+            }
         },
         methods: {
-            show: function () {
-                this.visible = true;
-            }
+
         }
     })
 </script>
-</body>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+    }
+    .el-header {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        margin: 10px 30px
+    }
+    .el-main {
+        background-color: #F5F5FA;
+    }
+    .el-row {
+        margin-bottom: 20px;
+
+    &:last-child {
+         margin-bottom: 0;
+     }
+    }
+    .el-col {
+        border-radius: 4px;
+    }
+    .bg-purple-dark {
+        background: #99a9bf;
+    }
+    .bg-teal {
+        background: #00D8BD;
+    }
+    .bg-red {
+        background: #FF3765;
+    }
+    .bg-green {
+        background: #00DC7C;
+    }
+    .bg-purple {
+        background: #A700DC;
+    }
+    .grid-content {
+        border-radius: 4px;
+        padding: 30px 40px;
+        height: 60px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        color: #f9fafc;
+    }
+    .overview-prefix-icon {
+        font-size: 30px;
+    }
+    .overview-detail {
+        display: flex;
+        flex-direction: column;
+    }
+    .overview-detail-title {
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+    .overview-detail-value {
+        font-size: 26px;
+        font-weight: bold;
+    }
+    .row-bg {
+        padding: 10px 0;
+        background-color: #f9fafc;
+    }
+    .aside-title {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    .user-info {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+</style>
 </html>

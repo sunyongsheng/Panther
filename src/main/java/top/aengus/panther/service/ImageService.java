@@ -14,6 +14,10 @@ import java.util.List;
  */
 public interface ImageService {
 
+    long countAll();
+
+    long countByAppKey(String appKey);
+
     List<ImageDTO> findAllByAppKey(String appKey);
 
     ImageModel findImageByName(String filename);

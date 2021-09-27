@@ -1,23 +1,17 @@
 package top.aengus.panther.controller;
 
-import cn.hutool.http.server.HttpServerResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import top.aengus.panther.core.Constants;
-import top.aengus.panther.core.Response;
+import top.aengus.panther.service.AppInfoService;
+import top.aengus.panther.service.ImageService;
 import top.aengus.panther.service.PantherConfigService;
-import top.aengus.panther.tool.EncryptUtil;
 import top.aengus.panther.tool.TokenUtil;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.io.IOException;
 import java.util.Arrays;
 
 @Slf4j
@@ -25,10 +19,14 @@ import java.util.Arrays;
 public class RouterController {
 
     private final PantherConfigService configService;
+    private final AppInfoService appInfoService;
+    private final ImageService imageService;
 
     @Autowired
-    public RouterController(PantherConfigService configService) {
+    public RouterController(PantherConfigService configService, AppInfoService appInfoService, ImageService imageService) {
         this.configService = configService;
+        this.appInfoService = appInfoService;
+        this.imageService = imageService;
     }
 
 
@@ -49,7 +47,11 @@ public class RouterController {
     }
 
     @RequestMapping("/admin/overview")
-    public String toAdminPage() {
+    public String toAdminPage(Model model) {
+        model.addAttribute("username", configService.getAdminUsername());
+        model.addAttribute("appCount", appInfoService.countAll());
+        model.addAttribute("imageCount", imageService.countAll());
+        model.addAttribute("runTime", configService.getRunningDuration());
         return "admin/overview";
     }
 
