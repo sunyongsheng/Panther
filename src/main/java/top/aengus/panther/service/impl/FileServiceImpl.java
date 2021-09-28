@@ -29,9 +29,9 @@ public class FileServiceImpl implements FileService {
         if (!imgDirs.containsAll(ListUtil.of(NAME_APP, NAME_COMMON))) {
             throw new BadRequestException("app与common文件夹为必选项");
         }
-        File parentFile = new File(basePath);
-        if (!FileUtil.checkAndCreateDir(parentFile)) {
-            throw new BadRequestException("创建「" + parentFile.getAbsolutePath() + "」文件夹失败，请手动创建");
+        File rootFile = new File(basePath);
+        if (!FileUtil.checkAndCreateDir(rootFile)) {
+            throw new BadRequestException("创建「" + rootFile.getAbsolutePath() + "」文件夹失败，请手动创建");
         }
         for (String dir : imgDirs) {
             File dirFile = new File(basePath, dir);

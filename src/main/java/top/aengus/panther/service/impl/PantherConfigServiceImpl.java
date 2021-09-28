@@ -210,6 +210,10 @@ public class PantherConfigServiceImpl implements PantherConfigService {
             if (StringUtil.isEmpty(param.getSaveRootPath())) {
                 param.setSaveRootPath(getFallbackPath());
             }
+            File check = new File(param.getSaveRootPath());
+            if (!check.exists() || !check.isDirectory()) {
+                throw new BadRequestException("路径不存在或不是目录！");
+            }
 
             long currTime = System.currentTimeMillis();
             PantherConfig hostUrlConfig = new PantherConfig();
