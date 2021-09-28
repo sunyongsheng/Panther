@@ -14,10 +14,12 @@ import top.aengus.panther.enums.ImageStatus;
 import top.aengus.panther.enums.NamingStrategy;
 import top.aengus.panther.exception.BadRequestException;
 import top.aengus.panther.exception.InternalException;
+import top.aengus.panther.exception.NotFoundException;
 import top.aengus.panther.model.app.AppInfo;
 import top.aengus.panther.model.setting.AppSetting;
 import top.aengus.panther.model.image.ImageDTO;
 import top.aengus.panther.model.image.ImageModel;
+import top.aengus.panther.service.AppInfoService;
 import top.aengus.panther.service.AppSettingService;
 import top.aengus.panther.service.ImageService;
 import top.aengus.panther.service.PantherConfigService;
@@ -34,12 +36,15 @@ import java.util.List;
 public class ImageServiceImpl implements ImageService {
 
     private final ImageRepository imageRepository;
+
+    private final AppInfoService appInfoService;
     private final AppSettingService appSettingService;
     private final PantherConfigService configService;
 
     @Autowired
-    public ImageServiceImpl(ImageRepository imageRepository, AppSettingService appSettingService, PantherConfigService configService) {
+    public ImageServiceImpl(ImageRepository imageRepository, AppInfoService appInfoService, AppSettingService appSettingService, PantherConfigService configService) {
         this.imageRepository = imageRepository;
+        this.appInfoService = appInfoService;
         this.appSettingService = appSettingService;
         this.configService = configService;
     }
@@ -76,7 +81,7 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public ImageDTO saveImage(MultipartFile image, String dir, AppInfo appInfo, boolean isAdmin) {
+    public ImageDTO saveImage(MultipartFile image, String dir, String appKey, boolean isAdmin) {
         if (image.isEmpty()) {
             throw new BadRequestException("文件不能为空！");
         }
@@ -85,6 +90,12 @@ public class ImageServiceImpl implements ImageService {
         if (!FileUtil.isPic(originName)) {
             throw new BadRequestException("非图片文件！");
         }
+
+        AppInfo appInfo = appInfoService.findByAppKey(appKey);
+        if (appInfo == null) {
+            throw new NotFoundException("App不存在！请先创建App", appKey);
+        }
+
         AppSetting setting = appSettingService.findAppSetting(appInfo.getId(), AppSettingKey.IMG_NAMING_STRATEGY.getCode());
         NamingStrategy rule;
         if (setting == null) {

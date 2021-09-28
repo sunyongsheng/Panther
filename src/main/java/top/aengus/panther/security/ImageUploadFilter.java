@@ -10,7 +10,6 @@ import top.aengus.panther.core.Constants;
 import top.aengus.panther.core.Response;
 import top.aengus.panther.enums.TokenStage;
 import top.aengus.panther.model.token.AppToken;
-import top.aengus.panther.service.AppInfoService;
 import top.aengus.panther.service.AppTokenService;
 
 import javax.servlet.FilterChain;
@@ -24,12 +23,10 @@ import java.io.IOException;
 @Order(0)
 public class ImageUploadFilter extends AbstractRequestFilter {
 
-    private final AppInfoService appInfoService;
     private final AppTokenService appTokenService;
 
     @Autowired
-    public ImageUploadFilter(AppInfoService appInfoService, AppTokenService appTokenService) {
-        this.appInfoService = appInfoService;
+    public ImageUploadFilter(AppTokenService appTokenService) {
         this.appTokenService = appTokenService;
 
         addInterceptUrl("/api/v1/image");
@@ -54,7 +51,7 @@ public class ImageUploadFilter extends AbstractRequestFilter {
             response.getWriter().write(mapper.writeValueAsString(new Response<String>().noAuth().msg("AppKey无效")));
             return;
         }
-        request.setAttribute(Constants.Header.APP_INFO_INTERNAL, appInfoService.findById(appToken.getAppId()));
+        request.setAttribute(Constants.Header.INTERNAL_APP_KEY, appToken.getAppKey());
         filterChain.doFilter(request, response);
     }
 

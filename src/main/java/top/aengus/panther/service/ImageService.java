@@ -2,7 +2,6 @@ package top.aengus.panther.service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
-import top.aengus.panther.model.app.AppInfo;
 import top.aengus.panther.model.image.ImageDTO;
 import top.aengus.panther.model.image.ImageModel;
 
@@ -25,7 +24,7 @@ public interface ImageService {
 
     ImageModel findImageByName(String filename);
 
-    ImageDTO saveImage(MultipartFile image, String dir, AppInfo appInfo, boolean isAdmin);
+    ImageDTO saveImage(MultipartFile image, String dir, String appKey, boolean isAdmin);
 
     boolean deleteImage(Long imageId, String operator);
 

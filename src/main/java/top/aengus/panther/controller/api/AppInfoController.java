@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import top.aengus.panther.core.Response;
 import top.aengus.panther.model.app.AppDTO;
-import top.aengus.panther.model.app.AppInfo;
 import top.aengus.panther.model.app.CreateAppParam;
 import top.aengus.panther.model.image.ImageDTO;
 import top.aengus.panther.service.AppInfoService;
@@ -41,8 +40,7 @@ public class AppInfoController extends ApiV1Controller {
     public Response<Void> updateAppIcon(@RequestParam("app_key") String appKey,
                                         @RequestParam("file") MultipartFile file) {
         Response<Void> response = new Response<>();
-        AppInfo appInfo = appInfoService.findByAppKey(appKey);
-        ImageDTO result = imageService.saveImage(file, null, appInfo, true);
+        ImageDTO result = imageService.saveImage(file, null, appKey, true);
         appInfoService.updateAppAvatar(appKey, result.getUrl());
         return response.success().msg("更新成功");
     }

@@ -29,7 +29,7 @@ public class ImageController extends ApiV1Controller {
     }
 
     /**
-     * POST /api/v1/image
+     * App上传图片API POST /api/v1/image
      *
      * @param dirPath 保存目录，
      * @param file 图片文件
@@ -39,21 +39,19 @@ public class ImageController extends ApiV1Controller {
                                      @RequestParam(value = "dir", required = false) String dirPath,
                                      @RequestParam("file") MultipartFile file) {
         Response<ImageDTO> response = new Response<>();
-
-        AppInfo appInfo = (AppInfo) request.getAttribute(Constants.Header.APP_INFO_INTERNAL);
-        return response.success().msg("保存成功").data(imageService.saveImage(file, dirPath, appInfo, false));
+        String appKey = request.getAttribute(Constants.Header.INTERNAL_APP_KEY).toString();
+        return response.success().msg("保存成功").data(imageService.saveImage(file, dirPath, appKey, false));
     }
 
     /**
-     * 超级管理员上传图片所用接口
+     * 超级管理员上传图片API
      */
     @PostMapping("/admin/image")
     public Response<ImageDTO> adminUpload(@RequestParam(value = "app_key", required = false) String appKey,
                                           @RequestParam(value = "dir", required = false) String dirPath,
                                           @RequestParam("file") MultipartFile file) {
         Response<ImageDTO> response = new Response<>();
-        AppInfo appInfo = appInfoService.findByAppKey(appKey);
-        return response.success().msg("保存成功").data(imageService.saveImage(file, dirPath, appInfo, true));
+        return response.success().msg("保存成功").data(imageService.saveImage(file, dirPath, appKey, true));
     }
 
     /**
@@ -70,10 +68,9 @@ public class ImageController extends ApiV1Controller {
         return new Response<List<ImageDTO>>().success().data(imageService.findAllByAppKey(appKey));
     }
 
-    @DeleteMapping("/image/{id}")
-    public Response<Boolean> delete(HttpServletRequest request, @PathVariable("id") Long imageId) {
+    @DeleteMapping("/image/{owner}/{id}")
+    public Response<Boolean> delete(@PathVariable("owner") String appKey, @PathVariable("id") Long imageId) {
         Response<Boolean> response = new Response<>();
-        AppInfo appInfo = (AppInfo) request.getAttribute(Constants.Header.APP_INFO_INTERNAL);
-        return response.success().data(imageService.deleteImage(imageId, appInfo.getAppKey()));
+        return response.success().data(imageService.deleteImage(imageId, appKey));
     }
 }

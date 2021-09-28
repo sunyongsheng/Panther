@@ -23,7 +23,7 @@ public class Constants {
         /**
          * 存储在Request Header中，图片上传时鉴权成功后服务器写入到Header中
          */
-        public static final String APP_INFO_INTERNAL = "internal-app-info";
+        public static final String INTERNAL_APP_KEY = "internal-app-key";
     }
 
 }
