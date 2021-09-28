@@ -42,7 +42,7 @@ public class AppInfoController extends ApiV1Controller {
                                         @RequestParam("file") MultipartFile file) {
         Response<Void> response = new Response<>();
         AppInfo appInfo = appInfoService.findByAppKey(appKey);
-        ImageDTO result = imageService.saveImage(file, null, appInfo);
+        ImageDTO result = imageService.saveImage(file, null, appInfo, true);
         appInfoService.updateAppAvatar(appKey, result.getUrl());
         return response.success().msg("更新成功");
     }

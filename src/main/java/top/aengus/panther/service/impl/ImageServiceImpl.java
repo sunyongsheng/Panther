@@ -4,6 +4,8 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.IdUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import top.aengus.panther.dao.ImageRepository;
@@ -53,8 +55,14 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
+    public Page<ImageDTO> findAll(int page, int pageSize) {
+        PageRequest pageRequest = PageRequest.of(page, pageSize);
+        return imageRepository.findAll(pageRequest).map(this::convertToDto);
+    }
+
+    @Override
     public List<ImageDTO> findAllByAppKey(String appKey) {
-        List<ImageModel> imageList = imageRepository.findAllByCreator(appKey);
+        List<ImageModel> imageList = imageRepository.findAllByOwner(appKey);
         List<ImageDTO> res = new ArrayList<>();
         for (ImageModel model : imageList) {
             res.add(convertToDto(model));
@@ -68,7 +76,7 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public ImageDTO saveImage(MultipartFile image, String dir, AppInfo appInfo) {
+    public ImageDTO saveImage(MultipartFile image, String dir, AppInfo appInfo, boolean isAdmin) {
         if (image.isEmpty()) {
             throw new BadRequestException("文件不能为空！");
         }
@@ -93,8 +101,13 @@ public class ImageServiceImpl implements ImageService {
         imageModel.setAbsolutePath(absolutePath);
         imageModel.setRelativePath(relativePath);
         imageModel.setUrl(generateUrl(relativePath));
+        imageModel.setOwner(appInfo.getAppKey());
         imageModel.setUploadTime(System.currentTimeMillis());
-        imageModel.setCreator(appInfo.getAppKey());
+        if (isAdmin) {
+            imageModel.setCreator(configService.getAdminUsername());
+        } else {
+            imageModel.setCreator(appInfo.getAppKey());
+        }
         imageModel.setSize(image.getSize());
         imageModel.setStatus(ImageStatus.NORMAL.getCode());
         try {
@@ -170,6 +183,7 @@ public class ImageServiceImpl implements ImageService {
         dto.setId(imageModel.getId());
         dto.setName(imageModel.getSaveName());
         dto.setUrl(imageModel.getUrl());
+        dto.setOwner(imageModel.getOwner());
         dto.setUploadTime(imageModel.getUploadTime());
         dto.setCreator(imageModel.getCreator());
         dto.setSize(imageModel.getSize());

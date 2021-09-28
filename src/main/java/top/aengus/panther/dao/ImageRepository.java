@@ -20,7 +20,10 @@ public interface ImageRepository extends PagingAndSortingRepository<ImageModel, 
 
     ImageModel findByIdAndCreator(Long id, String creator);
 
-    List<ImageModel> findAllByCreator(String appKey);
+    ImageModel findByAbsolutePath(String absolutePath);
 
-    Page<ImageModel> findAllByCreator(String appKey, Pageable pageable);
+    List<ImageModel> findAllByOwner(String appKey);
+
+    Page<ImageModel> findAllByOwner(String appKey, Pageable pageable);
+
 }
