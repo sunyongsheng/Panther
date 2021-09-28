@@ -37,6 +37,8 @@ public class ImageModel {
 
     private String relativePath;
 
+    private String owner;
+
     private Long uploadTime;
 
     private String creator;

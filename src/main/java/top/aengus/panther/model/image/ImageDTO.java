@@ -18,6 +18,8 @@ public class ImageDTO {
     // 图片的URL
     private String url;
 
+    private String owner;
+
     private Long uploadTime;
 
     private String creator;
