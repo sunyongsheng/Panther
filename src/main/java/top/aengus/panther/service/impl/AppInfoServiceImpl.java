@@ -103,7 +103,7 @@ public class AppInfoServiceImpl implements AppInfoService {
         if (appInfo == null) {
             throw new NotFoundException("App不存在！", appKey);
         }
-        return appTokenService.createOrUpdateToken(appInfo.getId(), TokenStage.UPLOAD_V1);
+        return appTokenService.createOrUpdateToken(appKey, TokenStage.UPLOAD_V1);
     }
 
     private AppDTO convertToDto(AppInfo appInfo) {

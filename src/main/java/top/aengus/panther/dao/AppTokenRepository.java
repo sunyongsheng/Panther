@@ -10,7 +10,7 @@ import top.aengus.panther.model.token.AppToken;
  */
 public interface AppTokenRepository extends CrudRepository<AppToken, Long> {
 
-    AppToken findByAppIdAndStage(Long appId, String stage);
+    AppToken findByAppKeyAndStage(String appKey, String stage);
 
     AppToken findByTokenAndStage(String token, String stage);
 }

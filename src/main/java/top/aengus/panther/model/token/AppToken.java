@@ -23,8 +23,8 @@ public class AppToken {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "app_id")
-    private Long appId;
+    @Column(name = "app_key")
+    private String appKey;
 
     @Column(name = "token")
     private String token;

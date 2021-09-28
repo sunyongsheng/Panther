@@ -5,8 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import top.aengus.panther.dao.AppTokenRepository;
 import top.aengus.panther.enums.TokenStage;
-import top.aengus.panther.exception.NotFoundException;
-import top.aengus.panther.model.app.AppInfo;
 import top.aengus.panther.model.token.AppToken;
 import top.aengus.panther.service.AppTokenService;
 
@@ -26,8 +24,8 @@ public class AppTokenServiceImpl implements AppTokenService {
     }
 
     @Override
-    public AppToken findByAppIdAndStage(Long appId, TokenStage stage) {
-        return appTokenRepository.findByAppIdAndStage(appId, stage.name());
+    public AppToken findByAppKeyAndStage(String appKey, TokenStage stage) {
+        return appTokenRepository.findByAppKeyAndStage(appKey, stage.name());
     }
 
     @Override
@@ -36,14 +34,14 @@ public class AppTokenServiceImpl implements AppTokenService {
     }
 
     @Override
-    public String createOrUpdateToken(Long appId, TokenStage stage) {
+    public String createOrUpdateToken(String appKey, TokenStage stage) {
         String token = RandomStringUtils.random(48, true, true);
         long now = System.currentTimeMillis();
 
-        AppToken appToken = appTokenRepository.findByAppIdAndStage(appId, stage.name());
+        AppToken appToken = appTokenRepository.findByAppKeyAndStage(appKey, stage.name());
         if (appToken == null) {
             appToken = new AppToken();
-            appToken.setAppId(appId);
+            appToken.setAppKey(appKey);
             appToken.setStage(stage.name());
             appToken.setCreateTime(now);
         }

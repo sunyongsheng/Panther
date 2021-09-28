@@ -10,10 +10,10 @@ import top.aengus.panther.model.token.AppToken;
  */
 public interface AppTokenService {
 
-    AppToken findByAppIdAndStage(Long appId, TokenStage stage);
+    AppToken findByAppKeyAndStage(String appKey, TokenStage stage);
 
     AppToken findByTokenAndStage(String token, TokenStage stage);
 
-    String createOrUpdateToken(Long appId, TokenStage stage);
+    String createOrUpdateToken(String appKey, TokenStage stage);
 
 }
