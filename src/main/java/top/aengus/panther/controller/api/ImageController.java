@@ -39,7 +39,7 @@ public class ImageController extends ApiV1Controller {
                                      @RequestParam("file") MultipartFile file) {
         Response<ImageDTO> response = new Response<>();
         String appKey = request.getAttribute(Constants.Header.INTERNAL_APP_KEY).toString();
-        return response.success().msg("保存成功").data(imageService.saveImage(file, dirPath, appKey, false));
+        return response.success().msg("上传成功").data(imageService.saveImage(file, dirPath, appKey, false));
     }
 
     /**
@@ -50,7 +50,7 @@ public class ImageController extends ApiV1Controller {
                                           @RequestParam(value = "dir", required = false) String dirPath,
                                           @RequestParam("file") MultipartFile file) {
         Response<ImageDTO> response = new Response<>();
-        return response.success().msg("保存成功").data(imageService.saveImage(file, dirPath, appKey, true));
+        return response.success().msg("上传成功").data(imageService.saveImage(file, dirPath, appKey, true));
     }
 
     /**
@@ -70,6 +70,6 @@ public class ImageController extends ApiV1Controller {
     @DeleteMapping("/image/{id}")
     public Response<Boolean> delete(@PathVariable("id") Long imageId) {
         Response<Boolean> response = new Response<>();
-        return response.success().data(imageService.deleteImage(imageId, configService.getAdminUsername()));
+        return response.success().msg("删除成功").data(imageService.deleteImage(imageId, configService.getAdminUsername()));
     }
 }

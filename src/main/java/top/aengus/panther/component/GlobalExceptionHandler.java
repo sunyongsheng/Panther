@@ -37,13 +37,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InternalException.class)
     public Response<Void> internalException(InternalException exception) {
         log.error("[internalException] " + exception.getMessage(), exception);
-        return new Response<Void>().msg(exception.getMessage());
+        return new Response<Void>().unknownError().msg(exception.getMessage());
     }
 
     @ExceptionHandler(NoAuthException.class)
     public Response<Object> noAuthException(NoAuthException exception) {
         log.error("[noAuthException] " + exception.getMessage(), exception);
-        return new Response<>().msg(exception.getMessage());
+        return new Response<>().noAuth().msg(exception.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
