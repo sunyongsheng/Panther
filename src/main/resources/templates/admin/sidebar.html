@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>SideBar</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script src="https://unpkg.com/element-ui@2.15.6/lib/index.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui@2.15.6/lib/theme-chalk/index.css">
+</head>
+<body>
+<div th:fragment="admin-sidebar">
+    <el-aside>
+        <div class="aside-title">
+            <p>Panther</p>
+        </div>
+        <el-menu th:default-active="${index}" @select="onSelectSideMenu">
+            <el-menu-item index="overview">
+                <i class="el-icon-data-board"></i>
+                <span slot="title">概览</span>
+            </el-menu-item>
+            <el-menu-item index="app-manager">
+                <i class="el-icon-mobile-phone"></i>
+                <span slot="title">App管理</span>
+            </el-menu-item>
+        </el-menu>
+    </el-aside>
+</div>
+</body>
+<style>
+    .aside-title {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+</style>
+</html>

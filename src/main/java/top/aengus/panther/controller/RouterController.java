@@ -55,6 +55,11 @@ public class RouterController {
         return "admin/overview";
     }
 
+    @RequestMapping("/admin/app-manager")
+    public String toAppManagerPage() {
+        return "admin/app";
+    }
+
     @RequestMapping("/shutdown")
     public void shutdown() {
         System.exit(0);

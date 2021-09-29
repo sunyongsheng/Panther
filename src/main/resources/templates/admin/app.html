@@ -2,7 +2,7 @@
 <html lang="zh" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
-    <title>概览 —— Panther</title>
+    <title>App管理 —— Panther</title>
     <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
     <script src="https://unpkg.com/element-ui@2.15.6/lib/index.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/element-ui@2.15.6/lib/theme-chalk/index.css">
@@ -14,7 +14,7 @@
 <body>
 <div id="app">
     <el-container>
-        <div th:replace="admin/sidebar::admin-sidebar(index='overview')"></div>
+        <div th:replace="admin/sidebar::admin-sidebar(index='app-manager')"></div>
 
         <el-container>
             <el-header>
@@ -29,35 +29,21 @@
             </el-header>
 
             <el-main>
-                <el-row :gutter="20">
-                    <el-col :span="8">
-                        <div class="grid-content bg-teal">
-                            <i class="el-icon-receiving overview-prefix-icon"></i>
-                            <div class="overview-detail">
-                                <div class="overview-detail-title">App总数</div>
-                                <div class="overview-detail-value" th:text="${appCount}"></div>
-                            </div>
-                        </div>
-                    </el-col>
-                    <el-col :span="8">
-                        <div class="grid-content bg-red">
-                            <i class="el-icon-picture-outline-round overview-prefix-icon"></i>
-                            <div class="overview-detail">
-                                <div class="overview-detail-title">图片数量</div>
-                                <div class="overview-detail-value" th:text="${imageCount}"></div>
-                            </div>
-                        </div>
-                    </el-col>
-                    <el-col :span="8">
-                        <div class="grid-content bg-purple">
-                            <i class="el-icon-time overview-prefix-icon"></i>
-                            <div class="overview-detail">
-                                <div class="overview-detail-title">运行时长</div>
-                                <div class="overview-detail-value" th:text="${runTime}"></div>
-                            </div>
-                        </div>
-                    </el-col>
-                </el-row>
+                <el-table
+                    :data="appData"
+                    stripe
+                    style="width: 100%;">
+                    <el-table-column prop="id" label="序号" width="180"></el-table-column>
+                    <el-table-column prop="name" label="名称" width="180"></el-table-column>
+                    <el-table-column prop="englishName" label="英文名" width="180"></el-table-column>
+                    <el-table-column prop="createTime" label="创建时间" width="180"></el-table-column>
+                    <el-table-column prop="status" label="状态" width="180">
+                        <template slot-scope="scope">
+                            <el-tag v-if="scope.row.status === 'NORMAL'" type="success">正常</el-tag>
+                            <el-tag v-if="scope.row.status === 'LOCKED'" type="warning">已锁定</el-tag>
+                        </template>
+                    </el-table-column>
+                </el-table>
             </el-main>
 
             <el-footer>
@@ -71,16 +57,27 @@
     new Vue({
         el: '#app',
         data() {
-            const item = {
-                date: '2016-05-02',
-                name: '王小虎',
-                address: '上海市普陀区金沙江路 1518 弄'
-            };
             return {
-                tableData: Array(20).fill(item)
+                appData: [{
+                    id: 1,
+                    name: "测试",
+                    englishName: "test",
+                    createTime: "2021/01/21 10:10:10",
+                    status: "NORMAL"
+                }, {
+                    id: 2,
+                    name: "测试",
+                    englishName: "test1",
+                    createTime: "2021/01/21 10:10:10",
+                    status: "LOCKED"
+                }]
             }
         },
         methods: {
+            fetchAppData() {
+
+            },
+
             onSelectSideMenu(index, _) {
                 if (index === 'overview') {
                     window.location.href = "/admin/overview"
