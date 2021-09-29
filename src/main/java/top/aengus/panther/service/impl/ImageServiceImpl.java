@@ -19,10 +19,7 @@ import top.aengus.panther.model.app.AppInfo;
 import top.aengus.panther.model.setting.AppSetting;
 import top.aengus.panther.model.image.ImageDTO;
 import top.aengus.panther.model.image.ImageModel;
-import top.aengus.panther.service.AppInfoService;
-import top.aengus.panther.service.AppSettingService;
-import top.aengus.panther.service.ImageService;
-import top.aengus.panther.service.PantherConfigService;
+import top.aengus.panther.service.*;
 import top.aengus.panther.tool.*;
 
 import java.io.File;
@@ -41,13 +38,15 @@ public class ImageServiceImpl implements ImageService {
     private final AppInfoService appInfoService;
     private final AppSettingService appSettingService;
     private final PantherConfigService configService;
+    private final FileService fileService;
 
     @Autowired
-    public ImageServiceImpl(ImageRepository imageRepository, AppInfoService appInfoService, AppSettingService appSettingService, PantherConfigService configService) {
+    public ImageServiceImpl(ImageRepository imageRepository, AppInfoService appInfoService, AppSettingService appSettingService, PantherConfigService configService, FileService fileService) {
         this.imageRepository = imageRepository;
         this.appInfoService = appInfoService;
         this.appSettingService = appSettingService;
         this.configService = configService;
+        this.fileService = fileService;
     }
 
     @Override
@@ -185,6 +184,7 @@ public class ImageServiceImpl implements ImageService {
         if (original.isPresent()) {
             ImageModel imageModel = original.get();
             imageModel.delete();
+            fileService.moveFileToTrash(configService.getSaveRootPath(), imageModel.getAbsolutePath());
             imageRepository.save(imageModel);
             return true;
         }
