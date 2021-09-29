@@ -191,6 +191,18 @@ public class ImageServiceImpl implements ImageService {
         return false;
     }
 
+    @Override
+    public boolean deleteImageForever(Long imageId, String operator) {
+        Optional<ImageModel> original = imageRepository.findById(imageId);
+        if (original.isPresent()) {
+            ImageModel imageModel = original.get();
+            fileService.deleteFile(configService.getSaveRootPath(), imageModel.getSaveName(), imageModel.getAbsolutePath());
+            imageRepository.delete(imageModel);
+            return true;
+        }
+        return false;
+    }
+
     private ImageDTO convertToDto(ImageModel imageModel) {
         ImageDTO dto = new ImageDTO();
         dto.setId(imageModel.getId());
