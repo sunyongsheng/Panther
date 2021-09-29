@@ -2,7 +2,7 @@ DROP TABLE IF EXISTS `tb_app_token`;
 CREATE TABLE `tb_app_token`
 (
     `id`          BIGINT       NOT NULL AUTO_INCREMENT,
-    `app_key`     BIGINT       NOT NULL COMMENT 'AppKey',
+    `app_key`     VARCHAR(64)  NOT NULL COMMENT 'AppKey',
     `token`       VARCHAR(128) NOT NULL DEFAULT '',
     `stage`       VARCHAR(30)  NOT NULL DEFAULT '',
     `create_time` BIGINT       NOT NULL DEFAULT 0,
