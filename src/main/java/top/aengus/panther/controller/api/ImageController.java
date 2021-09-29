@@ -7,10 +7,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import top.aengus.panther.core.Constants;
 import top.aengus.panther.core.Response;
-import top.aengus.panther.model.app.AppInfo;
 import top.aengus.panther.model.image.ImageDTO;
-import top.aengus.panther.service.AppInfoService;
 import top.aengus.panther.service.ImageService;
+import top.aengus.panther.service.PantherConfigService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -20,12 +19,12 @@ import java.util.List;
 public class ImageController extends ApiV1Controller {
 
     private final ImageService imageService;
-    private final AppInfoService appInfoService;
+    private final PantherConfigService configService;
 
     @Autowired
-    public ImageController(ImageService imageService, AppInfoService appInfoService) {
+    public ImageController(ImageService imageService, PantherConfigService configService) {
         this.imageService = imageService;
-        this.appInfoService = appInfoService;
+        this.configService = configService;
     }
 
     /**
@@ -68,9 +67,9 @@ public class ImageController extends ApiV1Controller {
         return new Response<List<ImageDTO>>().success().data(imageService.findAllByAppKey(appKey));
     }
 
-    @DeleteMapping("/image/{owner}/{id}")
-    public Response<Boolean> delete(@PathVariable("owner") String appKey, @PathVariable("id") Long imageId) {
+    @DeleteMapping("/image/{id}")
+    public Response<Boolean> delete(@PathVariable("id") Long imageId) {
         Response<Boolean> response = new Response<>();
-        return response.success().data(imageService.deleteImage(imageId, appKey));
+        return response.success().data(imageService.deleteImage(imageId, configService.getAdminUsername()));
     }
 }

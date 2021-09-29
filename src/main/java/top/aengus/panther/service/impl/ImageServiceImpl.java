@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -180,13 +181,14 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public boolean deleteImage(Long imageId, String operation) {
-        ImageModel original = imageRepository.findByIdAndCreator(imageId, operation);
-        if (original == null) {
-            return false;
+        Optional<ImageModel> original = imageRepository.findById(imageId);
+        if (original.isPresent()) {
+            ImageModel imageModel = original.get();
+            imageModel.delete();
+            imageRepository.save(imageModel);
+            return true;
         }
-        original.delete();
-        imageRepository.save(original);
-        return true;
+        return false;
     }
 
     private ImageDTO convertToDto(ImageModel imageModel) {
