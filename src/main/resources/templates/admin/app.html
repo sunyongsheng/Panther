@@ -43,14 +43,15 @@
                     <el-table-column prop="createTimeFormatted" label="创建时间" align="center"></el-table-column>
                     <el-table-column label="状态" align="center" width="150">
                         <template slot-scope="scope">
-                            <el-tag v-if="scope.row.status === 'NORMAL'" type="success">正常</el-tag>
-                            <el-tag v-if="scope.row.status === 'LOCKED'" type="warning">已锁定</el-tag>
+                            <el-tag v-if="scope.row.locked" type="warning">已锁定</el-tag>
+                            <el-tag v-else-if="scope.row.deleted" type="danger">回收站</el-tag>
+                            <el-tag v-else type="success">正常</el-tag>
                         </template>
                     </el-table-column>
                     <el-table-column label="类型" align="center" width="150">
                         <template slot-scope="scope">
-                            <el-tag v-if="scope.row.role === 'NORMAL'" type="info">普通</el-tag>
-                            <el-tag v-if="scope.row.role === 'SUPER'">超级App</el-tag>
+                            <el-tag v-if="scope.row.superApp">超级App</el-tag>
+                            <el-tag v-else type="info">普通</el-tag>
                         </template>
                     </el-table-column>
                     <el-table-column prop="appKeyFake" label="AppKey" v-popover:popover align="center">
@@ -114,6 +115,43 @@
             <el-button type="primary" :loading="uploading" @click="onSubmitUpload">上 传</el-button>
         </span>
     </el-dialog>
+
+    <el-dialog
+        title="编辑App"
+        :visible.sync="editDialogVisible"
+        center>
+        <el-form ref="edit-form" :model="currSelectApp" label-width="120px">
+            <el-form-item label="App Key">
+                <el-input v-model="currSelectApp.appKey" disabled></el-input>
+            </el-form-item>
+            <el-form-item label="App名称">
+                <el-input v-model="currSelectApp.name"></el-input>
+            </el-form-item>
+            <el-form-item label="英文名">
+                <el-input v-model="currSelectApp.englishName" disabled></el-input>
+            </el-form-item>
+            <el-form-item label="是否超级App">
+                <el-switch v-model="currSelectApp.superApp"></el-switch>
+            </el-form-item>
+            <el-form-item label="创建时间">
+                <el-input v-model="currSelectApp.createTimeFormatted" disabled></el-input>
+            </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+            <el-button type="danger" @click="onClickDeleteApp(currSelectApp.appKey, currSelectApp.deleted)" v-if="!currSelectApp.locked">
+                {{ currSelectApp.deleted ? '恢 复' : '删 除'}}
+            </el-button>
+            <el-button type="warning" @click="onClickLockApp(currSelectApp.appKey, currSelectApp.locked)" v-if="!currSelectApp.deleted">
+                {{ currSelectApp.locked ? '解 锁' : '锁 定'}}
+            </el-button>
+            <el-button @click="editDialogVisible = false">
+                取 消
+            </el-button>
+            <el-button type="primary" v-if="!currSelectApp.deleted" :loading="updating" @click="onClickUpdateApp">
+                保 存
+            </el-button>
+        </span>
+    </el-dialog>
 </div>
 </body>
 <script>
@@ -125,8 +163,22 @@
                 currPage: 1,
                 pageSize: 10,
 
-                currSelectApp: null,
+                currSelectApp: {
+                    appKey: '',
+                    name: '',
+                    role: 'NORMAL',
+                    englishName: '',
+                    avatarUrl: '',
+                    createTime: 0,
+                    phone: '',
+                    email: '',
+
+                    superApp: false,
+                    createTimeFormatted: '',
+                    locked: false,
+                },
                 editDialogVisible: false,
+                updating: false,
 
                 uploadDialogVisible: false,
                 uploading: false,
@@ -134,7 +186,7 @@
                 previewImages: [],
 
                 loadingAppData: false,
-                appData: []
+                appData: [],
             }
         },
         methods: {
@@ -145,6 +197,9 @@
                     this.totalPage = response.data.totalPages;
                     response.data.content.forEach(app => {
                         app.appKeyFake = "****************";
+                        app.superApp = app.role === 'SUPER';
+                        app.locked = app.status === 'LOCKED';
+                        app.deleted = app.status === 'DELETED';
                         app.createTimeFormatted = formatDate(new Date(app.createTime), "yyyy-MM-dd hh:mm:ss");
                         fetchedData.push(app);
                     });
@@ -159,15 +214,15 @@
             },
             onClickUpload(app) {
                 this.uploadDialogVisible = true;
-                if (this.currSelectApp !== app) {
+                if (this.currSelectApp.appKey !== app.appKey) {
                     this.selectedFiles = [];
-                    this.currSelectApp = app;
+                    Object.assign(this.currSelectApp, app);
                 }
             },
             onClickEdit(app) {
                 this.editDialogVisible = true;
-                if (this.currSelectApp !== app) {
-                    this.currSelectApp = app;
+                if (this.currSelectApp.appKey !== app.appKey) {
+                    Object.assign(this.currSelectApp, app);
                 }
             },
             parseFile(event) {
@@ -224,6 +279,99 @@
                     this.selectedFiles.splice(toRemoveIndex, 1);
                     this.previewImages.splice(toRemoveIndex, 1);
                 }
+            },
+            onClickDeleteApp(appKey, deleted) {
+                if (deleted) {
+                    this.$confirm('确认恢复App?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'info'
+                    }).then(() => {
+                        undeleteApp(appKey).then(_ => {
+                            this.editDialogVisible = false;
+                            this.$message({
+                                type: 'success',
+                                message: '恢复成功!'
+                            });
+                            this.fetchAppData();
+                        }).catch(error => {
+                            this.$message.error(error.msg);
+                        });
+                    });
+                } else {
+                    this.$prompt('删除后的App将在回收站中保留30天，之后将永远删除。请输入App英文名：', '警告', {
+                        confirmButtonClass: 'delete-app-confirm',
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        inputValidator: (val) => {
+                            return val === this.currSelectApp.englishName;
+                        },
+                        inputErrorMessage: 'App英文名不正确'
+                    }).then(({ value }) => {
+                        deleteApp(appKey).then(_ => {
+                            this.editDialogVisible = false;
+                            this.$message({
+                                type: 'success',
+                                message: '删除成功!'
+                            });
+                            this.fetchAppData();
+                        }).catch(error => {
+                            this.$message.error(error.msg);
+                        });
+                    });
+                }
+            },
+            onClickLockApp(appKey, locked) {
+                if (locked) {
+                    this.$confirm('解锁后App将可以继续上传图片, 是否解锁?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'info'
+                    }).then(() => {
+                        unlockApp(appKey).then(_ => {
+                            this.editDialogVisible = false;
+                            this.$message({
+                                type: 'success',
+                                message: '解锁成功!'
+                            });
+                            this.fetchAppData();
+                        }).catch(error => {
+                            this.$message.error(error.msg);
+                        });
+                    });
+                } else {
+                    this.$confirm('锁定App后将无法上传图片, 是否继续?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        lockApp(appKey).then(_ => {
+                            this.editDialogVisible = false;
+                            this.$message({
+                                type: 'success',
+                                message: '锁定成功!'
+                            });
+                            this.fetchAppData();
+                        }).catch(error => {
+                            this.$message.error(error.msg);
+                        });
+                    });
+                }
+            },
+            onClickUpdateApp() {
+                this.updating = true;
+                updateAppInfo(this.currSelectApp.appKey, {
+                    name: this.currSelectApp.name,
+                    role: this.currSelectApp.superApp ? 'SUPER' : 'NORMAL'
+                }).then(_ => {
+                    this.editDialogVisible = false;
+                    this.$message.success("保存成功");
+                    this.fetchAppData();
+                }).catch(error => {
+                    this.$message.error(error.msg);
+                }).finally(() => {
+                    this.updating = false;
+                });
             },
             onSelectSideMenu(index, _) {
                 if (index === 'overview') {
@@ -328,6 +476,18 @@
         width: 360px;
         height: 80px;
         border-radius: 4px;
+    }
+    .delete-app-confirm {
+        background-color: #FF4368;
+        border-color: #FF4368;
+    }
+    .delete-app-confirm:hover {
+        background-color: #FF7387;
+        border-color: #FF7387;
+    }
+    .delete-app-confirm:focus {
+        background-color: #FF7387;
+        border-color: #FF7387;
     }
 </style>
 </html>

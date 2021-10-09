@@ -16,6 +16,7 @@ import top.aengus.panther.exception.NotFoundException;
 import top.aengus.panther.model.app.AppDTO;
 import top.aengus.panther.model.app.AppInfo;
 import top.aengus.panther.model.app.CreateAppParam;
+import top.aengus.panther.model.app.UpdateAppParam;
 import top.aengus.panther.service.AppInfoService;
 import top.aengus.panther.service.AppTokenService;
 import top.aengus.panther.service.PantherConfigService;
@@ -84,6 +85,30 @@ public class AppInfoServiceImpl implements AppInfoService {
         appInfo.setStatus(AppStatus.NORMAL.getCode());
         eventPublisher.publishEvent(new CreateAppEvent(this, appInfoRepository.save(appInfo)));
         return appKey;
+    }
+
+    @Override
+    public AppDTO updateAppInfo(String appKey, UpdateAppParam param) {
+        AppInfo origin = appInfoRepository.findByAppKey(appKey);
+        if (origin == null) {
+            throw new NotFoundException("App不存在！", appKey);
+        }
+        origin.setName(param.getName());
+        origin.setRole(param.getRole().getCode());
+        return convertToDto(appInfoRepository.save(origin));
+    }
+
+    @Override
+    public void updateAppStatus(String appKey, AppStatus appStatus) {
+        AppInfo origin = appInfoRepository.findByAppKey(appKey);
+        if (origin == null) {
+            throw new NotFoundException("App不存在！", appKey);
+        }
+        if (appStatus == AppStatus.fromCode(origin.getStatus())) {
+            throw new BadRequestException("重复操作！");
+        }
+        origin.setStatus(appStatus.getCode());
+        appInfoRepository.save(origin);
     }
 
     @Override

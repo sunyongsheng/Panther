@@ -1,13 +1,16 @@
 package top.aengus.panther.controller.api;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import top.aengus.panther.core.Response;
+import top.aengus.panther.enums.AppStatus;
 import top.aengus.panther.model.app.AppDTO;
 import top.aengus.panther.model.app.CreateAppParam;
+import top.aengus.panther.model.app.UpdateAppParam;
 import top.aengus.panther.model.image.ImageDTO;
 import top.aengus.panther.service.AppInfoService;
 import top.aengus.panther.service.ImageService;
@@ -37,6 +40,36 @@ public class AppInfoController extends ApiV1Controller {
     @PostMapping("/app/uploadToken")
     public Response<String> generateUploadToken(@RequestParam("app_key") String appKey) {
         return new Response<String>().success().msg("生成Token成功").data(appInfoService.generateUploadToken(appKey));
+    }
+
+    @PutMapping("/app")
+    public Response<AppDTO> updateAppInfo(@RequestParam("app_key") String appKey,
+                                          @RequestBody @Validated UpdateAppParam param) {
+        return new Response<AppDTO>().success().msg("保存成功").data(appInfoService.updateAppInfo(appKey, param));
+    }
+
+    @PostMapping("/app/lock")
+    public Response<Void> lockApp(@RequestParam("app_key") String appKey) {
+        appInfoService.updateAppStatus(appKey, AppStatus.LOCKED);
+        return new Response<Void>().success().msg("锁定App成功！");
+    }
+
+    @PostMapping("/app/unlock")
+    public Response<Void> unlockApp(@RequestParam("app_key") String appKey) {
+        appInfoService.updateAppStatus(appKey, AppStatus.NORMAL);
+        return new Response<Void>().success().msg("解锁成功！");
+    }
+
+    @PostMapping("/app/delete")
+    public Response<Void> deleteApp(@RequestParam("app_key") String appKey) {
+        appInfoService.updateAppStatus(appKey, AppStatus.DELETED);
+        return new Response<Void>().success().msg("删除成功！");
+    }
+
+    @PostMapping("/app/undelete")
+    public Response<Void> undeleteApp(@RequestParam("app_key") String appKey) {
+        appInfoService.updateAppStatus(appKey, AppStatus.NORMAL);
+        return new Response<Void>().success().msg("恢复成功！");
     }
 
     @PutMapping("/app/avatar")
