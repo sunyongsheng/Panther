@@ -10,6 +10,8 @@
     <!-- axios必须引入且在request.js之前 -->
     <script type="text/javascript" th:src="@{/js/axios.min.js}"></script>
     <script type="text/javascript" th:src="@{/js/request.js}"></script>
+    <script type="text/javascript" th:src="@{/js/app/app.js}"></script>
+    <script type="text/javascript" th:src="@{/js/common/common.js}"></script>
 </head>
 <body>
 <div id="app">
@@ -29,21 +31,59 @@
             </el-header>
 
             <el-main>
+                <el-button type="primary" icon="el-icon-plus" size="medium">创建App</el-button>
+                <div class="space-column-20"></div>
                 <el-table
                     :data="appData"
+                    v-loading="loadingAppData"
                     stripe
                     style="width: 100%;">
-                    <el-table-column prop="id" label="序号" width="180"></el-table-column>
-                    <el-table-column prop="name" label="名称" width="180"></el-table-column>
-                    <el-table-column prop="englishName" label="英文名" width="180"></el-table-column>
-                    <el-table-column prop="createTime" label="创建时间" width="180"></el-table-column>
-                    <el-table-column prop="status" label="状态" width="180">
+                    <el-table-column prop="name" label="名称" align="center"></el-table-column>
+                    <el-table-column prop="englishName" label="英文名" align="center"></el-table-column>
+                    <el-table-column prop="createTimeFormatted" label="创建时间" align="center"></el-table-column>
+                    <el-table-column label="状态" align="center" width="150">
                         <template slot-scope="scope">
                             <el-tag v-if="scope.row.status === 'NORMAL'" type="success">正常</el-tag>
                             <el-tag v-if="scope.row.status === 'LOCKED'" type="warning">已锁定</el-tag>
                         </template>
                     </el-table-column>
+                    <el-table-column label="类型" align="center" width="150">
+                        <template slot-scope="scope">
+                            <el-tag v-if="scope.row.role === 'NORMAL'" type="info">普通</el-tag>
+                            <el-tag v-if="scope.row.role === 'SUPER'">超级App</el-tag>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="appKeyFake" label="AppKey" v-popover:popover align="center">
+                        <template slot-scope="scope">
+                            <el-popover trigger="click" placement="top" ref="popover">
+                                <p>{{ scope.row.appKey }}</p>
+                                <div slot="reference">
+                                    <p>{{ scope.row.appKeyFake }}</p>
+                                </div>
+                            </el-popover>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="操作" align="center">
+                        <template slot-scope="scope">
+                            <el-button
+                                    size="mini"
+                                    type="primary"
+                                    @click="onClickUpload(scope.row)">上传</el-button>
+                            <el-button
+                                    size="mini"
+                                    type="success"
+                                    @click="onClickEdit(scope.row)">编辑</el-button>
+                        </template>
+                    </el-table-column>
                 </el-table>
+                <div class="space-column-20"></div>
+                <el-pagination v-if="totalPage > 1"
+                        background
+                        layout="prev, pager, next"
+                        :total="totalPage"
+                        :current-page="currPage"
+                        @current-change="onChangePage">
+                </el-pagination>
             </el-main>
 
             <el-footer>
@@ -51,6 +91,29 @@
             </el-footer>
         </el-container>
     </el-container>
+
+    <el-dialog
+            title="上传图片"
+            :visible.sync="uploadDialogVisible"
+            width="480px" center>
+        <div class="upload-container">
+            <label class="upload-button" for="upload-actual">选 择 图 片</label>
+            <el-empty description="请选择图片" v-if="previewImages.length === 0"></el-empty>
+            <div class="preview-container" v-else>
+                <template v-for="image in previewImages" >
+                    <div class="preview-image-container">
+                        <el-image :src="image" class="preview-image"></el-image>
+                        <el-button type="danger" icon="el-icon-delete" circle class="preview-image-delete" @click="onClickUploadRemove(image)"></el-button>
+                    </div>
+                </template>
+            </div>
+        </div>
+        <input type="file" accept="image/*" multiple="multiple" id="upload-actual" hidden @change="parseFile($event)">
+        <span slot="footer" class="dialog-footer">
+            <el-button @click="uploadDialogVisible = false">取 消</el-button>
+            <el-button type="primary" :loading="uploading" @click="onSubmitUpload">上 传</el-button>
+        </span>
+    </el-dialog>
 </div>
 </body>
 <script>
@@ -58,26 +121,110 @@
         el: '#app',
         data() {
             return {
-                appData: [{
-                    id: 1,
-                    name: "测试",
-                    englishName: "test",
-                    createTime: "2021/01/21 10:10:10",
-                    status: "NORMAL"
-                }, {
-                    id: 2,
-                    name: "测试",
-                    englishName: "test1",
-                    createTime: "2021/01/21 10:10:10",
-                    status: "LOCKED"
-                }]
+                totalPage: 1,
+                currPage: 1,
+                pageSize: 10,
+
+                currSelectApp: null,
+                editDialogVisible: false,
+
+                uploadDialogVisible: false,
+                uploading: false,
+                selectedFiles: [],
+                previewImages: [],
+
+                loadingAppData: false,
+                appData: []
             }
         },
         methods: {
             fetchAppData() {
-
+                this.loadingAppData = true;
+                let fetchedData = []
+                getAllAppData(this.currPage - 1, this.pageSize).then(response => {
+                    this.totalPage = response.data.totalPages;
+                    response.data.content.forEach(app => {
+                        app.appKeyFake = "****************";
+                        app.createTimeFormatted = formatDate(new Date(app.createTime), "yyyy-MM-dd hh:mm:ss");
+                        fetchedData.push(app);
+                    });
+                    this.appData = fetchedData;
+                }).finally(() => {
+                    this.loadingAppData = false;
+                })
             },
-
+            onChangePage(page) {
+                this.currPage = page;
+                this.fetchAppData();
+            },
+            onClickUpload(app) {
+                this.uploadDialogVisible = true;
+                if (this.currSelectApp !== app) {
+                    this.selectedFiles = [];
+                    this.currSelectApp = app;
+                }
+            },
+            onClickEdit(app) {
+                this.editDialogVisible = true;
+                if (this.currSelectApp !== app) {
+                    this.currSelectApp = app;
+                }
+            },
+            parseFile(event) {
+                if (event.target.files.length > 0) {
+                    let that = this;
+                    let i = 0, len = event.target.files.length;
+                    for (i, len; i < len; i++) {
+                        const file = event.target.files[i]
+                        this.selectedFiles.push(file);
+                        const reader = new FileReader();
+                        reader.onload = function (evt) {
+                            that.previewImages.push(evt.target.result);
+                        }
+                        reader.readAsDataURL(file)
+                    }
+                }
+            },
+            onSubmitUpload() {
+                if (this.selectedFiles.length > 0) {
+                    this.uploading = true;
+                    const tasks = [];
+                    this.selectedFiles.forEach(file => {
+                        tasks.push(new Promise(((resolve, reject) => {
+                            upload(this.currSelectApp.appKey, null, file).then(response => {
+                                resolve.call(response);
+                            }).catch((error) => {
+                                reject.call(error);
+                            });
+                        })));
+                    });
+                    Promise.all(tasks).then((results) => {
+                        this.$message.success(`上传了${results.length}张图片`);
+                        this.uploadDialogVisible = false;
+                        this.selectedFiles = [];
+                        this.previewImages = [];
+                    }).catch(errors => {
+                        errors.forEach(error => this.$message.error(error.msg));
+                    }).finally(() => {
+                        this.uploading = false;
+                    });
+                } else {
+                    this.$message.error('请先选择图片');
+                }
+            },
+            onClickUploadRemove(image) {
+                let toRemoveIndex = -1;
+                for (let i = 0; i < this.previewImages.length; i++) {
+                    if (image === this.previewImages[i]) {
+                        toRemoveIndex = i;
+                        break;
+                    }
+                }
+                if (toRemoveIndex !== -1) {
+                    this.selectedFiles.splice(toRemoveIndex, 1);
+                    this.previewImages.splice(toRemoveIndex, 1);
+                }
+            },
             onSelectSideMenu(index, _) {
                 if (index === 'overview') {
                     window.location.href = "/admin/overview"
@@ -85,6 +232,9 @@
                     window.location.href = "/admin/app-manager"
                 }
             }
+        },
+        created: function () {
+            this.fetchAppData();
         }
     })
 </script>
@@ -102,30 +252,8 @@
     .el-main {
         background-color: #F5F5FA;
     }
-    .el-row {
-        margin-bottom: 20px;
-
-    &:last-child {
-         margin-bottom: 0;
-     }
-    }
     .el-col {
         border-radius: 4px;
-    }
-    .bg-purple-dark {
-        background: #99a9bf;
-    }
-    .bg-teal {
-        background: #00D8BD;
-    }
-    .bg-red {
-        background: #FF3765;
-    }
-    .bg-green {
-        background: #00DC7C;
-    }
-    .bg-purple {
-        background: #A700DC;
     }
     .grid-content {
         border-radius: 4px;
@@ -136,21 +264,6 @@
         align-items: center;
         justify-content: space-between;
         color: #f9fafc;
-    }
-    .overview-prefix-icon {
-        font-size: 30px;
-    }
-    .overview-detail {
-        display: flex;
-        flex-direction: column;
-    }
-    .overview-detail-title {
-        font-size: 14px;
-        margin-bottom: 8px;
-    }
-    .overview-detail-value {
-        font-size: 26px;
-        font-weight: bold;
     }
     .row-bg {
         padding: 10px 0;
@@ -166,6 +279,55 @@
         display: flex;
         flex-direction: row;
         align-items: center;
+    }
+    .upload-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .preview-container {
+        height: 350px;
+        overflow-y: auto;
+        text-align: center;
+    }
+    .upload-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 300px;
+        height: 40px;
+        color: #fff;
+        border-radius: 4px;
+        background-color: #7EBF50;
+        margin-bottom: 20px;
+        cursor: pointer;
+        transition: .2s;
+    }
+    .upload-button:hover {
+        background-color: #99cb77;
+    }
+    .preview-image-container {
+        position: relative;
+        margin-bottom: 20px;
+        display: inline-block;
+    }
+    .preview-image-delete {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-top: -20px;
+        margin-left: -20px;
+        opacity: 0;
+        transition: .5s;
+        z-index: 1000;
+    }
+    .preview-image-container:hover .preview-image-delete {
+        opacity: 1;
+    }
+    .preview-image {
+        width: 360px;
+        height: 80px;
+        border-radius: 4px;
     }
 </style>
 </html>
