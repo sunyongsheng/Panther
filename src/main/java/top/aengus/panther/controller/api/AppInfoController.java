@@ -30,7 +30,7 @@ public class AppInfoController extends ApiV1Controller {
     @PostMapping("/app")
     public Response<String> registerApp(@RequestBody @Validated CreateAppParam appParam) {
         Response<String> response = new Response<>();
-        String appKey = appInfoService.createApp(appParam);
+        String appKey = appInfoService.createApp(appParam, pantherConfigService.getAdminUsername());
         return response.success().msg("注册成功，请妥善保管AppKey").data(appKey);
     }
 

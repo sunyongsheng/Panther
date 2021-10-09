@@ -27,14 +27,12 @@ public class AppInfoServiceImpl implements AppInfoService {
     private final AppInfoRepository appInfoRepository;
 
     private final ApplicationEventPublisher eventPublisher;
-    private final PantherConfigService pantherConfigService;
     private final AppTokenService appTokenService;
 
     @Autowired
-    public AppInfoServiceImpl(AppInfoRepository appInfoRepository, ApplicationEventPublisher eventPublisher, PantherConfigService pantherConfigService, AppTokenService appTokenService) {
+    public AppInfoServiceImpl(AppInfoRepository appInfoRepository, ApplicationEventPublisher eventPublisher, AppTokenService appTokenService) {
         this.appInfoRepository = appInfoRepository;
         this.eventPublisher = eventPublisher;
-        this.pantherConfigService = pantherConfigService;
         this.appTokenService = appTokenService;
     }
 
@@ -69,7 +67,7 @@ public class AppInfoServiceImpl implements AppInfoService {
     }
 
     @Override
-    public String createApp(CreateAppParam param) {
+    public String createApp(CreateAppParam param, String owner) {
         if (StringUtil.isEmpty(param.getEnglishName()) || param.getEnglishName().contains(" ")) {
             throw new BadRequestException("英文名不能为空或含有空格！");
         }
@@ -80,7 +78,7 @@ public class AppInfoServiceImpl implements AppInfoService {
         AppInfo appInfo = new AppInfo();
         BeanUtils.copyProperties(param, appInfo);
         appInfo.setAppKey(appKey);
-        appInfo.setOwner(pantherConfigService.getAdminUsername());
+        appInfo.setOwner(owner);
         appInfo.setCreateTime(System.currentTimeMillis());
         appInfo.setRole(AppRole.NORMAL.getCode());
         appInfo.setStatus(AppStatus.NORMAL.getCode());

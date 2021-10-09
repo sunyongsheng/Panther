@@ -22,7 +22,7 @@ public interface AppInfoService {
 
     Page<AppDTO> findDTOsByOwner(String owner, int page, int pageSize);
 
-    String createApp(CreateAppParam param);
+    String createApp(CreateAppParam param, String owner);
 
     void updateAppAvatar(String appKey, String avatarUrl);
 
