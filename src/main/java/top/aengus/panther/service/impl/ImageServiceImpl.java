@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import top.aengus.panther.dao.ImageRepository;
 import top.aengus.panther.enums.AppSettingKey;
+import top.aengus.panther.enums.AppStatus;
 import top.aengus.panther.enums.ImageStatus;
 import top.aengus.panther.enums.NamingStrategy;
 import top.aengus.panther.exception.BadRequestException;
@@ -94,6 +95,12 @@ public class ImageServiceImpl implements ImageService {
         AppInfo appInfo = appInfoService.findByAppKey(appKey);
         if (appInfo == null) {
             throw new NotFoundException("App不存在！请先创建App", appKey);
+        }
+        AppStatus appStatus = AppStatus.fromCode(appInfo.getStatus());
+        if (appStatus == AppStatus.LOCKED) {
+            throw new BadRequestException("App已被锁定！请联系管理员");
+        } else if (appStatus == AppStatus.DELETED) {
+            throw new BadRequestException("App已被删除！请联系管理员");
         }
 
         AppSetting setting = appSettingService.findAppSetting(appInfo.getId(), AppSettingKey.IMG_NAMING_STRATEGY.getCode());
