@@ -11,17 +11,20 @@ import top.aengus.panther.model.app.CreateAppParam;
 import top.aengus.panther.model.image.ImageDTO;
 import top.aengus.panther.service.AppInfoService;
 import top.aengus.panther.service.ImageService;
+import top.aengus.panther.service.PantherConfigService;
 
 @RestController
 public class AppInfoController extends ApiV1Controller {
 
     private final AppInfoService appInfoService;
     private final ImageService imageService;
+    private final PantherConfigService pantherConfigService;
 
     @Autowired
-    public AppInfoController(AppInfoService appInfoService, ImageService imageService) {
+    public AppInfoController(AppInfoService appInfoService, ImageService imageService, PantherConfigService pantherConfigService) {
         this.appInfoService = appInfoService;
         this.imageService = imageService;
+        this.pantherConfigService = pantherConfigService;
     }
 
     @PostMapping("/app")
@@ -51,12 +54,11 @@ public class AppInfoController extends ApiV1Controller {
         return response.success().data(appInfoService.findDTOByAppKey(appKey));
     }
 
-    @GetMapping("/apps/{owner}")
-    public Response<Page<AppDTO>> getAllApps(@PathVariable String owner,
-                                             @RequestParam(value = "page", defaultValue = "0") int page,
+    @GetMapping("/apps")
+    public Response<Page<AppDTO>> getAllApps(@RequestParam(value = "page", defaultValue = "0") int page,
                                              @RequestParam(value = "page_size", defaultValue = "10") int pageSize) {
         Response<Page<AppDTO>> response = new Response<>();
-        return response.success().msg("获取成功").data(appInfoService.findDTOsByOwner(owner, page, pageSize));
+        return response.success().msg("获取成功").data(appInfoService.findDTOsByOwner(pantherConfigService.getAdminUsername(), page, pageSize));
     }
 
 }
