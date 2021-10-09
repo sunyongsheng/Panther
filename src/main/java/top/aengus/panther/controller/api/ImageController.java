@@ -46,7 +46,7 @@ public class ImageController extends ApiV1Controller {
      * 超级管理员上传图片API
      */
     @PostMapping("/admin/image")
-    public Response<ImageDTO> adminUpload(@RequestParam(value = "app_key", required = false) String appKey,
+    public Response<ImageDTO> adminUpload(@RequestParam(value = "app_key") String appKey,
                                           @RequestParam(value = "dir", required = false) String dirPath,
                                           @RequestParam("file") MultipartFile file) {
         Response<ImageDTO> response = new Response<>();
