@@ -3,6 +3,7 @@ package top.aengus.panther.model.app;
 import lombok.Data;
 import top.aengus.panther.enums.AppRole;
 import top.aengus.panther.enums.AppStatus;
+import top.aengus.panther.enums.NamingStrategy;
 
 
 /**
@@ -33,8 +34,12 @@ public class AppDTO {
 
     private AppStatus status;
 
+    // Token
     private Boolean hasUploadToken1;
 
     private Long updateToken1GenTime;
+
+    // Setting
+    private NamingStrategy namingStrategy;
 
 }

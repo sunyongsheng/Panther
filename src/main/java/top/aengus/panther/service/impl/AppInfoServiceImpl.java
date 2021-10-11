@@ -7,9 +7,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import top.aengus.panther.dao.AppInfoRepository;
-import top.aengus.panther.enums.AppRole;
-import top.aengus.panther.enums.AppStatus;
-import top.aengus.panther.enums.TokenStage;
+import top.aengus.panther.enums.*;
 import top.aengus.panther.event.CreateAppEvent;
 import top.aengus.panther.exception.BadRequestException;
 import top.aengus.panther.exception.NotFoundException;
@@ -17,8 +15,10 @@ import top.aengus.panther.model.app.AppDTO;
 import top.aengus.panther.model.app.AppInfo;
 import top.aengus.panther.model.app.CreateAppParam;
 import top.aengus.panther.model.app.UpdateAppParam;
+import top.aengus.panther.model.setting.AppSetting;
 import top.aengus.panther.model.token.AppToken;
 import top.aengus.panther.service.AppInfoService;
+import top.aengus.panther.service.AppSettingService;
 import top.aengus.panther.service.AppTokenService;
 import top.aengus.panther.tool.StringUtil;
 
@@ -29,12 +29,14 @@ public class AppInfoServiceImpl implements AppInfoService {
 
     private final ApplicationEventPublisher eventPublisher;
     private final AppTokenService appTokenService;
+    private final AppSettingService appSettingService;
 
     @Autowired
-    public AppInfoServiceImpl(AppInfoRepository appInfoRepository, ApplicationEventPublisher eventPublisher, AppTokenService appTokenService) {
+    public AppInfoServiceImpl(AppInfoRepository appInfoRepository, ApplicationEventPublisher eventPublisher, AppTokenService appTokenService, AppSettingService appSettingService) {
         this.appInfoRepository = appInfoRepository;
         this.eventPublisher = eventPublisher;
         this.appTokenService = appTokenService;
+        this.appSettingService = appSettingService;
     }
 
     @Override
@@ -130,6 +132,9 @@ public class AppInfoServiceImpl implements AppInfoService {
         AppToken appToken = appTokenService.findByAppKeyAndStage(appInfo.getAppKey(), TokenStage.UPLOAD_V1_1);
         appDTO.setHasUploadToken1(appToken != null);
         appDTO.setUpdateToken1GenTime(appToken == null ? 0 : appToken.getGenerateTime());
+
+        AppSetting appSetting = appSettingService.findAppSetting(appInfo.getId(), AppSettingKey.IMG_NAMING_STRATEGY.getCode());
+        appDTO.setNamingStrategy(appSetting == null ? NamingStrategy.UUID : NamingStrategy.valueOf(appSetting.getValue()));
 
         return appDTO;
     }
