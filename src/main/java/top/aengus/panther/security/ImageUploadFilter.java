@@ -44,7 +44,7 @@ public class ImageUploadFilter extends AbstractRequestFilter {
             response.getWriter().write(mapper.writeValueAsString(new Response<String>().noAuth().msg("请使用UploadToken")));
             return;
         }
-        AppToken appToken = appTokenService.findByTokenAndStage(uploadToken, TokenStage.UPLOAD_V1);
+        AppToken appToken = appTokenService.findByTokenAndStage(uploadToken, TokenStage.UPLOAD_V1_1);
         if (appToken == null) {
             log.warn("拦截到上传请求，地址【{} {}】，{}为【{}】", request.getMethod(), request.getRequestURI(), Constants.Header.UPLOAD_TOKEN, uploadToken);
             ObjectMapper mapper = new ObjectMapper();

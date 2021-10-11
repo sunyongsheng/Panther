@@ -8,5 +8,7 @@ package top.aengus.panther.enums;
  * date 2021/9/26
  */
 public enum TokenStage {
-    UPLOAD_V1
+    UPLOAD_V1_1,
+    UPLOAD_V1_2,
+    UPLOAD_V1_3
 }
