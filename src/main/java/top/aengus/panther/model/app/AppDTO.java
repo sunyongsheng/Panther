@@ -33,4 +33,8 @@ public class AppDTO {
 
     private AppStatus status;
 
+    private Boolean hasUploadToken1;
+
+    private Long updateToken1GenTime;
+
 }

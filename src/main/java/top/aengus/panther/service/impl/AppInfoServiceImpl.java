@@ -17,6 +17,7 @@ import top.aengus.panther.model.app.AppDTO;
 import top.aengus.panther.model.app.AppInfo;
 import top.aengus.panther.model.app.CreateAppParam;
 import top.aengus.panther.model.app.UpdateAppParam;
+import top.aengus.panther.model.token.AppToken;
 import top.aengus.panther.service.AppInfoService;
 import top.aengus.panther.service.AppTokenService;
 import top.aengus.panther.tool.StringUtil;
@@ -125,6 +126,11 @@ public class AppInfoServiceImpl implements AppInfoService {
         BeanUtils.copyProperties(appInfo, appDTO);
         appDTO.setRole(AppRole.fromCode(appInfo.getRole()));
         appDTO.setStatus(AppStatus.fromCode(appInfo.getStatus()));
+
+        AppToken appToken = appTokenService.findByAppKeyAndStage(appInfo.getAppKey(), TokenStage.UPLOAD_V1_1);
+        appDTO.setHasUploadToken1(appToken != null);
+        appDTO.setUpdateToken1GenTime(appToken == null ? 0 : appToken.getGenerateTime());
+
         return appDTO;
     }
 
