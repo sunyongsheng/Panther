@@ -67,18 +67,18 @@
                     <el-table-column label="操作" align="center">
                         <template slot-scope="scope">
                             <el-button
-                                    size="mini"
-                                    type="primary"
-                                    @click="onClickUpload(scope.row)">上传</el-button>
-                            <el-button
-                                    size="mini"
                                     type="success"
-                                    @click="onClickEdit(scope.row)">编辑</el-button>
+                                    icon="el-icon-upload2"
+                                    @click="onClickUpload(scope.row)" circle></el-button>
+                            <el-button
+                                    type="primary"
+                                    icon="el-icon-edit"
+                                    @click="onClickEdit(scope.row)" circle></el-button>
 
                             <el-button
-                                    size="mini"
                                     type="info"
-                                    @click="onClickToken(scope.row)">Token</el-button>
+                                    icon="el-icon-setting"
+                                    @click="onClickSetting(scope.row)" circle></el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -158,14 +158,32 @@
         </span>
     </el-dialog>
 
-    <el-dialog title="Token管理"
-        :visible.sync="tokenDialogVisible"
+    <el-dialog title="App设置"
+        :visible.sync="settingDialogVisible"
         width="40%"
         center destroy-on-close>
-        <div class="token-row-container">
-            <span>{{ currSelectApp.updateToken1GenTimeFormatted }}</span>
-            <el-button type="primary" round @click="onClickGenerateToken">{{currSelectApp.hasUploadToken1 ? '重新生成' : '生成Token'}}</el-button>
-        </div>
+        <el-form ref="settingForm" :model="settingForm" label-width="180px">
+            <el-form-item label="文件名生成规则">
+                <div class="row-container">
+                    <el-select size="medium" placeholder="请选择上传图片文件名生成规则" v-model="settingForm.namingStrategy">
+                        <el-option label="使用自动生成的「UUID」作为文件名" value="UUID"></el-option>
+                        <el-option label="使用「原始名称」作为文件名" value="ORIGIN"></el-option>
+                        <el-option label="使用「日期-UUID」作为文件名" value="DATE_UUID_HYPHEN"></el-option>
+                        <el-option label="使用「日期-原始名称」作为文件名" value="DATE_ORIGIN_HYPHEN"></el-option>
+                        <el-option label="使用「日期_UUID」作为文件名" value="DATE_UUID_UNDERLINE"></el-option>
+                        <el-option label="使用「日期_原始名称」作为文件名" value="DATE_ORIGIN_UNDERLINE"></el-option>
+                    </el-select>
+                    <div class="hint-sample-text">{{ '示例：' + allNamingStrategySample[settingForm.namingStrategy] }}</div>
+                </div>
+            </el-form-item>
+            <el-form-item label="Token管理">
+                <div class="token-row-container">
+                    <span>{{ currSelectApp.updateToken1GenTimeFormatted }}</span>
+                    <div class="space-row-20"></div>
+                    <el-button size="small" type="primary" round @click="onClickGenerateToken">{{currSelectApp.hasUploadToken1 ? '重新生成' : '生成Token'}}</el-button>
+                </div>
+            </el-form-item>
+        </el-form>
     </el-dialog>
     <el-dialog title="Token生成成功"
                :visible.sync="tokenValueDialogVisible"
@@ -221,9 +239,13 @@
                 selectedFiles: [],
                 previewImages: [],
 
-                tokenDialogVisible: false,
+                settingDialogVisible: false,
                 tokenValueDialogVisible: false,
                 tokenValue: '',
+                settingForm: {
+                    namingStrategy: 'UUID',
+                },
+                allNamingStrategySample,
 
                 createDialogVisible: false,
 
@@ -284,8 +306,9 @@
                     locked: false,
                 };
             },
-            onClickToken(app) {
-                this.tokenDialogVisible = true;
+            onClickSetting(app) {
+                this.settingDialogVisible = true;
+                this.settingForm.namingStrategy = app.namingStrategy;
                 Object.assign(this.currSelectApp, app);
             },
             parseFile(event) {
@@ -451,7 +474,7 @@
             },
             generateTokenActual() {
                 generateUploadToken(this.currSelectApp.appKey).then(response => {
-                    this.tokenDialogVisible = false;
+                    this.settingDialogVisible = false;
                     this.tokenValueDialogVisible = true;
                     this.tokenValue = response.data;
                     this.fetchAppData();
@@ -575,15 +598,14 @@
         background-color: #FF7387;
         border-color: #FF7387;
     }
+    .hint-sample-text {
+        color: #a2a2a2;
+        margin-left: 20px;
+    }
     .token-row-container {
         display: flex;
         flex-direction: row;
-        padding: 20px 30px;
-        margin: 10px 20px;
-        border-radius: 10px;
-        background: #ffffff;
         align-items: center;
-        justify-content: space-between;
     }
     .token-value-text {
         color: #000000;

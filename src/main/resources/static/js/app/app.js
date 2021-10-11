@@ -1,9 +1,14 @@
+const allNamingStrategySample = {
+    UUID: '2138dui2sdf0kfn.jpg',
+    ORIGIN: 'test.jpg',
+    DATE_UUID_HYPHEN: '2021-12-31-2138dui2sdf0kfn.jpg',
+    DATE_ORIGIN_HYPHEN: '2021-12-31-test.jpg',
+    DATE_UUID_UNDERLINE: '2021_12_31_2138dui2sdf0kfn.jpg',
+    DATE_ORIGIN_UNDERLINE: '2021_12_31_test.jpg'
+};
+
 async function getAllAppData(page, pageSize) {
     return axiosClient.get(`/api/v1/apps?page=${page}&page_size=${pageSize}`)
-}
-
-async function hasGeneratedToken(appKey) {
-    return axiosClient.get(`api/v1/app/uploadToken?app_key=${appKey}`)
 }
 
 async function generateUploadToken(appKey) {
