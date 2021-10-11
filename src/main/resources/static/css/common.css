@@ -19,3 +19,31 @@
     width: 20px;
     height: 0;
 }
+
+.column-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.row-container {
+    display: flex;
+    flex-direction: row;
+}
+
+.card-column-container {
+    display: flex;
+    flex-direction: column;
+    padding: 20px 30px;
+    margin: 10px 20px;
+    border-radius: 10px;
+    background: #ffffff;
+}
+
+.card-row-container {
+    display: flex;
+    flex-direction: row;
+    padding: 20px 30px;
+    margin: 10px 20px;
+    border-radius: 10px;
+    background: #ffffff;
+}

@@ -31,7 +31,7 @@
             </el-header>
 
             <el-main>
-                <el-button type="primary" icon="el-icon-plus" size="medium">创建App</el-button>
+                <el-button type="primary" icon="el-icon-plus" size="medium" @click="onClickCreate">创建App</el-button>
                 <div class="space-column-20"></div>
                 <el-table
                     :data="appData"
@@ -74,6 +74,11 @@
                                     size="mini"
                                     type="success"
                                     @click="onClickEdit(scope.row)">编辑</el-button>
+
+                            <el-button
+                                    size="mini"
+                                    type="info"
+                                    @click="onClickToken(scope.row)">Token</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -152,6 +157,33 @@
             </el-button>
         </span>
     </el-dialog>
+
+    <el-dialog title="Token管理"
+        :visible.sync="tokenDialogVisible"
+        width="40%"
+        center destroy-on-close>
+        <div class="token-row-container">
+            <span>{{ currSelectApp.updateToken1GenTimeFormatted }}</span>
+            <el-button type="primary" round @click="onClickGenerateToken">{{currSelectApp.hasUploadToken1 ? '重新生成' : '生成Token'}}</el-button>
+        </div>
+    </el-dialog>
+    <el-dialog title="Token生成成功"
+               :visible.sync="tokenValueDialogVisible"
+               width="500px" destroy-on-close>
+        <div class="column-container">
+            <p>请妥善保管好Token，此页面一经关闭将不再出现！</p>
+            <div class="token-value-text">{{ tokenValue }}</div>
+        </div>
+        <span slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="tokenValueDialogVisible = false" @close="tokenValue = ''">我已保存好Token</el-button>
+        </span>
+    </el-dialog>
+
+    <el-dialog title="创建App"
+               :visible.sync="createDialogVisible"
+               center>
+
+    </el-dialog>
 </div>
 </body>
 <script>
@@ -172,11 +204,15 @@
                     createTime: 0,
                     phone: '',
                     email: '',
+                    status: 'NORMAL',
+                    hasUploadToken1: false,
+                    updateToken1GenTime: 0,
 
                     superApp: false,
                     createTimeFormatted: '',
                     locked: false,
                 },
+
                 editDialogVisible: false,
                 updating: false,
 
@@ -184,6 +220,12 @@
                 uploading: false,
                 selectedFiles: [],
                 previewImages: [],
+
+                tokenDialogVisible: false,
+                tokenValueDialogVisible: false,
+                tokenValue: '',
+
+                createDialogVisible: false,
 
                 loadingAppData: false,
                 appData: [],
@@ -201,6 +243,11 @@
                         app.locked = app.status === 'LOCKED';
                         app.deleted = app.status === 'DELETED';
                         app.createTimeFormatted = formatDate(new Date(app.createTime), "yyyy-MM-dd hh:mm:ss");
+                        if (app.hasUploadToken1) {
+                            app.updateToken1GenTimeFormatted = '生成于 ' + formatDate(new Date(app.updateToken1GenTime), "yyyy年MM月dd日 hh:mm:ss");
+                        } else {
+                            app.updateToken1GenTimeFormatted = '还未生成过Token，点击右边按钮生成'
+                        }
                         fetchedData.push(app);
                     });
                     this.appData = fetchedData;
@@ -216,14 +263,30 @@
                 this.uploadDialogVisible = true;
                 if (this.currSelectApp.appKey !== app.appKey) {
                     this.selectedFiles = [];
-                    Object.assign(this.currSelectApp, app);
                 }
+                Object.assign(this.currSelectApp, app);
             },
             onClickEdit(app) {
                 this.editDialogVisible = true;
-                if (this.currSelectApp.appKey !== app.appKey) {
-                    Object.assign(this.currSelectApp, app);
-                }
+                Object.assign(this.currSelectApp, app);
+            },
+            onClickCreate() {
+                this.createDialogVisible = true;
+                this.currSelectApp = {
+                    name: '',
+                    role: 'NORMAL',
+                    englishName: '',
+                    avatarUrl: '',
+                    phone: '',
+                    email: '',
+
+                    superApp: false,
+                    locked: false,
+                };
+            },
+            onClickToken(app) {
+                this.tokenDialogVisible = true;
+                Object.assign(this.currSelectApp, app);
             },
             parseFile(event) {
                 if (event.target.files.length > 0) {
@@ -373,6 +436,29 @@
                     this.updating = false;
                 });
             },
+            onClickGenerateToken() {
+                if (this.currSelectApp.hasUploadToken1) {
+                    this.$confirm('重新生成Token后原Token将失效，是否继续？', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(_ => {
+                        this.generateTokenActual();
+                    });
+                } else {
+                    this.generateTokenActual();
+                }
+            },
+            generateTokenActual() {
+                generateUploadToken(this.currSelectApp.appKey).then(response => {
+                    this.tokenDialogVisible = false;
+                    this.tokenValueDialogVisible = true;
+                    this.tokenValue = response.data;
+                    this.fetchAppData();
+                }).catch(e => {
+                    this.$message.error(e.msg);
+                })
+            },
             onSelectSideMenu(index, _) {
                 if (index === 'overview') {
                     window.location.href = "/admin/overview"
@@ -488,6 +574,21 @@
     .delete-app-confirm:focus {
         background-color: #FF7387;
         border-color: #FF7387;
+    }
+    .token-row-container {
+        display: flex;
+        flex-direction: row;
+        padding: 20px 30px;
+        margin: 10px 20px;
+        border-radius: 10px;
+        background: #ffffff;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .token-value-text {
+        color: #000000;
+        padding: 12px 20px;
+        background-color: #f6f7fc;
     }
 </style>
 </html>
