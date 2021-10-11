@@ -34,7 +34,7 @@ public class AppTokenServiceImpl implements AppTokenService {
     }
 
     @Override
-    public String createOrUpdateToken(String appKey, TokenStage stage) {
+    public String generateToken(String appKey, TokenStage stage) {
         String token = RandomStringUtils.random(48, true, true);
         long now = System.currentTimeMillis();
 
@@ -43,10 +43,9 @@ public class AppTokenServiceImpl implements AppTokenService {
             appToken = new AppToken();
             appToken.setAppKey(appKey);
             appToken.setStage(stage.name());
-            appToken.setCreateTime(now);
         }
         appToken.setToken(token);
-        appToken.setUpdateTime(now);
+        appToken.setGenerateTime(now);
         appTokenRepository.save(appToken);
         return token;
     }

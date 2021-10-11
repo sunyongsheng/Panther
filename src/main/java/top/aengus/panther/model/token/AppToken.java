@@ -35,8 +35,8 @@ public class AppToken {
     @Column(name = "stage")
     private String stage;
 
-    @Column(name = "create_time")
-    private Long createTime;
+    @Column(name = "generate_time")
+    private Long generateTime;
 
     @Column(name = "update_time")
     private Long updateTime;

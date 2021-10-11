@@ -19,7 +19,6 @@ import top.aengus.panther.model.app.CreateAppParam;
 import top.aengus.panther.model.app.UpdateAppParam;
 import top.aengus.panther.service.AppInfoService;
 import top.aengus.panther.service.AppTokenService;
-import top.aengus.panther.service.PantherConfigService;
 import top.aengus.panther.tool.StringUtil;
 
 @Service
@@ -118,7 +117,7 @@ public class AppInfoServiceImpl implements AppInfoService {
     @Override
     public String generateUploadToken(String appKey) {
         findAppWithCheck(appKey);
-        return appTokenService.createOrUpdateToken(appKey, TokenStage.UPLOAD_V1);
+        return appTokenService.generateToken(appKey, TokenStage.UPLOAD_V1_1);
     }
 
     private AppDTO convertToDto(AppInfo appInfo) {

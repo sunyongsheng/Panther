@@ -14,6 +14,6 @@ public interface AppTokenService {
 
     AppToken findByTokenAndStage(String token, TokenStage stage);
 
-    String createOrUpdateToken(String appKey, TokenStage stage);
+    String generateToken(String appKey, TokenStage stage);
 
 }
