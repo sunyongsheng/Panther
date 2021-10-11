@@ -34,7 +34,7 @@ public class AppInfo {
     @Column(name = "avatar_url")
     private String avatarUrl;
 
-    @Column(name = "create_time", columnDefinition = "TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP")
+    @Column(name = "create_time")
     private Long createTime;
 
     @Column(name = "phone")
@@ -48,6 +48,9 @@ public class AppInfo {
 
     @Column(name = "status", columnDefinition = "TINYINT NOT NULL DEFAULT 0")
     private Integer status;
+
+    @Column(name = "update_time")
+    private Long updateTime;
 
     public boolean isSuperRole() {
         return AppRole.SUPER.getCode().equals(role);

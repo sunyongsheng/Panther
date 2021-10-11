@@ -89,43 +89,35 @@ public class AppInfoServiceImpl implements AppInfoService {
 
     @Override
     public AppDTO updateAppInfo(String appKey, UpdateAppParam param) {
-        AppInfo origin = appInfoRepository.findByAppKey(appKey);
-        if (origin == null) {
-            throw new NotFoundException("App不存在！", appKey);
-        }
-        origin.setName(param.getName());
-        origin.setRole(param.getRole().getCode());
-        return convertToDto(appInfoRepository.save(origin));
+        AppInfo appInfo = findAppWithCheck(appKey);
+        appInfo.setName(param.getName());
+        appInfo.setRole(param.getRole().getCode());
+        appInfo.setUpdateTime(System.currentTimeMillis());
+        return convertToDto(appInfoRepository.save(appInfo));
     }
 
     @Override
     public void updateAppStatus(String appKey, AppStatus appStatus) {
-        AppInfo origin = appInfoRepository.findByAppKey(appKey);
-        if (origin == null) {
-            throw new NotFoundException("App不存在！", appKey);
-        }
-        if (appStatus == AppStatus.fromCode(origin.getStatus())) {
+        AppInfo appInfo = findAppWithCheck(appKey);
+        if (appStatus == AppStatus.fromCode(appInfo.getStatus())) {
             throw new BadRequestException("重复操作！");
         }
-        origin.setStatus(appStatus.getCode());
-        appInfoRepository.save(origin);
+        appInfo.setStatus(appStatus.getCode());
+        appInfo.setUpdateTime(System.currentTimeMillis());
+        appInfoRepository.save(appInfo);
     }
 
     @Override
     public void updateAppAvatar(String appKey, String avatarUrl) {
-        AppInfo appInfo = appInfoRepository.findByAppKey(appKey);
-        if (appInfo == null) {
-            throw new NotFoundException("找不到App信息！", appKey);
-        }
+        AppInfo appInfo = findAppWithCheck(appKey);
         appInfo.setAvatarUrl(avatarUrl);
+        appInfo.setUpdateTime(System.currentTimeMillis());
+        appInfoRepository.save(appInfo);
     }
 
     @Override
     public String generateUploadToken(String appKey) {
-        AppInfo appInfo = appInfoRepository.findByAppKey(appKey);
-        if (appInfo == null) {
-            throw new NotFoundException("App不存在！", appKey);
-        }
+        findAppWithCheck(appKey);
         return appTokenService.createOrUpdateToken(appKey, TokenStage.UPLOAD_V1);
     }
 
@@ -135,5 +127,16 @@ public class AppInfoServiceImpl implements AppInfoService {
         appDTO.setRole(AppRole.fromCode(appInfo.getRole()));
         appDTO.setStatus(AppStatus.fromCode(appInfo.getStatus()));
         return appDTO;
+    }
+
+    private AppInfo findAppWithCheck(String appKey) {
+        if (StringUtil.isEmpty(appKey)) {
+            throw new BadRequestException("AppKey为空！");
+        }
+        AppInfo appInfo = appInfoRepository.findByAppKey(appKey);
+        if (appInfo == null) {
+            throw new NotFoundException("App不存在！", appKey);
+        }
+        return appInfo;
     }
 }
