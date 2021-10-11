@@ -1,6 +1,6 @@
 package top.aengus.panther.model.token;
 
-import lombok.Data;
+import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -15,7 +15,10 @@ import javax.persistence.*;
 @DynamicUpdate
 @DynamicInsert
 @Table(name = "tb_app_token")
-@Data
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
 public class AppToken {
 
     @Id

@@ -1,6 +1,6 @@
 package top.aengus.panther.model.config;
 
-import lombok.Data;
+import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -10,7 +10,10 @@ import javax.persistence.*;
 @DynamicUpdate
 @DynamicInsert
 @Table(name = "tb_panther_config")
-@Data
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
 public class PantherConfig {
 
     @Id

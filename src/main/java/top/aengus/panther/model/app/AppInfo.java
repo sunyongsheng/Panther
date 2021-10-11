@@ -1,6 +1,6 @@
 package top.aengus.panther.model.app;
 
-import lombok.Data;
+import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import top.aengus.panther.enums.AppRole;
@@ -11,7 +11,10 @@ import javax.persistence.*;
 @DynamicUpdate
 @DynamicInsert
 @Table(name = "tb_app_info")
-@Data
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
 public class AppInfo {
 
     @Id

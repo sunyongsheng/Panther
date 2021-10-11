@@ -1,6 +1,6 @@
 package top.aengus.panther.model.setting;
 
-import lombok.Data;
+import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -11,11 +11,14 @@ import javax.persistence.*;
  * <p>
  * date 2021/8/28
  */
-@Data
 @Entity
 @DynamicUpdate
 @DynamicInsert
 @Table(name = "tb_app_setting")
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
 public class AppSetting {
 
     @Id

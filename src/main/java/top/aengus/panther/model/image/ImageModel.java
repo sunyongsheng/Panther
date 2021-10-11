@@ -1,8 +1,6 @@
 package top.aengus.panther.model.image;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import top.aengus.panther.enums.ImageStatus;
@@ -18,9 +16,10 @@ import javax.persistence.*;
 @Table(name = "tb_image")
 @DynamicInsert
 @DynamicUpdate
-@Data
+@Getter
+@Setter
+@ToString
 @NoArgsConstructor
-@AllArgsConstructor
 public class ImageModel {
 
     @Id
@@ -46,13 +45,6 @@ public class ImageModel {
     private Long size;
 
     private int status;
-
-    public ImageModel(String originalName, String saveName, String absolutePath, int status) {
-        this.originalName = originalName;
-        this.saveName = saveName;
-        this.absolutePath = absolutePath;
-        this.status = status;
-    }
 
     public void delete() {
         this.status = ImageStatus.DELETED.getCode();
