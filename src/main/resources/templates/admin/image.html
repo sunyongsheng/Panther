@@ -77,8 +77,30 @@
             </el-main>
         </el-container>
     </el-container>
-</div>
 
+    <el-dialog
+            title="上传图片"
+            :visible.sync="uploadDialogVisible"
+            width="480px" center>
+        <div class="upload-container">
+            <label class="upload-button" for="upload-actual">选 择 图 片</label>
+            <el-empty description="请选择图片" v-if="selectedImagesPreview.length === 0"></el-empty>
+            <div class="preview-container" v-else>
+                <template v-for="image in selectedImagesPreview" >
+                    <div class="preview-image-container">
+                        <el-image :src="image" class="preview-image"></el-image>
+                        <el-button type="danger" icon="el-icon-delete" circle class="preview-image-delete" @click="onClickUploadRemove(image)"></el-button>
+                    </div>
+                </template>
+            </div>
+        </div>
+        <input type="file" accept="image/*" multiple="multiple" id="upload-actual" hidden @change="parseFile($event)">
+        <span slot="footer" class="dialog-footer">
+            <el-button @click="uploadDialogVisible = false">取 消</el-button>
+            <el-button type="primary" :loading="uploading" @click="clickUpload">上 传</el-button>
+        </span>
+    </el-dialog>
+</div>
 </body>
 <script>
     new Vue({
@@ -93,11 +115,16 @@
                 pageSize: 10,
 
                 multipleSelection: [],
+
+                uploadDialogVisible: false,
+                uploading: false,
+                selectedImages: [],
+                selectedImagesPreview: [],
             }
         },
         methods: {
             fetchImageData() {
-                this.loadingAppData = true;
+                this.loadingImageData = true;
                 let fetchedData = []
                 getAllImages(this.currPage - 1, this.pageSize).then(response => {
                     this.totalPage = response.data.totalPages;
@@ -116,10 +143,41 @@
                 }).catch(e => {
                     this.$message.error(e.msg)
                 }).finally(_ => {
-                    this.loadingAppData = false;
-                })
+                    this.loadingImageData = false;
+                });
             },
             onClickUpload() {
+                this.uploadDialogVisible = true;
+            },
+            parseFile(event) {
+                if (event.target.files.length > 0) {
+                    let that = this;
+                    let i = 0, len = event.target.files.length;
+                    for (i, len; i < len; i++) {
+                        const file = event.target.files[i]
+                        this.selectedImages.push(file);
+                        const reader = new FileReader();
+                        reader.onload = function (evt) {
+                            that.selectedImagesPreview.push(evt.target.result);
+                        }
+                        reader.readAsDataURL(file)
+                    }
+                }
+            },
+            onClickUploadRemove(image) {
+                let toRemoveIndex = -1;
+                for (let i = 0; i < this.selectedImagesPreview.length; i++) {
+                    if (image === this.selectedImagesPreview[i]) {
+                        toRemoveIndex = i;
+                        break;
+                    }
+                }
+                if (toRemoveIndex !== -1) {
+                    this.selectedImages.splice(toRemoveIndex, 1);
+                    this.selectedImagesPreview.splice(toRemoveIndex, 1);
+                }
+            },
+            clickUpload() {
 
             },
             onClickImageName(image) {
@@ -224,6 +282,55 @@
     }
     .el-main {
         background-color: #F5F5FA;
+    }
+    .upload-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .preview-container {
+        height: 350px;
+        overflow-y: auto;
+        text-align: center;
+    }
+    .upload-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 300px;
+        height: 40px;
+        color: #fff;
+        border-radius: 4px;
+        background-color: #7EBF50;
+        margin-bottom: 20px;
+        cursor: pointer;
+        transition: .2s;
+    }
+    .upload-button:hover {
+        background-color: #99cb77;
+    }
+    .preview-image-container {
+        position: relative;
+        margin-bottom: 20px;
+        display: inline-block;
+    }
+    .preview-image-delete {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-top: -20px;
+        margin-left: -20px;
+        opacity: 0;
+        transition: .5s;
+        z-index: 1000;
+    }
+    .preview-image-container:hover .preview-image-delete {
+        opacity: 1;
+    }
+    .preview-image {
+        width: 360px;
+        height: 80px;
+        border-radius: 4px;
     }
 </style>
 </html>
