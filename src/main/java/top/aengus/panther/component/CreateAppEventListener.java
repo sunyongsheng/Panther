@@ -48,6 +48,8 @@ public class CreateAppEventListener {
             param.setKey(key.getCode());
             if (key == AppSettingKey.IMG_NAMING_STRATEGY) {
                 param.setValue(NamingStrategy.UUID.name());
+            } else {
+                continue;
             }
             appSettingService.createAppSetting(param);
         }

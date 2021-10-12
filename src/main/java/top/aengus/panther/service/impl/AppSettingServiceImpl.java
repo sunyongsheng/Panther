@@ -4,6 +4,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import top.aengus.panther.dao.AppSettingRepository;
+import top.aengus.panther.enums.AppSettingKey;
+import top.aengus.panther.enums.NamingStrategy;
 import top.aengus.panther.model.setting.AppSetting;
 import top.aengus.panther.model.setting.CreateAppSettingParam;
 import top.aengus.panther.model.setting.UpdateAppSettingParam;
@@ -38,13 +40,21 @@ public class AppSettingServiceImpl implements AppSettingService {
     }
 
     @Override
-    public void updateAppSetting(UpdateAppSettingParam param) {
-        AppSetting appSetting = appSettingRepository.findByAppIdAndKey(param.getAppId(), param.getKey());
-        if (appSetting == null) {
-            appSetting = new AppSetting();
+    public void updateAppSetting(Long appId, UpdateAppSettingParam param) {
+        for (AppSettingKey settingKey : AppSettingKey.values()) {
+            AppSetting appSetting = appSettingRepository.findByAppIdAndKey(appId, settingKey.getCode());
+            if (appSetting == null) {
+                appSetting = new AppSetting();
+                appSetting.setAppId(appId);
+                appSetting.setKey(settingKey.getCode());
+            }
+            if (settingKey == AppSettingKey.IMG_NAMING_STRATEGY) {
+                appSetting.setValue(param.getNamingStrategy().name());
+            } else {
+                continue;
+            }
+            appSetting.setUpdateTime(System.currentTimeMillis());
+            appSettingRepository.save(appSetting);
         }
-        BeanUtils.copyProperties(param, appSetting);
-        appSetting.setUpdateTime(System.currentTimeMillis());
-        appSettingRepository.save(appSetting);
     }
 }

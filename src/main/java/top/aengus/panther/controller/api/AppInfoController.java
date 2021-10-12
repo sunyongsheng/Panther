@@ -11,6 +11,7 @@ import top.aengus.panther.model.app.AppDTO;
 import top.aengus.panther.model.app.CreateAppParam;
 import top.aengus.panther.model.app.UpdateAppParam;
 import top.aengus.panther.model.image.ImageDTO;
+import top.aengus.panther.model.setting.UpdateAppSettingParam;
 import top.aengus.panther.service.AppInfoService;
 import top.aengus.panther.service.ImageService;
 import top.aengus.panther.service.PantherConfigService;
@@ -78,6 +79,13 @@ public class AppInfoController extends ApiV1Controller {
         ImageDTO result = imageService.saveImage(file, null, appKey, true);
         appInfoService.updateAppAvatar(appKey, result.getUrl());
         return response.success().msg("更新成功");
+    }
+
+    @PutMapping("/app/setting")
+    public Response<Void> updateAppSetting(@RequestParam("app_key") String appKey,
+                                           @RequestBody @Validated UpdateAppSettingParam param) {
+        appInfoService.updateAppSetting(appKey, param);
+        return new Response<Void>().success().msg("保存成功");
     }
 
     @GetMapping("/app/{appKey}")

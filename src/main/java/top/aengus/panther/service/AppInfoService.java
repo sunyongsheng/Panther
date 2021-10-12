@@ -6,6 +6,7 @@ import top.aengus.panther.model.app.AppDTO;
 import top.aengus.panther.model.app.AppInfo;
 import top.aengus.panther.model.app.CreateAppParam;
 import top.aengus.panther.model.app.UpdateAppParam;
+import top.aengus.panther.model.setting.UpdateAppSettingParam;
 
 /**
  * @author sunyongsheng (sunyongsheng@bytedance.com)
@@ -33,5 +34,7 @@ public interface AppInfoService {
     void updateAppAvatar(String appKey, String avatarUrl);
 
     String generateUploadToken(String appKey);
+
+    void updateAppSetting(String appKey, UpdateAppSettingParam param);
 
 }

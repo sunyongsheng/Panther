@@ -15,6 +15,6 @@ public interface AppSettingService {
 
     void createAppSetting(CreateAppSettingParam param);
 
-    void updateAppSetting(UpdateAppSettingParam param);
+    void updateAppSetting(Long appId, UpdateAppSettingParam param);
 
 }

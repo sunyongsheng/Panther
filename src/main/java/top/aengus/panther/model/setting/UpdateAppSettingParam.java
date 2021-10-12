@@ -1,6 +1,9 @@
 package top.aengus.panther.model.setting;
 
 import lombok.Data;
+import top.aengus.panther.enums.NamingStrategy;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * @author Aengus Sun (sys6511@126.com)
@@ -10,10 +13,7 @@ import lombok.Data;
 @Data
 public class UpdateAppSettingParam {
 
-    private Long appId;
-
-    private String key;
-
-    private String value;
+    @NotNull(message = "命名规则不可为空！")
+    private NamingStrategy namingStrategy;
 
 }
