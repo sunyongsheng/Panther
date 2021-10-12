@@ -1,7 +1,3 @@
-async function shutdown() {
-    return axiosClient.get("/shutdown");
-}
-
 async function upload(appKey, dir, file) {
     const config = {
         headers: {

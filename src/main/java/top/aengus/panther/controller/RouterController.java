@@ -60,9 +60,4 @@ public class RouterController {
         return "admin/app";
     }
 
-    @RequestMapping("/shutdown")
-    public void shutdown() {
-        System.exit(0);
-    }
-
 }

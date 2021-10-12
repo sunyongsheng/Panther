@@ -30,7 +30,7 @@ public class CreateController {
     public Response<String> installPanther(@RequestBody @Validated InstallPantherParam param) {
         boolean result = pantherConfigService.install(param);
         if (result) {
-            return new Response<String>().success().msg("安装成功，请手动重启Panther。点击确认将自动停止Panther").data("admin");
+            return new Response<String>().success().msg("安装成功，请手动重启Panther，否则仍无法正常使用").data("admin");
         }
         return new Response<String>().unknownError().msg("安装失败");
     }

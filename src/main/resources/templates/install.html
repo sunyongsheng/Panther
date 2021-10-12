@@ -123,34 +123,13 @@
                 this.installing = true;
                 this.installText = "安装中"
                 this.install(this.installParam).then(response => {
-                    this.$confirm(response.msg, "提示", {
-                        confirmButtonText: '确定',
-                        cancelButtonText: '取消',
-                        type: 'warning'
-                    }).then(() => {
-                        shutdown().then(_ => {
-                            this.$message({
-                                type: 'success',
-                                message: '已停止，请再次启动Panther!'
-                            });
-                        }).catch(_ => {
-                            this.$message({
-                                type: 'error',
-                                message: '停止失败，请手动停止'
-                            });
-                        })
-                    }).catch(() => {
-                        this.$message({
-                            type: 'info',
-                            message: '请手动重启！'
-                        });
-                    });
+                    this.$alert(response.msg, "提示", {confirmButtonText: '确定',})
                 }).catch(response => {
                     this.$notify.error({
                         title: "安装失败",
                         message: response.msg,
                         duration: 0,
-                    })
+                    });
                 }).finally(() => {
                     this.installing = false;
                     this.installText = "开始安装"
