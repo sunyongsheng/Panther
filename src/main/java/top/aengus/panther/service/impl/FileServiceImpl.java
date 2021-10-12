@@ -70,6 +70,19 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    public void moveFileToBack(String rootPath, String filename, String originalPath) {
+        File deletedFile = getDeletedFile(rootPath);
+        File targetFile = new File(deletedFile, filename);
+        if (!targetFile.exists()) {
+            throw new InternalException("原文件已被删除，无法恢复文件！");
+        }
+        File originalFile = new File(originalPath);
+        if (!targetFile.renameTo(originalFile)) {
+            throw new InternalException("无法恢复文件，可能是有重名文件存在！");
+        }
+    }
+
+    @Override
     public void deleteFile(String rootPath, String filename, String absolutePath) {
         File deletedFile = getDeletedFile(rootPath);
         File targetFile = new File(deletedFile, filename);

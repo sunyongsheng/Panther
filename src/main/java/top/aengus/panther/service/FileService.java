@@ -22,6 +22,13 @@ public interface FileService {
     void moveFileToTrash(String rootPath, String absolutePath);
 
     /**
+     * 将文件移动回原位置
+     * @param filename 文件名
+     * @param originalPath 原来的位置
+     */
+    void moveFileToBack(String rootPath, String filename, String originalPath);
+
+    /**
      * 删除文件
      * 1. 先去回收站中寻找文件；
      * 2. 回收站中找不到则直接删除文件；

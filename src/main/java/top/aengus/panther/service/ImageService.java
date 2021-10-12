@@ -28,6 +28,8 @@ public interface ImageService {
 
     void deleteImage(Long imageId, String operator);
 
+    void undeleteImage(Long imageId, String operator);
+
     void deleteImageForever(Long imageId, String operator);
 
 }

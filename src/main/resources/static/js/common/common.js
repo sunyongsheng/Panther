@@ -34,3 +34,25 @@ function formatDate(date, fmt) {
     }
     return fmt;
 }
+
+function getSizeFromByte(byte) {
+    const KB = 1024;
+    const MB = 1048576;
+    if (byte < KB) {
+        return byte + 'B'
+    } else if (byte < MB) {
+        const k = byte / 1024
+        return k.toFixed(2) + 'K'
+    } else {
+        const m = byte / MB;
+        return m.toFixed(2) + 'M';
+    }
+}
+
+function ellipsisText(text, len) {
+    if (typeof text === 'string') {
+        if (text.length < len) return text;
+        return text.substring(0, len - 3) + '...';
+    }
+    return text;
+}

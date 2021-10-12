@@ -46,12 +46,4 @@ public class ImageModel {
 
     private int status;
 
-    public void delete() {
-        this.status = ImageStatus.DELETED.getCode();
-    }
-
-    public boolean isDeleted() {
-        return status == ImageStatus.DELETED.getCode();
-    }
-
 }

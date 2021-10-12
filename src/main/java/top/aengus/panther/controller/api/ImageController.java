@@ -74,6 +74,12 @@ public class ImageController extends ApiV1Controller {
         return response.success().msg("删除成功");
     }
 
+    @PostMapping("/image/undelete/{id}")
+    public Response<Void> undelete(@PathVariable("id") Long imageId) {
+        imageService.undeleteImage(imageId, configService.getAdminUsername());
+        return new Response<Void>().success().msg("恢复成功");
+    }
+
     @DeleteMapping("/image/{id}")
     public Response<Void> deleteForever(@PathVariable("id") Long imageId) {
         imageService.deleteImageForever(imageId, configService.getAdminUsername());

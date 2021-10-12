@@ -194,6 +194,14 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
+    public void undeleteImage(Long imageId, String operator) {
+        ImageModel imageModel = findImageWithCheck(imageId);
+        fileService.moveFileToBack(configService.getSaveRootPath(), imageModel.getSaveName(), imageModel.getAbsolutePath());
+        imageModel.setStatus(ImageStatus.NORMAL.getCode());
+        imageRepository.save(imageModel);
+    }
+
+    @Override
     public void deleteImageForever(Long imageId, String operator) {
         ImageModel imageModel = findImageWithCheck(imageId);
         fileService.deleteFile(configService.getSaveRootPath(), imageModel.getSaveName(), imageModel.getAbsolutePath());
