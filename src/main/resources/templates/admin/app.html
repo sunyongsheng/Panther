@@ -395,7 +395,7 @@
                     });
                 } else {
                     this.$prompt('删除后的App将在回收站中保留30天，之后将永远删除。请输入App英文名：', '警告', {
-                        confirmButtonClass: 'delete-app-confirm',
+                        confirmButtonClass: 'delete-action-confirm',
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
                         inputValidator: (val) => {
@@ -604,18 +604,6 @@
         width: 360px;
         height: 80px;
         border-radius: 4px;
-    }
-    .delete-app-confirm {
-        background-color: #FF4368;
-        border-color: #FF4368;
-    }
-    .delete-app-confirm:hover {
-        background-color: #FF7387;
-        border-color: #FF7387;
-    }
-    .delete-app-confirm:focus {
-        background-color: #FF7387;
-        border-color: #FF7387;
     }
     .setting-form {
         padding: 0 20px;

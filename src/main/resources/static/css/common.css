@@ -47,3 +47,16 @@
     border-radius: 10px;
     background: #ffffff;
 }
+
+.delete-action-confirm {
+    background-color: #FF4368;
+    border-color: #FF4368;
+}
+.delete-action-confirm:hover {
+    background-color: #FF7387;
+    border-color: #FF7387;
+}
+.delete-action-confirm:focus {
+    background-color: #FF7387;
+    border-color: #FF7387;
+}
