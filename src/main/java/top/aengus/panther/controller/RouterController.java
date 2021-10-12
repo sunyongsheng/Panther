@@ -56,8 +56,15 @@ public class RouterController {
     }
 
     @RequestMapping("/admin/app-manager")
-    public String toAppManagerPage() {
+    public String toAppManagerPage(Model model) {
+        model.addAttribute("username", configService.getAdminUsername());
         return "admin/app";
+    }
+
+    @RequestMapping("/admin/image-manager")
+    public String toImageManagerPage(Model model) {
+        model.addAttribute("username", configService.getAdminUsername());
+        return "admin/image";
     }
 
 }

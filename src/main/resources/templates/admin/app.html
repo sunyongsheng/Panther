@@ -536,11 +536,7 @@
                 })
             },
             onSelectSideMenu(index, _) {
-                if (index === 'overview') {
-                    window.location.href = "/admin/overview"
-                } else if (index === 'app-manager') {
-                    window.location.href = "/admin/app-manager"
-                }
+                window.location.href = "/admin/" + index;
             }
         },
         created: function () {

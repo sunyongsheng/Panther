@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>图片管理 —— Panther</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script src="https://unpkg.com/element-ui@2.15.6/lib/index.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui@2.15.6/lib/theme-chalk/index.css">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/common.css}">
+    <!-- axios必须引入且在request.js之前 -->
+    <script type="text/javascript" th:src="@{/js/axios.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/request.js}"></script>
+    <script type="text/javascript" th:src="@{/js/common/common.js}"></script>
+</head>
+<body>
+<div id="app">
+    <el-container>
+        <div th:replace="admin/sidebar::admin-sidebar(index='image-manager')"></div>
+
+    </el-container>
+</div>
+
+</body>
+<script>
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+
+            }
+        },
+        methods: {
+            onSelectSideMenu(index, _) {
+                window.location.href = "/admin/" + index;
+            }
+        }
+    })
+</script>
+<style>
+    .aside-title {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    body {
+        font-family: Arial, sans-serif;
+    }
+    .el-header {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        margin: 10px 30px
+    }
+    .el-main {
+        background-color: #F5F5FA;
+    }
+    .el-col {
+        border-radius: 4px;
+    }
+</style>
+</html>
