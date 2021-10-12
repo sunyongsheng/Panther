@@ -98,7 +98,11 @@ public class AppInfoController extends ApiV1Controller {
     public Response<Page<AppDTO>> getAllApps(@RequestParam(value = "page", defaultValue = "0") int page,
                                              @RequestParam(value = "page_size", defaultValue = "10") int pageSize) {
         Response<Page<AppDTO>> response = new Response<>();
-        return response.success().msg("获取成功").data(appInfoService.findDTOsByOwner(pantherConfigService.getAdminUsername(), page, pageSize));
+        // 因为ImageService和AppInfoService不能循环引用，所以totalImages字段在此填充
+        return response.success().msg("获取成功").data(appInfoService.findDTOsByOwner(pantherConfigService.getAdminUsername(), page, pageSize).map(app -> {
+            app.setTotalImages(imageService.countByAppKey(app.getAppKey()));
+            return app;
+        }));
     }
 
 }

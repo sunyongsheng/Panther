@@ -34,6 +34,8 @@ public class AppDTO {
 
     private AppStatus status;
 
+    private Long totalImages;
+
     // Token
     private Boolean hasUploadToken1;
 

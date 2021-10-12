@@ -32,6 +32,7 @@
                     <el-table-column prop="name" label="名称" align="center"></el-table-column>
                     <el-table-column prop="englishName" label="英文名" align="center"></el-table-column>
                     <el-table-column prop="createTimeFormatted" label="创建时间" align="center"></el-table-column>
+                    <el-table-column prop="totalImages" label="图片总数" align="center"></el-table-column>
                     <el-table-column label="状态" align="center" width="150">
                         <template slot-scope="scope">
                             <el-tag v-if="scope.row.locked" type="warning">已锁定</el-tag>

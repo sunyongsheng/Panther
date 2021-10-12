@@ -57,7 +57,7 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public long countByAppKey(String appKey) {
-        return imageRepository.countAllByCreator(appKey);
+        return imageRepository.countAllByOwner(appKey);
     }
 
     @Override
