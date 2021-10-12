@@ -8,7 +8,7 @@ package top.aengus.panther.enums;
  */
 public enum ImageStatus {
     NORMAL(0, "正常"),
-    DELETED(-1, "已删除");
+    DELETED(-1, "回收站");
 
     private final Integer code;
     private final String desc;
@@ -24,5 +24,12 @@ public enum ImageStatus {
 
     public String getDesc() {
         return desc;
+    }
+
+    public static ImageStatus fromCode(Integer code) {
+        if (ImageStatus.DELETED.code.equals(code)) {
+            return ImageStatus.DELETED;
+        }
+        return ImageStatus.NORMAL;
     }
 }

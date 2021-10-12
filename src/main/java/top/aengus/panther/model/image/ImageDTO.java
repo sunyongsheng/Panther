@@ -1,6 +1,7 @@
 package top.aengus.panther.model.image;
 
 import lombok.Data;
+import top.aengus.panther.enums.ImageStatus;
 
 /**
  * @author sunyongsheng (sunyongsheng@bytedance.com)
@@ -18,7 +19,9 @@ public class ImageDTO {
     // 图片的URL
     private String url;
 
-    private String owner;
+    private String ownerApp;
+
+    private ImageStatus status;
 
     private Long uploadTime;
 

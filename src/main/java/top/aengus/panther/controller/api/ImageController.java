@@ -67,14 +67,16 @@ public class ImageController extends ApiV1Controller {
         return new Response<List<ImageDTO>>().success().data(imageService.findAllByAppKey(appKey));
     }
 
-    @DeleteMapping("/image/{id}")
-    public Response<Boolean> delete(@PathVariable("id") Long imageId) {
-        Response<Boolean> response = new Response<>();
-        return response.success().msg("删除成功").data(imageService.deleteImage(imageId, configService.getAdminUsername()));
+    @PostMapping("/image/delete/{id}")
+    public Response<Void> delete(@PathVariable("id") Long imageId) {
+        Response<Void> response = new Response<>();
+        imageService.deleteImage(imageId, configService.getAdminUsername());
+        return response.success().msg("删除成功");
     }
 
-    @DeleteMapping("/image/delete/{id}")
-    public Response<Boolean> deleteForever(@PathVariable("id") Long imageId) {
-        return new Response<Boolean>().success().msg("删除成功").data(imageService.deleteImageForever(imageId, configService.getAdminUsername()));
+    @DeleteMapping("/image/{id}")
+    public Response<Void> deleteForever(@PathVariable("id") Long imageId) {
+        imageService.deleteImageForever(imageId, configService.getAdminUsername());
+        return new Response<Void>().success().msg("删除成功");
     }
 }

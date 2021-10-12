@@ -186,28 +186,23 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public boolean deleteImage(Long imageId, String operation) {
-        Optional<ImageModel> original = imageRepository.findById(imageId);
-        if (original.isPresent()) {
-            ImageModel imageModel = original.get();
-            imageModel.delete();
-            fileService.moveFileToTrash(configService.getSaveRootPath(), imageModel.getAbsolutePath());
-            imageRepository.save(imageModel);
-            return true;
-        }
-        return false;
+    public void deleteImage(Long imageId, String operation) {
+        ImageModel imageModel = findImageWithCheck(imageId);
+        fileService.moveFileToTrash(configService.getSaveRootPath(), imageModel.getAbsolutePath());
+        imageModel.setStatus(ImageStatus.DELETED.getCode());
+        imageRepository.save(imageModel);
     }
 
     @Override
-    public boolean deleteImageForever(Long imageId, String operator) {
+    public void deleteImageForever(Long imageId, String operator) {
+        ImageModel imageModel = findImageWithCheck(imageId);
+        fileService.deleteFile(configService.getSaveRootPath(), imageModel.getSaveName(), imageModel.getAbsolutePath());
+        imageRepository.delete(imageModel);
+    }
+
+    private ImageModel findImageWithCheck(Long imageId) {
         Optional<ImageModel> original = imageRepository.findById(imageId);
-        if (original.isPresent()) {
-            ImageModel imageModel = original.get();
-            fileService.deleteFile(configService.getSaveRootPath(), imageModel.getSaveName(), imageModel.getAbsolutePath());
-            imageRepository.delete(imageModel);
-            return true;
-        }
-        return false;
+        return original.orElseThrow(() -> new NotFoundException("图片不存在", imageId));
     }
 
     private ImageDTO convertToDto(ImageModel imageModel) {
@@ -215,8 +210,9 @@ public class ImageServiceImpl implements ImageService {
         dto.setId(imageModel.getId());
         dto.setName(imageModel.getSaveName());
         dto.setUrl(imageModel.getUrl());
-        dto.setOwner(imageModel.getOwner());
+        dto.setOwnerApp(appInfoService.findByAppKey(imageModel.getOwner()).getName());
         dto.setUploadTime(imageModel.getUploadTime());
+        dto.setStatus(ImageStatus.fromCode(imageModel.getStatus()));
         dto.setCreator(imageModel.getCreator());
         dto.setSize(imageModel.getSize());
         return dto;
