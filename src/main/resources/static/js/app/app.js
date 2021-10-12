@@ -39,6 +39,6 @@ async function updateSetting(appKey, param) {
     return axiosClient.put(`/api/v1/app/setting?app_key=${appKey}`, param)
 }
 
-async function createApp(param) {
+async function registerApp(param) {
     return axiosClient.post(`/api/v1/app`, param)
 }

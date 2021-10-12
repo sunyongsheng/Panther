@@ -117,7 +117,7 @@
         <input type="file" accept="image/*" multiple="multiple" id="upload-actual" hidden @change="parseFile($event)">
         <span slot="footer" class="dialog-footer">
             <el-button @click="uploadDialogVisible = false">取 消</el-button>
-            <el-button type="primary" :loading="uploading" @click="onSubmitUpload">上 传</el-button>
+            <el-button type="primary" :loading="uploading" @click="clickUpload">上 传</el-button>
         </span>
     </el-dialog>
 
@@ -143,16 +143,16 @@
             </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">
-            <el-button type="danger" @click="onClickDeleteApp(currSelectApp.appKey, currSelectApp.deleted)" v-if="!currSelectApp.locked">
+            <el-button type="danger" @click="clickDeleteApp(currSelectApp.appKey, currSelectApp.deleted)" v-if="!currSelectApp.locked">
                 {{ currSelectApp.deleted ? '恢 复' : '删 除'}}
             </el-button>
-            <el-button type="warning" @click="onClickLockApp(currSelectApp.appKey, currSelectApp.locked)" v-if="!currSelectApp.deleted">
+            <el-button type="warning" @click="clickLockApp(currSelectApp.appKey, currSelectApp.locked)" v-if="!currSelectApp.deleted">
                 {{ currSelectApp.locked ? '解 锁' : '锁 定'}}
             </el-button>
             <el-button @click="editDialogVisible = false">
                 取 消
             </el-button>
-            <el-button type="primary" v-if="!currSelectApp.deleted" :loading="updating" @click="onClickUpdateApp">
+            <el-button type="primary" v-if="!currSelectApp.deleted" :loading="updating" @click="clickUpdateApp">
                 保 存
             </el-button>
         </span>
@@ -185,13 +185,13 @@
                         <div class="space-column-6"></div>
                         <div class="setting-hint-text">{{ currSelectApp.updateToken1GenTimeFormatted }}</div>
                     </div>
-                    <el-button size="small" type="primary" round @click="onClickGenerateToken">{{currSelectApp.hasUploadToken1 ? '重新生成' : '生成Token'}}</el-button>
+                    <el-button size="small" type="primary" round @click="clickGenerateToken">{{currSelectApp.hasUploadToken1 ? '重新生成' : '生成Token'}}</el-button>
                 </div>
             </div>
         </div>
         <span slot="footer" class="dialog-footer">
             <el-button @click="settingDialogVisible = false">取 消</el-button>
-            <el-button type="primary" :loading="updating" @click="onClickSaveSetting">保 存</el-button>
+            <el-button type="primary" :loading="updating" @click="clickSaveSetting">保 存</el-button>
         </span>
     </el-dialog>
     <el-dialog title="Token生成成功"
@@ -222,7 +222,7 @@
         </el-form>
         <span slot="footer" class="dialog-footer">
             <el-button @click="createDialogVisible = false">取 消</el-button>
-            <el-button type="primary" :loading="updating" @click="createApp">创 建</el-button>
+            <el-button type="primary" :loading="updating" @click="clickCreateApp">创 建</el-button>
         </span>
     </el-dialog>
 </div>
@@ -348,7 +348,7 @@
                     }
                 }
             },
-            onSubmitUpload() {
+            clickUpload() {
                 if (this.selectedFiles.length > 0) {
                     this.uploading = true;
                     const tasks = [];
@@ -388,7 +388,7 @@
                     this.previewImages.splice(toRemoveIndex, 1);
                 }
             },
-            onClickDeleteApp(appKey, deleted) {
+            clickDeleteApp(appKey, deleted) {
                 if (deleted) {
                     this.$confirm('确认恢复App?', '提示', {
                         confirmButtonText: '确定',
@@ -429,7 +429,7 @@
                     });
                 }
             },
-            onClickLockApp(appKey, locked) {
+            clickLockApp(appKey, locked) {
                 if (locked) {
                     this.$confirm('解锁后App将可以继续上传图片, 是否解锁?', '提示', {
                         confirmButtonText: '确定',
@@ -466,7 +466,7 @@
                     });
                 }
             },
-            onClickUpdateApp() {
+            clickUpdateApp() {
                 this.updating = true;
                 updateAppInfo(this.currSelectApp.appKey, {
                     name: this.currSelectApp.name,
@@ -481,7 +481,7 @@
                     this.updating = false;
                 });
             },
-            onClickSaveSetting() {
+            clickSaveSetting() {
                 this.updating = true;
                 updateSetting(this.currSelectApp.appKey, {
                     namingStrategy: this.settingForm.namingStrategy
@@ -495,7 +495,7 @@
                     this.updating = false;
                 });
             },
-            onClickGenerateToken() {
+            clickGenerateToken() {
                 if (this.currSelectApp.hasUploadToken1) {
                     this.$confirm('重新生成Token后原Token将失效，是否继续？', '提示', {
                         confirmButtonText: '确定',
@@ -518,14 +518,14 @@
                     this.$message.error(e.msg);
                 })
             },
-            createApp() {
+            clickCreateApp() {
                 this.updating = true;
                 if (this.createAppParam.superApp) {
                     this.createAppParam.appRole = 'SUPER';
                 } else {
                     this.createAppParam.appRole = 'NORMAL';
                 }
-                createApp(this.createAppParam).then(response => {
+                registerApp(this.createAppParam).then(response => {
                     this.$message.success(response.msg);
                     this.createDialogVisible = false;
                     this.fetchAppData();
