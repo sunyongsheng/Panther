@@ -77,7 +77,7 @@
                 <el-pagination v-if="totalPage > 1"
                         background
                         layout="prev, pager, next"
-                        :total="totalPage"
+                        :page-count="totalPage"
                         :current-page="currPage"
                         @current-change="onChangePage">
                 </el-pagination>
