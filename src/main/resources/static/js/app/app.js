@@ -1,10 +1,10 @@
 const allNamingStrategySample = {
-    UUID: '2138dui2sdf0kfn.jpg',
-    ORIGIN: 'test.jpg',
-    DATE_UUID_HYPHEN: '2021-12-31-2138dui2sdf0kfn.jpg',
-    DATE_ORIGIN_HYPHEN: '2021-12-31-test.jpg',
-    DATE_UUID_UNDERLINE: '2021_12_31_2138dui2sdf0kfn.jpg',
-    DATE_ORIGIN_UNDERLINE: '2021_12_31_test.jpg'
+    UUID: '13513f...32e054.jpg',
+    ORIGIN: 'sample.jpg',
+    DATE_UUID_HYPHEN: '2021-12-31-13513f...32e054.jpg',
+    DATE_ORIGIN_HYPHEN: '2021-12-31-sample.jpg',
+    DATE_UUID_UNDERLINE: '2021_12_31-13513f...32e054.jpg',
+    DATE_ORIGIN_UNDERLINE: '2021_12_31_sample.jpg'
 };
 
 async function getAllAppData(page, pageSize) {
@@ -33,4 +33,8 @@ async function deleteApp(appKey) {
 
 async function undeleteApp(appKey) {
     return axiosClient.post(`/api/v1/app/undelete/?app_key=${appKey}`)
+}
+
+async function updateSetting(appKey, param) {
+    return axiosClient.put(`/api/v1/app/setting?app_key=${appKey}`, param)
 }

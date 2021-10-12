@@ -162,9 +162,10 @@
         :visible.sync="settingDialogVisible"
         width="40%"
         center destroy-on-close>
-        <el-form ref="settingForm" :model="settingForm" label-width="180px">
-            <el-form-item label="文件名生成规则">
-                <div class="row-container">
+        <div class="setting-form">
+            <div class="setting-form-item">
+                <div class="setting-form-item-title">文件名生成规则</div>
+                <div class="setting-form-item-content">
                     <el-select size="medium" placeholder="请选择上传图片文件名生成规则" v-model="settingForm.namingStrategy">
                         <el-option label="使用自动生成的「UUID」作为文件名" value="UUID"></el-option>
                         <el-option label="使用「原始名称」作为文件名" value="ORIGIN"></el-option>
@@ -175,15 +176,23 @@
                     </el-select>
                     <div class="hint-sample-text">{{ '示例：' + allNamingStrategySample[settingForm.namingStrategy] }}</div>
                 </div>
-            </el-form-item>
-            <el-form-item label="Token管理">
-                <div class="token-row-container">
-                    <span>{{ currSelectApp.updateToken1GenTimeFormatted }}</span>
-                    <div class="space-row-20"></div>
+            </div>
+            <div class="setting-form-item">
+                <div class="setting-form-item-title">Token管理</div>
+                <div class="setting-form-item-content">
+                    <div class="column-container">
+                        <div class="setting-form-item-text">上传Token</div>
+                        <div class="space-column-6"></div>
+                        <div class="setting-hint-text">{{ currSelectApp.updateToken1GenTimeFormatted }}</div>
+                    </div>
                     <el-button size="small" type="primary" round @click="onClickGenerateToken">{{currSelectApp.hasUploadToken1 ? '重新生成' : '生成Token'}}</el-button>
                 </div>
-            </el-form-item>
-        </el-form>
+            </div>
+        </div>
+        <span slot="footer" class="dialog-footer">
+            <el-button @click="settingDialogVisible = false">取 消</el-button>
+            <el-button type="primary" :loading="updating" @click="onClickSaveSetting">保 存</el-button>
+        </span>
     </el-dialog>
     <el-dialog title="Token生成成功"
                :visible.sync="tokenValueDialogVisible"
@@ -459,6 +468,20 @@
                     this.updating = false;
                 });
             },
+            onClickSaveSetting() {
+                this.updating = true;
+                updateSetting(this.currSelectApp.appKey, {
+                    namingStrategy: this.settingForm.namingStrategy
+                }).then(_ => {
+                    this.settingDialogVisible = false;
+                    this.$message.success("保存成功");
+                    this.fetchAppData();
+                }).catch(error => {
+                    this.$message.error(error.msg);
+                }).finally(() => {
+                    this.updating = false;
+                });
+            },
             onClickGenerateToken() {
                 if (this.currSelectApp.hasUploadToken1) {
                     this.$confirm('重新生成Token后原Token将失效，是否继续？', '提示', {
@@ -598,14 +621,45 @@
         background-color: #FF7387;
         border-color: #FF7387;
     }
+    .setting-form {
+        padding: 0 20px;
+        display: flex;
+        flex-direction: column;
+    }
+    .setting-form-item {
+        padding: 20px 0;
+        display: flex;
+        flex-direction: column;
+    }
+    .setting-form-item-title {
+        color: #000000;
+        font-weight: bold;
+        font-size: 16px;
+    }
+    .setting-form-item-content {
+        margin: 15px 0 5px 0;
+        padding: 20px 20px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        background: #F7F9FA;
+        border-radius: 4px;
+    }
+    .setting-form-item-text {
+        color: #000000;
+        font-size: 14px;
+    }
+    .setting-hint-text {
+        color: #a2a2a2;
+        font-size: 12px;
+    }
     .hint-sample-text {
         color: #a2a2a2;
         margin-left: 20px;
     }
-    .token-row-container {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
+    .upload-token-title {
+        color: #000000;
     }
     .token-value-text {
         color: #000000;
