@@ -128,15 +128,8 @@ public class ImageServiceImpl implements ImageService {
         }
         imageModel.setSize(image.getSize());
         imageModel.setStatus(ImageStatus.NORMAL.getCode());
-        try {
-            File dest = new File(absolutePath);
-            FileUtil.checkAndCreateDir(dest.getParentFile());
-            image.transferTo(dest);
-            log.info("上传图片成功：name={}, namingRule={}", dest.getName(), rule.getDesc());
-            return convertToDto(imageRepository.save(imageModel));
-        } catch (IOException e) {
-            throw new InternalException("保存图片异常", e);
-        }
+        fileService.saveToFile(image, absolutePath);
+        return convertToDto(imageRepository.save(imageModel));
     }
 
     private String generateAbsolutePath(AppInfo app, String dir, String name) {

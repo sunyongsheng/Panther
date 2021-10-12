@@ -1,5 +1,7 @@
 package top.aengus.panther.service;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 
 /**
@@ -12,6 +14,8 @@ public interface FileService {
     void initWorkspace(String rootPath, List<String> imgDirs);
 
     void initAppWorkspace(String rootPath, String appName);
+
+    void saveToFile(MultipartFile file, String absolutePath);
 
     /**
      * 将文件移动至回收站中
