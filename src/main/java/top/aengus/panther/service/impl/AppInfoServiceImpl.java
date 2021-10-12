@@ -84,7 +84,7 @@ public class AppInfoServiceImpl implements AppInfoService {
         appInfo.setAppKey(appKey);
         appInfo.setOwner(owner);
         appInfo.setCreateTime(System.currentTimeMillis());
-        appInfo.setRole(AppRole.NORMAL.getCode());
+        appInfo.setRole(param.getAppRole().getCode());
         appInfo.setStatus(AppStatus.NORMAL.getCode());
         eventPublisher.publishEvent(new CreateAppEvent(this, appInfoRepository.save(appInfo)));
         return appKey;

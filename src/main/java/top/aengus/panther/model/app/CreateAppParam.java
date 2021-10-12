@@ -1,10 +1,10 @@
 package top.aengus.panther.model.app;
 
 import lombok.Data;
-import org.hibernate.validator.constraints.Length;
+import top.aengus.panther.enums.AppRole;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Data
 public class CreateAppParam {
@@ -15,10 +15,7 @@ public class CreateAppParam {
     @NotBlank(message = "英文名不能为空")
     private String englishName;
 
-    @Length(message = "手机号必须为11位")
-    private String phone;
-
-    @Email(message = "邮箱地址不合法")
-    private String email;
+    @NotNull(message = "App必须设置初始角色！")
+    private AppRole appRole;
 
 }

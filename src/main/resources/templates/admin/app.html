@@ -209,7 +209,21 @@
     <el-dialog title="创建App"
                :visible.sync="createDialogVisible"
                center>
-
+        <el-form ref="create-form" :model="createAppParam" label-width="120px">
+            <el-form-item label="App名称">
+                <el-input v-model="createAppParam.name" placeholder="App的名称，可重复"></el-input>
+            </el-form-item>
+            <el-form-item label="App英文名">
+                <el-input v-model="createAppParam.englishName" placeholder="不可重复，不可包含符号、中文，上传图片将存储在同名文件夹中"></el-input>
+            </el-form-item>
+            <el-form-item label="是否超级App">
+                <el-switch v-model="createAppParam.superApp"></el-switch>
+            </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+            <el-button @click="createDialogVisible = false">取 消</el-button>
+            <el-button type="primary" :loading="updating" @click="createApp">创 建</el-button>
+        </span>
     </el-dialog>
 </div>
 </body>
@@ -257,6 +271,11 @@
                 allNamingStrategySample,
 
                 createDialogVisible: false,
+                createAppParam: {
+                    name: '',
+                    englishName: '',
+                    superApp: false,
+                },
 
                 loadingAppData: false,
                 appData: [],
@@ -303,16 +322,10 @@
             },
             onClickCreate() {
                 this.createDialogVisible = true;
-                this.currSelectApp = {
+                this.createAppParam = {
                     name: '',
-                    role: 'NORMAL',
                     englishName: '',
-                    avatarUrl: '',
-                    phone: '',
-                    email: '',
-
-                    superApp: false,
-                    locked: false,
+                    superApp: false
                 };
             },
             onClickSetting(app) {
@@ -503,6 +516,23 @@
                     this.fetchAppData();
                 }).catch(e => {
                     this.$message.error(e.msg);
+                })
+            },
+            createApp() {
+                this.updating = true;
+                if (this.createAppParam.superApp) {
+                    this.createAppParam.appRole = 'SUPER';
+                } else {
+                    this.createAppParam.appRole = 'NORMAL';
+                }
+                createApp(this.createAppParam).then(response => {
+                    this.$message.success(response.msg);
+                    this.createDialogVisible = false;
+                    this.fetchAppData();
+                }).catch(e => {
+                    this.$message.error(e.msg);
+                }).finally(_ => {
+                    this.updating = false;
                 })
             },
             onSelectSideMenu(index, _) {

@@ -38,3 +38,7 @@ async function undeleteApp(appKey) {
 async function updateSetting(appKey, param) {
     return axiosClient.put(`/api/v1/app/setting?app_key=${appKey}`, param)
 }
+
+async function createApp(param) {
+    return axiosClient.post(`/api/v1/app`, param)
+}
