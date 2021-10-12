@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NotFoundException.class)
     public Response<Object> notFoundException(NotFoundException exception) {
-        log.error("[notFoundException]", exception);
+        log.error("[notFoundException] key=" + exception.getKey().toString(), exception);
         return new Response<>().notFound().msg(exception.getMessage()).data(exception.getKey());
     }
 
