@@ -17,6 +17,13 @@
     <el-container>
         <div th:replace="admin/sidebar::admin-sidebar(index='image-manager')"></div>
 
+        <el-container direction="vertical">
+            <div th:replace="admin/sidebar::admin-header"></div>
+
+            <el-main>
+
+            </el-main>
+        </el-container>
     </el-container>
 </div>
 
@@ -43,6 +50,11 @@
         justify-content: center;
         align-items: center;
     }
+    .user-info {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
     body {
         font-family: Arial, sans-serif;
     }
@@ -55,9 +67,6 @@
     }
     .el-main {
         background-color: #F5F5FA;
-    }
-    .el-col {
-        border-radius: 4px;
     }
 </style>
 </html>
