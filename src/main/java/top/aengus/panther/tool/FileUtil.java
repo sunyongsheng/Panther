@@ -48,14 +48,15 @@ public class FileUtil {
 
     public static boolean isPic(String filename) {
         if (filename == null) return false;
-        return (filename.endsWith(".jpeg")
-                || filename.endsWith(".jpg")
-                || filename.endsWith(".png")
-                || filename.endsWith(".gif")
-                || filename.endsWith(".svg")
-                || filename.endsWith(".bmp")
-                || filename.endsWith(".ico")
-                || filename.endsWith(".tiff"));
+        String ignoreCase = filename.toLowerCase();
+        return (ignoreCase.endsWith(".jpeg")
+                || ignoreCase.endsWith(".jpg")
+                || ignoreCase.endsWith(".png")
+                || ignoreCase.endsWith(".gif")
+                || ignoreCase.endsWith(".svg")
+                || ignoreCase.endsWith(".bmp")
+                || ignoreCase.endsWith(".ico")
+                || ignoreCase.endsWith(".tiff"));
     }
 
     public static boolean checkAndCreateDir(File dir) {
