@@ -90,6 +90,8 @@ public class ImageServiceImpl implements ImageService {
             throw new BadRequestException(originName + " 非图片文件！");
         }
 
+        String saveDir = tryCheckDir(dir);
+
         AppInfo appInfo = appInfoService.findByAppKey(appKey);
         if (appInfo == null) {
             throw new NotFoundException("App不存在！请先创建App", appKey);
@@ -109,8 +111,8 @@ public class ImageServiceImpl implements ImageService {
             rule = NamingStrategy.valueOf(setting.getValue());
         }
         String saveName = generateName(rule, originName);
-        String absolutePath = generateAbsolutePath(appInfo, dir, saveName);
-        String relativePath = generateRelativePath(appInfo, dir, saveName);
+        String absolutePath = generateAbsolutePath(appInfo, saveDir, saveName);
+        String relativePath = generateRelativePath(appInfo, saveDir, saveName);
         ImageModel imageModel = new ImageModel();
         imageModel.setOriginalName(originName);
         imageModel.setSaveName(saveName);
@@ -131,9 +133,6 @@ public class ImageServiceImpl implements ImageService {
     }
 
     private String generateAbsolutePath(AppInfo app, String dir, String name) {
-        if (!ImageDirUtil.isValidDir(dir)) {
-            throw new BadRequestException("路径不合法，只能为 common|post|travel");
-        }
         if (app.isSuperRole() && StringUtil.isNotEmpty(dir)) {
             return new File(new File(configService.getSaveRootPath(), dir), name).getAbsolutePath();
         } else {
@@ -174,6 +173,15 @@ public class ImageServiceImpl implements ImageService {
 
     private String generateUrl(String relativePath) {
         return UrlUtil.ensureNoSuffix(configService.getHostUrl()) + relativePath;
+    }
+
+    private String tryCheckDir(String dir) {
+        if (StringUtil.isEmpty(dir)) return null;
+        if (!FileUtil.checkDirname(dir)) throw new BadRequestException("文件夹名不合法！");
+        if (dir.contains("\\")) throw new BadRequestException("目前不支持上传到子文件夹！" + dir);
+        String correct = FileUtil.ensureNoPrefix(FileUtil.ensureNoSuffix(dir));
+        if (correct.contains("/")) throw new BadRequestException("目前不支持上传到子文件夹！" + dir);
+        return correct;
     }
 
     @Override

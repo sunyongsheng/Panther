@@ -59,6 +59,15 @@ public class FileUtil {
                 || ignoreCase.endsWith(".tiff"));
     }
 
+    public static boolean checkDirname(String dirname) {
+        if (StringUtil.isEmpty(dirname)) return false;
+        return !dirname.contains(".") && !dirname.contains("?")
+                && !dirname.contains("*") && !dirname.contains("=")
+                && !dirname.contains(">") && !dirname.contains("<")
+                && !dirname.contains(":") && !dirname.contains("\"")
+                && !dirname.contains("|");
+    }
+
     public static boolean checkAndCreateDir(File dir) {
         if (!dir.exists()) {
             if (!dir.mkdir()) {
