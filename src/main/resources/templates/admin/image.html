@@ -12,6 +12,7 @@
     <script type="text/javascript" th:src="@{/js/request.js}"></script>
     <script type="text/javascript" th:src="@{/js/common/common.js}"></script>
     <script type="text/javascript" th:src="@{/js/image/image.js}"></script>
+    <script type="text/javascript" th:src="@{/js/app/app.js}"></script>
 </head>
 <body>
 <div id="app">
@@ -81,8 +82,38 @@
     <el-dialog
             title="上传图片"
             :visible.sync="uploadDialogVisible"
-            width="480px" center>
+            width="650px" center>
         <div class="upload-container">
+            <el-form :inline="true" :model="uploadData" class="demo-form-inline">
+                <el-form-item label="所属App">
+                    <el-select v-model="uploadData.uploadApp"
+                               placeholder="请选择图片的App"
+                               value-key="appKey"
+                               :loading="searching"
+                               remote filterable
+                               :remote-method="getAppData"
+                               @change="onChangeSelectedApp"
+                               @focus="getAppData('')">
+                        <el-option v-for="app in appData"
+                                   :key="app.id"
+                                   :label="app.name"
+                                   :value="app"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="文件夹">
+                    <el-input v-model="uploadData.uploadDir"
+                              :disabled="uploadData.uploadDirDisabled"
+                              v-popover:popover
+                              placeholder="默认上传到App目录"></el-input>
+                </el-form-item>
+                <el-popover
+                        ref="popover"
+                        placement="top"
+                        title="说明"
+                        width="200"
+                        trigger="hover"
+                        content="只有超级App才可编辑此项目"></el-popover>
+            </el-form>
             <label class="upload-button" for="upload-actual">选 择 图 片</label>
             <el-empty description="请选择图片" v-if="selectedImagesPreview.length === 0"></el-empty>
             <div class="preview-container" v-else>
@@ -114,11 +145,19 @@
                 totalPage: 1,
                 pageSize: 10,
 
+                // 多选的图片
                 multipleSelection: [],
 
                 uploadDialogVisible: false,
                 uploading: false,
-                selectedImages: [],
+                uploadData: {
+                    selectedImages: [],
+                    uploadDir: '',
+                    uploadDirDisabled: false,
+                    uploadApp: {},
+                },
+                appData: [],
+                searching: false,
                 selectedImagesPreview: [],
             }
         },
@@ -155,7 +194,7 @@
                     let i = 0, len = event.target.files.length;
                     for (i, len; i < len; i++) {
                         const file = event.target.files[i]
-                        this.selectedImages.push(file);
+                        this.uploadData.selectedImages.push(file);
                         const reader = new FileReader();
                         reader.onload = function (evt) {
                             that.selectedImagesPreview.push(evt.target.result);
@@ -173,12 +212,75 @@
                     }
                 }
                 if (toRemoveIndex !== -1) {
-                    this.selectedImages.splice(toRemoveIndex, 1);
+                    this.uploadData.selectedImages.splice(toRemoveIndex, 1);
                     this.selectedImagesPreview.splice(toRemoveIndex, 1);
                 }
             },
+            getAppData(query) {
+                let fetched = [];
+                this.searching = true;
+                if (query) {
+                    searchApp(query).then(response => {
+                        response.data.forEach(app => {
+                            fetched.push(app);
+                        });
+                        this.appData = fetched;
+                    }).finally(() => this.searching = false);
+                } else {
+                    getAllAppData(0, 50).then(response => {
+                        response.data.content.forEach(app => {
+                            fetched.push(app);
+                        });
+                        this.appData = fetched;
+                    }).finally(() => this.searching = false);
+                }
+            },
+            onChangeSelectedApp(app) {
+                this.uploadData.uploadDir = '/app/' + app.englishName;
+                this.uploadData.uploadDirDisabled = app.role !== 'SUPER';
+            },
             clickUpload() {
-
+                if (!this.uploadData.uploadApp.appKey) {
+                    this.$message.error("请选择图片所属App");
+                    return;
+                }
+                if (this.uploadData.selectedImages.length === 0) {
+                    this.$message.error("请选择上传的图片");
+                    return;
+                }
+                this.uploading = true;
+                const tasks = [];
+                let dir;
+                if (this.uploadData.uploadApp.role === 'SUPER') {
+                    if (this.uploadData.uploadDir !== '/app/' + this.uploadData.uploadApp.englishName) {
+                        dir = this.uploadData.uploadDir;
+                    }
+                } else {
+                    dir = null;
+                }
+                this.uploadData.selectedImages.forEach(file => {
+                    tasks.push(new Promise(((resolve, reject) => {
+                        upload(this.uploadData.uploadApp.appKey, dir, file).then(response => {
+                            this.$message.success(`上传${response.data.originalName}成功`);
+                            resolve.call(response);
+                        }).catch((error) => {
+                            this.$message.error(error.msg);
+                            reject.call(error);
+                        });
+                    })));
+                });
+                Promise.all(tasks).then((_) => {
+                    this.uploadDialogVisible = false;
+                    this.uploadData.selectedImages = [];
+                    this.uploadData.uploadDir = '';
+                    this.uploadData.uploadApp = {};
+                    this.selectedImagesPreview = [];
+                }).catch(error => {
+                    console.error(error)
+                }).finally(() => {
+                    this.uploading = false;
+                    this.fetchImageData();
+                });
             },
             onClickImageName(image) {
                 try {
