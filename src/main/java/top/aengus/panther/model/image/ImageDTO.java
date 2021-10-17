@@ -16,6 +16,9 @@ public class ImageDTO {
     // 图片文件名
     private String name;
 
+    // 图片原始文件名
+    private String originalName;
+
     // 图片的URL
     private String url;
 

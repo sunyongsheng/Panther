@@ -14,7 +14,6 @@ import top.aengus.panther.enums.AppStatus;
 import top.aengus.panther.enums.ImageStatus;
 import top.aengus.panther.enums.NamingStrategy;
 import top.aengus.panther.exception.BadRequestException;
-import top.aengus.panther.exception.InternalException;
 import top.aengus.panther.exception.NotFoundException;
 import top.aengus.panther.model.app.AppInfo;
 import top.aengus.panther.model.setting.AppSetting;
@@ -24,7 +23,6 @@ import top.aengus.panther.service.*;
 import top.aengus.panther.tool.*;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -89,7 +87,7 @@ public class ImageServiceImpl implements ImageService {
 
         String originName = image.getOriginalFilename();
         if (!FileUtil.isPic(originName)) {
-            throw new BadRequestException("非图片文件！");
+            throw new BadRequestException(originName + " 非图片文件！");
         }
 
         AppInfo appInfo = appInfoService.findByAppKey(appKey);
@@ -210,6 +208,7 @@ public class ImageServiceImpl implements ImageService {
         ImageDTO dto = new ImageDTO();
         dto.setId(imageModel.getId());
         dto.setName(imageModel.getSaveName());
+        dto.setOriginalName(imageModel.getOriginalName());
         dto.setUrl(imageModel.getUrl());
         dto.setOwnerApp(appInfoService.findByAppKey(imageModel.getOwner()).getName());
         dto.setUploadTime(imageModel.getUploadTime());
