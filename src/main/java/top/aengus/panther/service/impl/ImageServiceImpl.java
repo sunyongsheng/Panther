@@ -185,11 +185,11 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public void deleteImage(Long imageId, String operation) {
+    public ImageModel deleteImage(Long imageId, String operation) {
         ImageModel imageModel = findImageWithCheck(imageId);
         fileService.moveFileToTrash(configService.getSaveRootPath(), imageModel.getAbsolutePath());
         imageModel.setStatus(ImageStatus.DELETED.getCode());
-        imageRepository.save(imageModel);
+        return imageRepository.save(imageModel);
     }
 
     @Override

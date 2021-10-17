@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import top.aengus.panther.core.Constants;
 import top.aengus.panther.core.Response;
 import top.aengus.panther.model.image.ImageDTO;
+import top.aengus.panther.model.image.ImageModel;
 import top.aengus.panther.service.ImageService;
 import top.aengus.panther.service.PantherConfigService;
 
@@ -70,8 +71,8 @@ public class ImageController extends ApiV1Controller {
     @PostMapping("/image/delete/{id}")
     public Response<Void> delete(@PathVariable("id") Long imageId) {
         Response<Void> response = new Response<>();
-        imageService.deleteImage(imageId, configService.getAdminUsername());
-        return response.success().msg("删除成功");
+        ImageModel model = imageService.deleteImage(imageId, configService.getAdminUsername());
+        return response.success().msg(model.getSaveName() + " 删除成功");
     }
 
     @PostMapping("/image/undelete/{id}")

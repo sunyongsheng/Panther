@@ -26,7 +26,7 @@ public interface ImageService {
 
     ImageDTO saveImage(MultipartFile image, String dir, String appKey, boolean isAdmin);
 
-    void deleteImage(Long imageId, String operator);
+    ImageModel deleteImage(Long imageId, String operator);
 
     void undeleteImage(Long imageId, String operator);
 
