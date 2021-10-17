@@ -81,7 +81,7 @@ public class FileServiceImpl implements FileService {
         File deletedFile = getDeletedFile(rootPath);
         File target = new File(deletedFile, original.getName());
         if (!original.renameTo(target)) {
-            throw new InternalException("删除文件失败");
+            throw new InternalException("删除文件失败，可能是回收站目录损坏！");
         }
     }
 
