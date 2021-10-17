@@ -16,6 +16,8 @@ import top.aengus.panther.service.AppInfoService;
 import top.aengus.panther.service.ImageService;
 import top.aengus.panther.service.PantherConfigService;
 
+import java.util.List;
+
 @RestController
 public class AppInfoController extends ApiV1Controller {
 
@@ -92,6 +94,12 @@ public class AppInfoController extends ApiV1Controller {
     public Response<AppDTO> findApp(@PathVariable("appKey") String appKey) {
         Response<AppDTO> response = new Response<>();
         return response.success().data(appInfoService.findDTOByAppKey(appKey));
+    }
+
+    @GetMapping("/app}")
+    public Response<List<AppDTO>> searchApp(@RequestParam("query") String query) {
+        Response<List<AppDTO>> response = new Response<>();
+        return response.success().data(appInfoService.findDTOByName(query));
     }
 
     @GetMapping("/apps")

@@ -1,6 +1,7 @@
 package top.aengus.panther.service.impl;
 
 import cn.hutool.core.util.IdUtil;
+import lombok.NonNull;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -22,6 +23,9 @@ import top.aengus.panther.service.AppInfoService;
 import top.aengus.panther.service.AppSettingService;
 import top.aengus.panther.service.AppTokenService;
 import top.aengus.panther.tool.StringUtil;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AppInfoServiceImpl implements AppInfoService {
@@ -62,6 +66,13 @@ public class AppInfoServiceImpl implements AppInfoService {
             throw new NotFoundException("App不存在！", appKey);
         }
         return convertToDto(appInfo);
+    }
+
+    @Override
+    public List<AppDTO> findDTOByName(String name) {
+        List<AppInfo> appInfo = appInfoRepository.findByNameContainsOrEnglishNameContains(name, name);
+        if (appInfo == null) return null;
+        return appInfo.stream().map(this::convertToDto).collect(Collectors.toList());
     }
 
     @Override
@@ -130,7 +141,7 @@ public class AppInfoServiceImpl implements AppInfoService {
         appSettingService.updateAppSetting(appInfo.getId(), param);
     }
 
-    private AppDTO convertToDto(AppInfo appInfo) {
+    private AppDTO convertToDto(@NonNull AppInfo appInfo) {
         AppDTO appDTO = new AppDTO();
         BeanUtils.copyProperties(appInfo, appDTO);
         appDTO.setRole(AppRole.fromCode(appInfo.getRole()));

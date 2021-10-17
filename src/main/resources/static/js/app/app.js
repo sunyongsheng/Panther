@@ -11,6 +11,10 @@ async function getAllAppData(page, pageSize) {
     return axiosClient.get(`/api/v1/apps?page=${page}&page_size=${pageSize}`)
 }
 
+async function searchApp(query) {
+    return axiosClient.get(`/api/v1/app?query=${query}`)
+}
+
 async function generateUploadToken(appKey) {
     return axiosClient.post(`api/v1/app/uploadToken?app_key=${appKey}`)
 }

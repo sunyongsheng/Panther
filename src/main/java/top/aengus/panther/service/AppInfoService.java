@@ -8,6 +8,8 @@ import top.aengus.panther.model.app.CreateAppParam;
 import top.aengus.panther.model.app.UpdateAppParam;
 import top.aengus.panther.model.setting.UpdateAppSettingParam;
 
+import java.util.List;
+
 /**
  * @author sunyongsheng (sunyongsheng@bytedance.com)
  * <p>
@@ -22,6 +24,8 @@ public interface AppInfoService {
     AppInfo findByAppKey(String appKey);
 
     AppDTO findDTOByAppKey(String appKey);
+
+    List<AppDTO> findDTOByName(String name);
 
     Page<AppDTO> findDTOsByOwner(String owner, int page, int pageSize);
 
