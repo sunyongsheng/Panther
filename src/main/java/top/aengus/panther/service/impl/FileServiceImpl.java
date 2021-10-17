@@ -118,11 +118,6 @@ public class FileServiceImpl implements FileService {
         }
     }
 
-    @Override
-    public List<String> getWorkspaceDirs(String basePath) {
-        return null;
-    }
-
     private File getDeletedFile(String basePath) {
         if (DELETED_FILE == null) {
             synchronized (FileServiceImpl.class) {

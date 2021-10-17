@@ -42,6 +42,4 @@ public interface FileService {
      */
     void deleteFile(String rootPath,String filename, String absolutePath);
 
-    List<String> getWorkspaceDirs(String rootPath);
-
 }
