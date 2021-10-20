@@ -209,6 +209,8 @@ public class PantherConfigServiceImpl implements PantherConfigService {
         try {
             if (StringUtil.isEmpty(param.getSaveRootPath())) {
                 param.setSaveRootPath(getFallbackPath());
+            } else if (param.getSaveRootPath().contains("\\")) {
+                throw new BadRequestException("请使用 / 作为路径分隔符！");
             }
             File check = new File(param.getSaveRootPath());
             if (!check.exists() || !check.isDirectory()) {
