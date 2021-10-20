@@ -128,7 +128,7 @@
                     this.$notify.error({
                         title: "安装失败",
                         message: response.msg,
-                        duration: 0,
+                        duration: 5000,
                     });
                 }).finally(() => {
                     this.installing = false;
