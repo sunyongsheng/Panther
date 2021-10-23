@@ -72,14 +72,14 @@ public class AppEventListener {
             appTokenService.deleteToken(appKey);
             appSettingService.deleteAppSetting(app.getId());
         } else {
-            imageService.deleteImagesByAppKey(event.getApp().getAppKey());
+            imageService.deleteImagesWithAppAuto(event.getApp().getAppKey());
         }
     }
 
     @Async
     @EventListener(UndeleteAppEvent.class)
     public void handleUndeleteAppEvent(UndeleteAppEvent event) {
-        imageService.undeleteImagesByAppKey(event.getApp().getAppKey());
+        imageService.undeleteImagesWithAppAuto(event.getApp().getAppKey());
     }
 
 }

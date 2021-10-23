@@ -189,11 +189,11 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public void deleteImagesByAppKey(String appKey) {
+    public void deleteImagesWithAppAuto(String appKey) {
         String rootPath = configService.getSaveRootPath();
-        imageRepository.findAllByOwner(appKey).forEach(image -> {
+        imageRepository.findAllByOwnerAndStatus(appKey, ImageStatus.NORMAL.getCode()).forEach(image -> {
             fileService.moveFileToTrashWithCatch(rootPath, image.getAbsolutePath());
-            image.setStatus(ImageStatus.DELETED.getCode());
+            image.setStatus(ImageStatus.DELETED_AUTO.getCode());
             image.setUpdateTime(System.currentTimeMillis());
             imageRepository.save(image);
         });
@@ -209,9 +209,9 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public void undeleteImagesByAppKey(String appKey) {
+    public void undeleteImagesWithAppAuto(String appKey) {
         String rootPath = configService.getSaveRootPath();
-        imageRepository.findAllByOwner(appKey).forEach(image -> {
+        imageRepository.findAllByOwnerAndStatus(appKey, ImageStatus.DELETED_AUTO.getCode()).forEach(image -> {
             fileService.moveFileToBackWithCatch(rootPath, image.getSaveName(), image.getAbsolutePath());
             image.setStatus(ImageStatus.NORMAL.getCode());
             image.setUpdateTime(System.currentTimeMillis());
@@ -248,7 +248,7 @@ public class ImageServiceImpl implements ImageService {
         dto.setUrl(imageModel.getUrl());
         dto.setOwnerApp(appInfoService.findByAppKey(imageModel.getOwner()).getName());
         dto.setUploadTime(imageModel.getUploadTime());
-        dto.setStatus(ImageStatus.fromCode(imageModel.getStatus()));
+        dto.setStatus(ImageStatus.fromCodeForDTO(imageModel.getStatus()));
         dto.setCreator(imageModel.getCreator());
         dto.setSize(imageModel.getSize());
         return dto;
