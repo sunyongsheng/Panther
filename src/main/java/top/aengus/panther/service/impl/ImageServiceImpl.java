@@ -235,6 +235,11 @@ public class ImageServiceImpl implements ImageService {
         });
     }
 
+    @Override
+    public Page<ImageModel> findAllByStatus(ImageStatus status, int page, int pageSize) {
+        return imageRepository.findAllByStatus(status.getCode(), PageRequest.of(page, pageSize));
+    }
+
     private ImageModel findImageWithCheck(Long imageId) {
         Optional<ImageModel> original = imageRepository.findById(imageId);
         return original.orElseThrow(() -> new NotFoundException("图片不存在", imageId));

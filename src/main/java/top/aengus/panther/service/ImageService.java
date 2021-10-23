@@ -2,6 +2,7 @@ package top.aengus.panther.service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
+import top.aengus.panther.enums.ImageStatus;
 import top.aengus.panther.model.image.ImageDTO;
 import top.aengus.panther.model.image.ImageModel;
 
@@ -42,4 +43,5 @@ public interface ImageService {
 
     void deleteImagesForeverByAppKey(String appKey);
 
+    Page<ImageModel> findAllByStatus(ImageStatus status, int page, int pageSize);
 }

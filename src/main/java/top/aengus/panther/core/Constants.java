@@ -2,6 +2,13 @@ package top.aengus.panther.core;
 
 public class Constants {
 
+    public static final int PAGE_SIZE = 20;
+
+    /**
+     * 图片及App在回收站中的保留时间
+     */
+    public static final int RETENTION_DAYS = 30;
+
     public static class Cookie {
         /**
          * 存储在Cookie中，进行Router请求时鉴权使用
