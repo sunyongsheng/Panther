@@ -46,7 +46,7 @@ public class DeleteAppTask {
     private void decideDeleteApp(AppInfo app, long deadline) {
         if (calculateDays(app.getUpdateTime(), deadline) > 30) {
             log.info("[deleteAppForever] {} 被永久删除", app);
-            appInfoService.deleteApp(app.getId());
+            appInfoService.deleteAppForever(app.getId());
             eventPublisher.publishEvent(new DeleteAppEvent(this, app, true));
         }
     }

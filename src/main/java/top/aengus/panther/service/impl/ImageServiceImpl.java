@@ -192,7 +192,7 @@ public class ImageServiceImpl implements ImageService {
     public void deleteImagesByAppKey(String appKey) {
         String rootPath = configService.getSaveRootPath();
         imageRepository.findAllByOwner(appKey).forEach(image -> {
-            fileService.moveFileToTrash(rootPath, image.getAbsolutePath());
+            fileService.moveFileToTrashWithCatch(rootPath, image.getAbsolutePath());
             image.setStatus(ImageStatus.DELETED.getCode());
             image.setUpdateTime(System.currentTimeMillis());
             imageRepository.save(image);
@@ -212,7 +212,7 @@ public class ImageServiceImpl implements ImageService {
     public void undeleteImagesByAppKey(String appKey) {
         String rootPath = configService.getSaveRootPath();
         imageRepository.findAllByOwner(appKey).forEach(image -> {
-            fileService.moveFileToBack(rootPath, image.getSaveName(), image.getAbsolutePath());
+            fileService.moveFileToBackWithCatch(rootPath, image.getSaveName(), image.getAbsolutePath());
             image.setStatus(ImageStatus.NORMAL.getCode());
             image.setUpdateTime(System.currentTimeMillis());
             imageRepository.save(image);

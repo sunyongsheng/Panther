@@ -379,7 +379,7 @@
             },
             clickDeleteApp(appKey, deleted) {
                 if (deleted) {
-                    this.$confirm('确认恢复App?', '提示', {
+                    this.$confirm('恢复App后，将恢复上传能力，其图片也将从回收站中移动回原目录，确认恢复？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
                         type: 'info'
@@ -388,7 +388,7 @@
                             this.editDialogVisible = false;
                             this.$message({
                                 type: 'success',
-                                message: '恢复成功!'
+                                message: '恢复成功！图片将在稍后自动移动至原目录'
                             });
                             this.fetchAppData();
                         }).catch(error => {
@@ -397,7 +397,7 @@
                     });
                 } else {
                     this.$prompt(
-                        `删除后的App将在回收站中保留30天，之后将永远删除，其${this.currSelectApp.totalImages}张图片也将被一并删除。请输入App英文名：`,
+                        `删除后的App及其${this.currSelectApp.totalImages}张图片将在回收站中保留30天，之后将永远删除。请输入App英文名：`,
                         '警告', {
                         confirmButtonClass: 'delete-action-confirm',
                         confirmButtonText: '确定',
@@ -411,7 +411,7 @@
                             this.editDialogVisible = false;
                             this.$message({
                                 type: 'success',
-                                message: '删除成功!'
+                                message: '删除成功！App图片将在稍后自动移动至回收站'
                             });
                             this.fetchAppData();
                         }).catch(error => {
@@ -439,7 +439,7 @@
                         });
                     });
                 } else {
-                    this.$confirm('锁定App后将无法上传图片, 是否继续?', '提示', {
+                    this.$confirm('锁定App后将无法上传图片, 但已上传图片不会受到影响，是否继续?', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
                         type: 'warning'

@@ -7,6 +7,7 @@ import top.aengus.panther.enums.AppSettingKey;
 import top.aengus.panther.enums.NamingStrategy;
 import top.aengus.panther.event.CreateAppEvent;
 import top.aengus.panther.event.DeleteAppEvent;
+import top.aengus.panther.event.UndeleteAppEvent;
 import top.aengus.panther.model.app.AppInfo;
 import top.aengus.panther.model.setting.CreateAppSettingParam;
 import top.aengus.panther.service.*;
@@ -71,9 +72,14 @@ public class AppEventListener {
             appTokenService.deleteToken(appKey);
             appSettingService.deleteAppSetting(app.getId());
         } else {
-            // 暂时不会走这里
             imageService.deleteImagesByAppKey(event.getApp().getAppKey());
         }
+    }
+
+    @Async
+    @EventListener(UndeleteAppEvent.class)
+    public void handleUndeleteAppEvent(UndeleteAppEvent event) {
+        imageService.undeleteImagesByAppKey(event.getApp().getAppKey());
     }
 
 }

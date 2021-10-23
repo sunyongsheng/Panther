@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import top.aengus.panther.dao.AppInfoRepository;
 import top.aengus.panther.enums.*;
 import top.aengus.panther.event.CreateAppEvent;
+import top.aengus.panther.event.DeleteAppEvent;
+import top.aengus.panther.event.UndeleteAppEvent;
 import top.aengus.panther.exception.BadRequestException;
 import top.aengus.panther.exception.NotFoundException;
 import top.aengus.panther.model.app.AppDTO;
@@ -118,26 +120,47 @@ public class AppInfoServiceImpl implements AppInfoService {
     }
 
     @Override
-    public void updateAppStatus(String appKey, AppStatus appStatus) {
+    public void deleteApp(String appKey) {
         AppInfo appInfo = findAppWithCheck(appKey);
-        if (appStatus == AppStatus.fromCode(appInfo.getStatus())) {
-            throw new BadRequestException("重复操作！");
+        if (AppStatus.DELETED == AppStatus.fromCode(appInfo.getStatus())) {
+            throw new BadRequestException("App已被删除！");
         }
-        appInfo.setStatus(appStatus.getCode());
+        appInfo.setStatus(AppStatus.DELETED.getCode());
+        appInfo.setUpdateTime(System.currentTimeMillis());
+        eventPublisher.publishEvent(new DeleteAppEvent(this, appInfo, false));
+        appInfoRepository.save(appInfo);
+    }
+
+    @Override
+    public void undeleteApp(String appKey) {
+        AppInfo appInfo = findAppWithCheck(appKey);
+        if (AppStatus.DELETED != AppStatus.fromCode(appInfo.getStatus())) {
+            throw new BadRequestException("App未被删除，无法恢复！");
+        }
+        appInfo.setStatus(AppStatus.NORMAL.getCode());
+        appInfo.setUpdateTime(System.currentTimeMillis());
+        eventPublisher.publishEvent(new UndeleteAppEvent(this, appInfo));
+        appInfoRepository.save(appInfo);
+    }
+
+    @Override
+    public void lockApp(String appKey) {
+        AppInfo appInfo = findAppWithCheck(appKey);
+        if (AppStatus.NORMAL != AppStatus.fromCode(appInfo.getStatus())) {
+            throw new BadRequestException("App状态不正确！");
+        }
+        appInfo.setStatus(AppStatus.LOCKED.getCode());
         appInfo.setUpdateTime(System.currentTimeMillis());
         appInfoRepository.save(appInfo);
     }
 
     @Override
-    public void updateAppAvatar(String appKey, String avatarUrl) {
+    public void unlockApp(String appKey) {
         AppInfo appInfo = findAppWithCheck(appKey);
-        AppStatus appStatus = AppStatus.fromCode(appInfo.getStatus());
-        if (appStatus == AppStatus.LOCKED) {
-            throw new BadRequestException("App已被锁定！请联系管理员");
-        } else if (appStatus == AppStatus.DELETED) {
-            throw new BadRequestException("App已被删除！请联系管理员");
+        if (AppStatus.LOCKED != AppStatus.fromCode(appInfo.getStatus())) {
+            throw new BadRequestException("App未被锁定，无法解锁！");
         }
-        appInfo.setAvatarUrl(avatarUrl);
+        appInfo.setStatus(AppStatus.LOCKED.getCode());
         appInfo.setUpdateTime(System.currentTimeMillis());
         appInfoRepository.save(appInfo);
     }
@@ -167,7 +190,7 @@ public class AppInfoServiceImpl implements AppInfoService {
     }
 
     @Override
-    public void deleteApp(Long appId) {
+    public void deleteAppForever(Long appId) {
         appInfoRepository.deleteById(appId);
     }
 

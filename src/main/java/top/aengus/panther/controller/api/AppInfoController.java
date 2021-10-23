@@ -52,37 +52,26 @@ public class AppInfoController extends ApiV1Controller {
 
     @PostMapping("/app/lock")
     public Response<Void> lockApp(@RequestParam("app_key") String appKey) {
-        appInfoService.updateAppStatus(appKey, AppStatus.LOCKED);
+        appInfoService.lockApp(appKey);
         return new Response<Void>().success().msg("锁定App成功！");
     }
 
     @PostMapping("/app/unlock")
     public Response<Void> unlockApp(@RequestParam("app_key") String appKey) {
-        appInfoService.updateAppStatus(appKey, AppStatus.NORMAL);
+        appInfoService.unlockApp(appKey);
         return new Response<Void>().success().msg("解锁成功！");
     }
 
     @PostMapping("/app/delete")
     public Response<Void> deleteApp(@RequestParam("app_key") String appKey) {
-        appInfoService.updateAppStatus(appKey, AppStatus.DELETED);
-        imageService.deleteImagesByAppKey(appKey);
+        appInfoService.deleteApp(appKey);
         return new Response<Void>().success().msg("删除成功！");
     }
 
     @PostMapping("/app/undelete")
     public Response<Void> undeleteApp(@RequestParam("app_key") String appKey) {
-        appInfoService.updateAppStatus(appKey, AppStatus.NORMAL);
-        imageService.undeleteImagesByAppKey(appKey);
+        appInfoService.undeleteApp(appKey);
         return new Response<Void>().success().msg("恢复成功！");
-    }
-
-    @PutMapping("/app/avatar")
-    public Response<Void> updateAppIcon(@RequestParam("app_key") String appKey,
-                                        @RequestParam("file") MultipartFile file) {
-        Response<Void> response = new Response<>();
-        ImageDTO result = imageService.saveImage(file, null, appKey, true);
-        appInfoService.updateAppAvatar(appKey, result.getUrl());
-        return response.success().msg("更新成功");
     }
 
     @PutMapping("/app/setting")

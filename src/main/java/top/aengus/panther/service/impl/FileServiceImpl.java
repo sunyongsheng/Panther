@@ -99,6 +99,24 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    public void moveFileToTrashWithCatch(String rootPath, String absolutePath) {
+        try {
+            moveFileToTrash(rootPath, absolutePath);
+        } catch (Exception e) {
+            log.error("moveFileToTrash出现了异常", e);
+        }
+    }
+
+    @Override
+    public void moveFileToBackWithCatch(String rootPath, String filename, String originalPath) {
+        try {
+            moveFileToBack(rootPath, filename, originalPath);
+        } catch (Exception e) {
+            log.error("moveFileToBack出现了异常", e);
+        }
+    }
+
+    @Override
     public void deleteFile(String rootPath, String filename, String absolutePath) {
         File deletedFile = getDeletedFile(rootPath);
         File targetFile = new File(deletedFile, filename);

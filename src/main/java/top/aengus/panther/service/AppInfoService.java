@@ -33,14 +33,30 @@ public interface AppInfoService {
 
     AppDTO updateAppInfo(String appKey, UpdateAppParam param);
 
-    void updateAppStatus(String appKey, AppStatus appStatus);
+    /**
+     * 非[DELETED]状态App可被删除
+     */
+    void deleteApp(String appKey);
 
-    void updateAppAvatar(String appKey, String avatarUrl);
+    /**
+     * 只有[DELETED]状态App可被恢复
+     */
+    void undeleteApp(String appKey);
+
+    /**
+     * 只有[NORMAL]状态App可被锁定
+     */
+    void lockApp(String appKey);
+
+    /**
+     * 只有[LOCKED]状态App可被解锁
+     */
+    void unlockApp(String appKey);
 
     String generateUploadToken(String appKey);
 
     void updateAppSetting(String appKey, UpdateAppSettingParam param);
 
-    void deleteApp(Long appId);
+    void deleteAppForever(Long appId);
 
 }

@@ -25,12 +25,16 @@ public interface FileService {
      */
     void moveFileToTrash(String rootPath, String absolutePath);
 
+    void moveFileToTrashWithCatch(String rootPath, String absolutePath);
+
     /**
      * 将文件移动回原位置
      * @param filename 文件名
      * @param originalPath 原来的位置
      */
     void moveFileToBack(String rootPath, String filename, String originalPath);
+
+    void moveFileToBackWithCatch(String rootPath, String filename, String originalPath);
 
     /**
      * 删除文件
