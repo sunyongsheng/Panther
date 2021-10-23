@@ -35,7 +35,7 @@ public class RouterController {
         return "install";
     }
 
-    @RequestMapping("/login")
+    @RequestMapping(value = {"/login", "/admin"})
     public String toLoginPage(HttpServletRequest request) {
         String adminUsername = configService.getAdminUsername();
         if (request.getCookies() != null
