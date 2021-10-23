@@ -57,4 +57,9 @@ public class AppSettingServiceImpl implements AppSettingService {
             appSettingRepository.save(appSetting);
         }
     }
+
+    @Override
+    public void deleteAppSetting(Long appId) {
+        appSettingRepository.deleteAll(appSettingRepository.findAllByAppId(appId));
+    }
 }

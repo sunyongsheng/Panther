@@ -17,4 +17,6 @@ public interface AppSettingService {
 
     void updateAppSetting(Long appId, UpdateAppSettingParam param);
 
+    void deleteAppSetting(Long appId);
+
 }

@@ -4,6 +4,8 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import top.aengus.panther.model.setting.AppSetting;
 
+import java.util.List;
+
 /**
  * @author Aengus Sun (sys6511@126.com)
  * <p>
@@ -13,5 +15,7 @@ import top.aengus.panther.model.setting.AppSetting;
 public interface AppSettingRepository extends CrudRepository<AppSetting, Long> {
 
     AppSetting findByAppIdAndKey(Long appId, String key);
+
+    List<AppSetting> findAllByAppId(Long appId);
 
 }

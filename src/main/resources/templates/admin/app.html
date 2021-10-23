@@ -234,6 +234,7 @@
                     phone: '',
                     email: '',
                     status: 'NORMAL',
+                    totalImages: 0,
                     hasUploadToken1: false,
                     updateToken1GenTime: 0,
 
@@ -395,7 +396,9 @@
                         });
                     });
                 } else {
-                    this.$prompt('删除后的App将在回收站中保留30天，之后将永远删除。请输入App英文名：', '警告', {
+                    this.$prompt(
+                        `删除后的App将在回收站中保留30天，之后将永远删除，其${this.currSelectApp.totalImages}张图片也将被一并删除。请输入App英文名：`,
+                        '警告', {
                         confirmButtonClass: 'delete-action-confirm',
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',

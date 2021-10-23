@@ -12,6 +12,7 @@ CREATE TABLE `tb_image`
     `creator`       VARCHAR(64)  NOT NULL DEFAULT '' COMMENT '上传者，可能为管理员用户名或者AppKey',
     `size`          BIGINT       NOT NULL DEFAULT 0 COMMENT '图片大小',
     `status`        TINYINT      NOT NULL DEFAULT 0 COMMENT '图片状态',
+    `update_time`   BIGINT       NOT NULL DEFAULT 0 COMMENT '更新时间',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4 comment '上传图片表';

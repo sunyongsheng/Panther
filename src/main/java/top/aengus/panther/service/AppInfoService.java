@@ -19,7 +19,7 @@ public interface AppInfoService {
 
     long countAll();
 
-    AppInfo findById(Long id);
+    Page<AppInfo> findAllByStatus(AppStatus status, int page, int pageSize);
 
     AppInfo findByAppKey(String appKey);
 
@@ -40,5 +40,7 @@ public interface AppInfoService {
     String generateUploadToken(String appKey);
 
     void updateAppSetting(String appKey, UpdateAppSettingParam param);
+
+    void deleteApp(Long appId);
 
 }

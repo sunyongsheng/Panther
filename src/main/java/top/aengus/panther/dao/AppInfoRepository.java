@@ -18,4 +18,6 @@ public interface AppInfoRepository extends CrudRepository<AppInfo, Long> {
     Optional<AppInfo> findByEnglishName(String englishName);
 
     Page<AppInfo> findAllByOwner(String owner, Pageable pageable);
+
+    Page<AppInfo> findAllByStatus(Integer status, Pageable pageable);
 }

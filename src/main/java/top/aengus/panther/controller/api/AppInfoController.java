@@ -65,12 +65,14 @@ public class AppInfoController extends ApiV1Controller {
     @PostMapping("/app/delete")
     public Response<Void> deleteApp(@RequestParam("app_key") String appKey) {
         appInfoService.updateAppStatus(appKey, AppStatus.DELETED);
+        imageService.deleteImagesByAppKey(appKey);
         return new Response<Void>().success().msg("删除成功！");
     }
 
     @PostMapping("/app/undelete")
     public Response<Void> undeleteApp(@RequestParam("app_key") String appKey) {
         appInfoService.updateAppStatus(appKey, AppStatus.NORMAL);
+        imageService.undeleteImagesByAppKey(appKey);
         return new Response<Void>().success().msg("恢复成功！");
     }
 

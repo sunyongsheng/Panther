@@ -75,11 +75,6 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public ImageModel findImageByName(String filename) {
-        return imageRepository.findBySaveName(filename);
-    }
-
-    @Override
     public ImageDTO saveImage(MultipartFile image, String dir, String appKey, boolean isAdmin) {
         if (image.isEmpty()) {
             throw new BadRequestException("文件不能为空！");
@@ -189,7 +184,19 @@ public class ImageServiceImpl implements ImageService {
         ImageModel imageModel = findImageWithCheck(imageId);
         fileService.moveFileToTrash(configService.getSaveRootPath(), imageModel.getAbsolutePath());
         imageModel.setStatus(ImageStatus.DELETED.getCode());
+        imageModel.setUpdateTime(System.currentTimeMillis());
         return imageRepository.save(imageModel);
+    }
+
+    @Override
+    public void deleteImagesByAppKey(String appKey) {
+        String rootPath = configService.getSaveRootPath();
+        imageRepository.findAllByOwner(appKey).forEach(image -> {
+            fileService.moveFileToTrash(rootPath, image.getAbsolutePath());
+            image.setStatus(ImageStatus.DELETED.getCode());
+            image.setUpdateTime(System.currentTimeMillis());
+            imageRepository.save(image);
+        });
     }
 
     @Override
@@ -197,7 +204,19 @@ public class ImageServiceImpl implements ImageService {
         ImageModel imageModel = findImageWithCheck(imageId);
         fileService.moveFileToBack(configService.getSaveRootPath(), imageModel.getSaveName(), imageModel.getAbsolutePath());
         imageModel.setStatus(ImageStatus.NORMAL.getCode());
+        imageModel.setUpdateTime(System.currentTimeMillis());
         imageRepository.save(imageModel);
+    }
+
+    @Override
+    public void undeleteImagesByAppKey(String appKey) {
+        String rootPath = configService.getSaveRootPath();
+        imageRepository.findAllByOwner(appKey).forEach(image -> {
+            fileService.moveFileToBack(rootPath, image.getSaveName(), image.getAbsolutePath());
+            image.setStatus(ImageStatus.NORMAL.getCode());
+            image.setUpdateTime(System.currentTimeMillis());
+            imageRepository.save(image);
+        });
     }
 
     @Override
@@ -205,6 +224,15 @@ public class ImageServiceImpl implements ImageService {
         ImageModel imageModel = findImageWithCheck(imageId);
         fileService.deleteFile(configService.getSaveRootPath(), imageModel.getSaveName(), imageModel.getAbsolutePath());
         imageRepository.delete(imageModel);
+    }
+
+    @Override
+    public void deleteImagesForeverByAppKey(String appKey) {
+        String rootPath = configService.getSaveRootPath();
+        imageRepository.findAllByOwner(appKey).forEach(image -> {
+            fileService.deleteFile(rootPath, image.getSaveName(), image.getAbsolutePath());
+            imageRepository.delete(image);
+        });
     }
 
     private ImageModel findImageWithCheck(Long imageId) {

@@ -16,12 +16,6 @@ public interface ImageRepository extends PagingAndSortingRepository<ImageModel, 
 
     long countAllByOwner(String owner);
 
-    ImageModel findBySaveName(String saveName);
-
-    ImageModel findByIdAndCreator(Long id, String creator);
-
-    ImageModel findByAbsolutePath(String absolutePath);
-
     List<ImageModel> findAllByOwner(String appKey);
 
     Page<ImageModel> findAllByOwner(String appKey, Pageable pageable);

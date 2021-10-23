@@ -22,14 +22,18 @@ public interface ImageService {
 
     List<ImageDTO> findAllByAppKey(String appKey);
 
-    ImageModel findImageByName(String filename);
-
     ImageDTO saveImage(MultipartFile image, String dir, String appKey, boolean isAdmin);
 
     ImageModel deleteImage(Long imageId, String operator);
 
+    void deleteImagesByAppKey(String appKey);
+
     void undeleteImage(Long imageId, String operator);
 
+    void undeleteImagesByAppKey(String appKey);
+
     void deleteImageForever(Long imageId, String operator);
+
+    void deleteImagesForeverByAppKey(String appKey);
 
 }

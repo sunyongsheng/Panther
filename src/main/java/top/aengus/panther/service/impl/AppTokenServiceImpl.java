@@ -50,4 +50,8 @@ public class AppTokenServiceImpl implements AppTokenService {
         return token;
     }
 
+    @Override
+    public void deleteToken(String appKey) {
+        appTokenRepository.deleteAll(appTokenRepository.findAllByAppKey(appKey));
+    }
 }

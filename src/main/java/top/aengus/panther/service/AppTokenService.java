@@ -16,4 +16,6 @@ public interface AppTokenService {
 
     String generateToken(String appKey, TokenStage stage);
 
+    void deleteToken(String appKey);
+
 }

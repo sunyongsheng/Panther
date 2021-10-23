@@ -46,4 +46,6 @@ public class ImageModel {
 
     private int status;
 
+    private Long updateTime;
+
 }

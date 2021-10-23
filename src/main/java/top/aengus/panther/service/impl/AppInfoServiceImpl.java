@@ -50,8 +50,9 @@ public class AppInfoServiceImpl implements AppInfoService {
     }
 
     @Override
-    public AppInfo findById(Long id) {
-        return appInfoRepository.findById(id).orElse(null);
+    public Page<AppInfo> findAllByStatus(AppStatus status, int page, int pageSize) {
+        Pageable request = PageRequest.of(page, pageSize);
+        return appInfoRepository.findAllByStatus(status.getCode(), request);
     }
 
     @Override
@@ -104,6 +105,12 @@ public class AppInfoServiceImpl implements AppInfoService {
     @Override
     public AppDTO updateAppInfo(String appKey, UpdateAppParam param) {
         AppInfo appInfo = findAppWithCheck(appKey);
+        AppStatus appStatus = AppStatus.fromCode(appInfo.getStatus());
+        if (appStatus == AppStatus.LOCKED) {
+            throw new BadRequestException("App已被锁定！请联系管理员");
+        } else if (appStatus == AppStatus.DELETED) {
+            throw new BadRequestException("App已被删除！请联系管理员");
+        }
         appInfo.setName(param.getName());
         appInfo.setRole(param.getRole().getCode());
         appInfo.setUpdateTime(System.currentTimeMillis());
@@ -124,6 +131,12 @@ public class AppInfoServiceImpl implements AppInfoService {
     @Override
     public void updateAppAvatar(String appKey, String avatarUrl) {
         AppInfo appInfo = findAppWithCheck(appKey);
+        AppStatus appStatus = AppStatus.fromCode(appInfo.getStatus());
+        if (appStatus == AppStatus.LOCKED) {
+            throw new BadRequestException("App已被锁定！请联系管理员");
+        } else if (appStatus == AppStatus.DELETED) {
+            throw new BadRequestException("App已被删除！请联系管理员");
+        }
         appInfo.setAvatarUrl(avatarUrl);
         appInfo.setUpdateTime(System.currentTimeMillis());
         appInfoRepository.save(appInfo);
@@ -131,14 +144,31 @@ public class AppInfoServiceImpl implements AppInfoService {
 
     @Override
     public String generateUploadToken(String appKey) {
-        findAppWithCheck(appKey);
+        AppInfo appInfo = findAppWithCheck(appKey);
+        AppStatus appStatus = AppStatus.fromCode(appInfo.getStatus());
+        if (appStatus == AppStatus.LOCKED) {
+            throw new BadRequestException("App已被锁定！请联系管理员");
+        } else if (appStatus == AppStatus.DELETED) {
+            throw new BadRequestException("App已被删除！请联系管理员");
+        }
         return appTokenService.generateToken(appKey, TokenStage.UPLOAD_V1_1);
     }
 
     @Override
     public void updateAppSetting(String appKey, UpdateAppSettingParam param) {
         AppInfo appInfo = findAppWithCheck(appKey);
+        AppStatus appStatus = AppStatus.fromCode(appInfo.getStatus());
+        if (appStatus == AppStatus.LOCKED) {
+            throw new BadRequestException("App已被锁定！请联系管理员");
+        } else if (appStatus == AppStatus.DELETED) {
+            throw new BadRequestException("App已被删除！请联系管理员");
+        }
         appSettingService.updateAppSetting(appInfo.getId(), param);
+    }
+
+    @Override
+    public void deleteApp(Long appId) {
+        appInfoRepository.deleteById(appId);
     }
 
     private AppDTO convertToDto(@NonNull AppInfo appInfo) {
