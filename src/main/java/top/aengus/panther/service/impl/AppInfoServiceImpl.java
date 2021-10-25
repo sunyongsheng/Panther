@@ -26,6 +26,7 @@ import top.aengus.panther.service.AppSettingService;
 import top.aengus.panther.service.AppTokenService;
 import top.aengus.panther.tool.StringUtil;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -64,17 +65,14 @@ public class AppInfoServiceImpl implements AppInfoService {
 
     @Override
     public AppDTO findDTOByAppKey(String appKey) {
-        AppInfo appInfo = appInfoRepository.findByAppKey(appKey);
-        if (appInfo == null) {
-            throw new NotFoundException("App不存在！", appKey);
-        }
+        AppInfo appInfo = findAppWithCheck(appKey, false);
         return convertToDto(appInfo);
     }
 
     @Override
     public List<AppDTO> findDTOByName(String name) {
         List<AppInfo> appInfo = appInfoRepository.findByNameContainsOrEnglishNameContains(name, name);
-        if (appInfo == null) return null;
+        if (appInfo == null) return Collections.emptyList();
         return appInfo.stream().map(this::convertToDto).collect(Collectors.toList());
     }
 
@@ -106,13 +104,7 @@ public class AppInfoServiceImpl implements AppInfoService {
 
     @Override
     public AppDTO updateAppInfo(String appKey, UpdateAppParam param) {
-        AppInfo appInfo = findAppWithCheck(appKey);
-        AppStatus appStatus = AppStatus.fromCode(appInfo.getStatus());
-        if (appStatus == AppStatus.LOCKED) {
-            throw new BadRequestException("App已被锁定！请联系管理员");
-        } else if (appStatus == AppStatus.DELETED) {
-            throw new BadRequestException("App已被删除！请联系管理员");
-        }
+        AppInfo appInfo = findAppWithCheck(appKey, true);
         appInfo.setName(param.getName());
         appInfo.setRole(param.getRole().getCode());
         appInfo.setUpdateTime(System.currentTimeMillis());
@@ -121,7 +113,7 @@ public class AppInfoServiceImpl implements AppInfoService {
 
     @Override
     public void deleteApp(String appKey) {
-        AppInfo appInfo = findAppWithCheck(appKey);
+        AppInfo appInfo = findAppWithCheck(appKey, false);
         if (AppStatus.DELETED == AppStatus.fromCode(appInfo.getStatus())) {
             throw new BadRequestException("App已被删除！");
         }
@@ -133,7 +125,7 @@ public class AppInfoServiceImpl implements AppInfoService {
 
     @Override
     public void undeleteApp(String appKey) {
-        AppInfo appInfo = findAppWithCheck(appKey);
+        AppInfo appInfo = findAppWithCheck(appKey, false);
         if (AppStatus.DELETED != AppStatus.fromCode(appInfo.getStatus())) {
             throw new BadRequestException("App未被删除，无法恢复！");
         }
@@ -145,7 +137,7 @@ public class AppInfoServiceImpl implements AppInfoService {
 
     @Override
     public void lockApp(String appKey) {
-        AppInfo appInfo = findAppWithCheck(appKey);
+        AppInfo appInfo = findAppWithCheck(appKey, false);
         if (AppStatus.NORMAL != AppStatus.fromCode(appInfo.getStatus())) {
             throw new BadRequestException("App状态不正确！");
         }
@@ -156,7 +148,7 @@ public class AppInfoServiceImpl implements AppInfoService {
 
     @Override
     public void unlockApp(String appKey) {
-        AppInfo appInfo = findAppWithCheck(appKey);
+        AppInfo appInfo = findAppWithCheck(appKey, false);
         if (AppStatus.LOCKED != AppStatus.fromCode(appInfo.getStatus())) {
             throw new BadRequestException("App未被锁定，无法解锁！");
         }
@@ -167,25 +159,13 @@ public class AppInfoServiceImpl implements AppInfoService {
 
     @Override
     public String generateUploadToken(String appKey) {
-        AppInfo appInfo = findAppWithCheck(appKey);
-        AppStatus appStatus = AppStatus.fromCode(appInfo.getStatus());
-        if (appStatus == AppStatus.LOCKED) {
-            throw new BadRequestException("App已被锁定！请联系管理员");
-        } else if (appStatus == AppStatus.DELETED) {
-            throw new BadRequestException("App已被删除！请联系管理员");
-        }
+        findAppWithCheck(appKey, true);
         return appTokenService.generateToken(appKey, TokenStage.UPLOAD_V1_1);
     }
 
     @Override
     public void updateAppSetting(String appKey, UpdateAppSettingParam param) {
-        AppInfo appInfo = findAppWithCheck(appKey);
-        AppStatus appStatus = AppStatus.fromCode(appInfo.getStatus());
-        if (appStatus == AppStatus.LOCKED) {
-            throw new BadRequestException("App已被锁定！请联系管理员");
-        } else if (appStatus == AppStatus.DELETED) {
-            throw new BadRequestException("App已被删除！请联系管理员");
-        }
+        AppInfo appInfo = findAppWithCheck(appKey, true);
         appSettingService.updateAppSetting(appInfo.getId(), param);
     }
 
@@ -210,13 +190,21 @@ public class AppInfoServiceImpl implements AppInfoService {
         return appDTO;
     }
 
-    private AppInfo findAppWithCheck(String appKey) {
+    private AppInfo findAppWithCheck(String appKey, boolean checkStatus) {
         if (StringUtil.isEmpty(appKey)) {
             throw new BadRequestException("AppKey为空！");
         }
         AppInfo appInfo = appInfoRepository.findByAppKey(appKey);
         if (appInfo == null) {
             throw new NotFoundException("App不存在！", appKey);
+        }
+        if (checkStatus) {
+            AppStatus appStatus = AppStatus.fromCode(appInfo.getStatus());
+            if (appStatus == AppStatus.LOCKED) {
+                throw new BadRequestException("App已被锁定！请联系管理员");
+            } else if (appStatus == AppStatus.DELETED) {
+                throw new BadRequestException("App已被删除！请联系管理员");
+            }
         }
         return appInfo;
     }
