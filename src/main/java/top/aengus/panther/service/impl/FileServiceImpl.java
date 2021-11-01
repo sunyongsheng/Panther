@@ -63,6 +63,9 @@ public class FileServiceImpl implements FileService {
     @Override
     public void saveToFile(MultipartFile file, String absolutePath) {
         File dest = new File(absolutePath);
+        if (dest.exists()) {
+            throw new BadRequestException("文件已存在，请尝试修改文件名");
+        }
         FileUtil.checkAndCreateDir(dest.getParentFile());
         try {
             file.transferTo(dest);
