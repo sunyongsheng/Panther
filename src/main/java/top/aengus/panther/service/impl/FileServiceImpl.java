@@ -7,6 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 import top.aengus.panther.exception.BadRequestException;
 import top.aengus.panther.exception.InternalException;
 import top.aengus.panther.exception.NotFoundException;
+import top.aengus.panther.model.FileTree;
 import top.aengus.panther.service.FileService;
 import top.aengus.panther.tool.FileUtil;
 
@@ -135,6 +136,29 @@ public class FileServiceImpl implements FileService {
                 }
             } else {
                 throw new NotFoundException("文件不存在！", absolutePath);
+            }
+        }
+    }
+
+    @Override
+    public FileTree listFiles(String rootPath, boolean recursion) {
+        File root = new File(rootPath);
+        FileTree result = new FileTree(root);
+        readPath(result, root, recursion);
+        return result;
+    }
+
+    private void readPath(FileTree fileTree, File currDir, boolean recursion) {
+        File[] childFiles = currDir.listFiles((dir, name) -> !name.equals(DELETED));
+        if (childFiles != null) {
+            for (File child : childFiles) {
+                if (child.isDirectory()) {
+                    FileTree directory = new FileTree(child);
+                    if (recursion) readPath(directory, child, true);
+                    fileTree.append(directory);
+                } else {
+                    fileTree.append(child);
+                }
             }
         }
     }

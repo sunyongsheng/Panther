@@ -1,6 +1,7 @@
 package top.aengus.panther.service;
 
 import org.springframework.web.multipart.MultipartFile;
+import top.aengus.panther.model.FileTree;
 
 import java.util.List;
 
@@ -45,5 +46,10 @@ public interface FileService {
      * @param absolutePath 文件绝对路径
      */
     void deleteFile(String rootPath,String filename, String absolutePath);
+
+    /**
+     * 列出所有文件
+     */
+    FileTree listFiles(String rootPath, boolean recursion);
 
 }
