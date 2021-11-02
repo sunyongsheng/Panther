@@ -43,7 +43,7 @@ public class DeleteImageTask {
     private void decideDeleteImage(ImageModel image, long deadline) {
         if (DateUtil.betweenDay(new Date(image.getUpdateTime()), new Date(deadline), false) > Constants.RETENTION_DAYS) {
             log.info("[deleteImageForever] {} 被永久删除", image);
-            imageService.deleteImageForever(image.getId(), null);
+            imageService.deleteImageForever(image.getId(), null, true);
         }
     }
 }

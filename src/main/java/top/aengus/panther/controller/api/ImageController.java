@@ -9,6 +9,7 @@ import top.aengus.panther.core.Constants;
 import top.aengus.panther.core.Response;
 import top.aengus.panther.model.image.ImageDTO;
 import top.aengus.panther.model.image.ImageModel;
+import top.aengus.panther.model.image.RefreshResult;
 import top.aengus.panther.service.ImageService;
 import top.aengus.panther.service.PantherConfigService;
 
@@ -30,6 +31,7 @@ public class ImageController extends ApiV1Controller {
 
     /**
      * App上传图片API POST /api/v1/image
+     * 此接口由 {@link top.aengus.panther.security.ImageUploadFilter} 进行拦截
      *
      * @param dirPath 保存目录，
      * @param file 图片文件
@@ -81,9 +83,15 @@ public class ImageController extends ApiV1Controller {
         return new Response<Void>().success().msg("恢复成功");
     }
 
-    @DeleteMapping("/image/{id}")
-    public Response<Void> deleteForever(@PathVariable("id") Long imageId) {
-        imageService.deleteImageForever(imageId, configService.getAdminUsername());
+    @DeleteMapping("/admin/image")
+    public Response<Void> deleteForever(@RequestParam("id") Long imageId,
+                                        @RequestParam("delete_file") boolean deleteFile) {
+        imageService.deleteImageForever(imageId, configService.getAdminUsername(), deleteFile);
         return new Response<Void>().success().msg("删除成功");
+    }
+
+    @GetMapping("/image/db/refresh")
+    public Response<RefreshResult> refreshImageDb() {
+        return new Response<RefreshResult>().success().data(imageService.refreshDatabase());
     }
 }

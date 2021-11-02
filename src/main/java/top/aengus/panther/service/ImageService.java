@@ -5,6 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 import top.aengus.panther.enums.ImageStatus;
 import top.aengus.panther.model.image.ImageDTO;
 import top.aengus.panther.model.image.ImageModel;
+import top.aengus.panther.model.image.RefreshResult;
 
 import java.util.List;
 
@@ -39,9 +40,11 @@ public interface ImageService {
      */
     void undeleteImagesWithAppAuto(String appKey);
 
-    void deleteImageForever(Long imageId, String operator);
+    void deleteImageForever(Long imageId, String operator, boolean deleteFile);
 
     void deleteImagesForeverByAppKey(String appKey);
 
     Page<ImageModel> findAllByStatus(ImageStatus status, int page, int pageSize);
+
+    RefreshResult refreshDatabase();
 }

@@ -56,3 +56,14 @@ function ellipsisText(text, len) {
     }
     return text;
 }
+
+function findFirstIndex(list, condition) {
+    let i = 0;
+    for (i; i < list.length; i++) {
+        let element = list[i];
+        if (condition(element)) {
+            return i;
+        }
+    }
+    return -1;
+}

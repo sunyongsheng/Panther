@@ -6,8 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import top.aengus.panther.core.Constants;
 import top.aengus.panther.dao.ImageRepository;
 import top.aengus.panther.enums.AppSettingKey;
 import top.aengus.panther.enums.AppStatus;
@@ -16,6 +18,7 @@ import top.aengus.panther.enums.NamingStrategy;
 import top.aengus.panther.exception.BadRequestException;
 import top.aengus.panther.exception.NotFoundException;
 import top.aengus.panther.model.app.AppInfo;
+import top.aengus.panther.model.image.RefreshResult;
 import top.aengus.panther.model.setting.AppSetting;
 import top.aengus.panther.model.image.ImageDTO;
 import top.aengus.panther.model.image.ImageModel;
@@ -220,9 +223,11 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public void deleteImageForever(Long imageId, String operator) {
+    public void deleteImageForever(Long imageId, String operator, boolean deleteFile) {
         ImageModel imageModel = findImageWithCheck(imageId);
-        fileService.deleteFile(configService.getSaveRootPath(), imageModel.getSaveName(), imageModel.getAbsolutePath());
+        if (deleteFile) {
+            fileService.deleteFileSafely(configService.getSaveRootPath(), imageModel.getSaveName(), imageModel.getAbsolutePath());
+        }
         imageRepository.delete(imageModel);
     }
 
@@ -230,7 +235,7 @@ public class ImageServiceImpl implements ImageService {
     public void deleteImagesForeverByAppKey(String appKey) {
         String rootPath = configService.getSaveRootPath();
         imageRepository.findAllByOwner(appKey).forEach(image -> {
-            fileService.deleteFile(rootPath, image.getSaveName(), image.getAbsolutePath());
+            fileService.deleteFileSafely(rootPath, image.getSaveName(), image.getAbsolutePath());
             imageRepository.delete(image);
         });
     }
@@ -238,6 +243,34 @@ public class ImageServiceImpl implements ImageService {
     @Override
     public Page<ImageModel> findAllByStatus(ImageStatus status, int page, int pageSize) {
         return imageRepository.findAllByStatus(status.getCode(), PageRequest.of(page, pageSize));
+    }
+
+    @Override
+    public RefreshResult refreshDatabase() {
+        RefreshResult result = new RefreshResult();
+        List<RefreshResult.Item> invalidDb = new ArrayList<>();
+        int currPage = 0;
+        while (true) {
+            Pageable pageable = PageRequest.of(currPage, Constants.PAGE_SIZE);
+            Page<ImageModel> images = imageRepository.findAllByStatus(ImageStatus.NORMAL.getCode(), pageable);
+            images.forEach(image -> {
+                if (!new File(image.getAbsolutePath()).exists()) {
+                    RefreshResult.Item item = new RefreshResult.Item();
+                    item.setId(image.getId());
+                    item.setName(image.getSaveName());
+                    item.setAbsolutePath(image.getAbsolutePath());
+                    item.setRelativePath(image.getRelativePath());
+                    item.setUrl(image.getUrl());
+                    invalidDb.add(item);
+                }
+            });
+            if (images.getNumberOfElements() < Constants.PAGE_SIZE) {
+                break;
+            }
+            currPage++;
+        }
+        result.setInvalidItems(invalidDb);
+        return result;
     }
 
     private ImageModel findImageWithCheck(Long imageId) {
