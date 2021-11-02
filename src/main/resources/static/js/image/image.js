@@ -17,3 +17,7 @@ async function refreshImageDb() {
 async function deleteForever(id, deleteFile) {
     return axiosClient.delete(`/api/v1/admin/image?id=${id}&delete_file=${deleteFile}`)
 }
+
+async function refreshImageFile() {
+    return axiosClient.get("/api/v1/image/file/refresh")
+}

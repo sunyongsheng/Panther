@@ -94,4 +94,9 @@ public class ImageController extends ApiV1Controller {
     public Response<RefreshResult> refreshImageDb() {
         return new Response<RefreshResult>().success().data(imageService.refreshDatabase());
     }
+
+    @GetMapping("/image/file/refresh")
+    public Response<RefreshResult> refreshImageFile() {
+        return null;
+    }
 }

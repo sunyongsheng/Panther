@@ -25,6 +25,7 @@
             <el-main>
                 <el-button type="success" icon="el-icon-upload" size="medium" @click="onClickUpload">上传图片</el-button>
                 <el-button type="info" icon="el-icon-tickets" size="medium" @click="onClickRefreshDb">刷新数据库</el-button>
+                <el-button type="primary" icon="el-icon-files" size="medium" @click="onClickRefreshFile">刷新本地目录</el-button>
                 <el-button type="danger" icon="el-icon-delete-solid" size="medium" @click="onClickDelete" v-if="multipleSelection.length > 0">删除</el-button>
 
                 <div class="space-column-20"></div>
@@ -182,8 +183,12 @@
                 selectedImagesPreview: [],
                 // 刷新数据库
                 refreshDbDialogVisible: false,
+                invalidDbItems: [],
+                // 刷新本地目录
+                refreshFileDialogVisible: false,
+                invalidFileItems: [],
+
                 refreshing: false,
-                invalidDbItems: []
             }
         },
         methods: {
@@ -223,6 +228,15 @@
                         this.$message.error(e.msg);
                     }).finally(() => {
                         this.refreshing = false;
+                    });
+                });
+            },
+            onClickRefreshFile() {
+                this.$confirm("此操作将扫描存储目录下的所有文件是否在数据库中有记录，可能会消耗较多内存，是否继续", "提示").then(() => {
+                    this.refreshFileDialogVisible = true;
+                    this.refreshing = true;
+                    refreshImageFile().then(response => {
+                        this.invalidFileItems = response.data.invalidItems;
                     });
                 });
             },
