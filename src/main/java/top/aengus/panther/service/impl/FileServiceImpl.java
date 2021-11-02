@@ -126,17 +126,26 @@ public class FileServiceImpl implements FileService {
         File targetFile = new File(deletedFile, filename);
         if (targetFile.exists()) {
             if (!targetFile.delete()) {
-                throw new InternalException("删除文件失败");
+                throw new InternalException("删除回收站文件失败");
             }
         } else {
             File fallback = new File(absolutePath);
             if (fallback.exists()) {
                 if (!fallback.delete()) {
-                    throw new InternalException("删除文件失败");
+                    throw new InternalException("删除原文件失败");
                 }
             } else {
                 throw new NotFoundException("文件不存在！", absolutePath);
             }
+        }
+    }
+
+    @Override
+    public void deleteFileSafely(String rootPath, String filename, String absolutePath) {
+        try {
+            deleteFile(rootPath, filename, absolutePath);
+        } catch (InternalException | NotFoundException exception) {
+            log.error("deleteFileSafely出现异常", exception);
         }
     }
 

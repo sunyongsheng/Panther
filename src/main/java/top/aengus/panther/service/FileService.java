@@ -45,7 +45,9 @@ public interface FileService {
      * @param filename 文件名
      * @param absolutePath 文件绝对路径
      */
-    void deleteFile(String rootPath,String filename, String absolutePath);
+    void deleteFile(String rootPath, String filename, String absolutePath);
+
+    void deleteFileSafely(String rootPath, String filename, String absolutePath);
 
     /**
      * 列出所有文件
