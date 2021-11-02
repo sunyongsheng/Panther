@@ -65,14 +65,16 @@ public class AppEventListener {
     @Async
     @EventListener(DeleteAppEvent.class)
     public void handleDeleteAppEvent(DeleteAppEvent event) {
+        AppInfo app = event.getApp();
+        String appKey = app.getAppKey();
         if (event.isForever()) {
-            AppInfo app = event.getApp();
-            String appKey = app.getAppKey();
+            // 永久删除App
             imageService.deleteImagesForeverByAppKey(appKey);
             appTokenService.deleteToken(appKey);
             appSettingService.deleteAppSetting(app.getId());
         } else {
-            imageService.deleteImagesWithAppAuto(event.getApp().getAppKey());
+            // 将App移动至回收站
+            imageService.deleteImagesWithAppAuto(appKey);
         }
     }
 
