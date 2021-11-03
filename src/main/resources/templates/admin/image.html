@@ -177,7 +177,7 @@
         <el-empty v-else description="恭喜你！已整理完成所有文件"></el-empty>
         <span slot="footer" class="dialog-footer">
             <el-button @click="refreshFileDialogVisible = false">取 消</el-button>
-            <el-button type="primary" :loading="uploading" @click="clickSaveInvalidFile">保 存</el-button>
+            <el-button type="primary" :loading="processing" @click="clickSaveInvalidFile">保 存</el-button>
         </span>
     </el-dialog>
 </div>
@@ -216,6 +216,7 @@
                 invalidFileItems: [],
 
                 refreshing: false,
+                processing: false,
             }
         },
         methods: {
@@ -417,12 +418,15 @@
                     confirmButtonText: '确认',
                     cancelButtonText: '取消',
                 }).then(() => {
+                    this.processing = true;
                     saveInvalidFiles(this.invalidFileItems).then(response => {
                         this.$message.success(response.msg);
                         this.refreshFileDialogVisible = false;
                         this.fetchImageData();
                     }).catch(e => {
                         this.$message.error(e.msg);
+                    }).finally(() => {
+                        this.processing = true;
                     });
                 });
             },
