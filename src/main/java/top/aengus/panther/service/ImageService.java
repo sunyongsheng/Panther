@@ -29,14 +29,14 @@ public interface ImageService {
     ImageModel deleteImage(Long imageId, String operator);
 
     /**
-     * 删除App下所有状态为[NORMAL]的图片，将其状态变为[DELETED_AUTO]
+     * 删除App下所有状态为{@link ImageStatus#NORMAL}的图片，将其状态变为{@link ImageStatus#DELETED_AUTO}
      */
     void deleteImagesWithAppAuto(String appKey);
 
     void undeleteImage(Long imageId, String operator);
 
     /**
-     * 恢复App下所有状态为[DELETED_AUTO]的图片
+     * 恢复App下所有状态为{@link ImageStatus#DELETED_AUTO}的图片
      */
     void undeleteImagesWithAppAuto(String appKey);
 

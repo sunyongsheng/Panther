@@ -34,22 +34,22 @@ public interface AppInfoService {
     AppDTO updateAppInfo(String appKey, UpdateAppParam param);
 
     /**
-     * 非[DELETED]状态App可被删除
+     * 非{@link AppStatus#DELETED}状态App可被删除
      */
     void deleteApp(String appKey);
 
     /**
-     * 只有[DELETED]状态App可被恢复
+     * 只有{@link AppStatus#DELETED}状态App可被恢复
      */
     void undeleteApp(String appKey);
 
     /**
-     * 只有[NORMAL]状态App可被锁定
+     * 只有{@link AppStatus#NORMAL}状态App可被锁定
      */
     void lockApp(String appKey);
 
     /**
-     * 只有[LOCKED]状态App可被解锁
+     * 只有{@link AppStatus#LOCKED}状态App可被解锁
      */
     void unlockApp(String appKey);
 

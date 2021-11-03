@@ -36,10 +36,12 @@ public class ImageModel {
 
     private String relativePath;
 
+    // AppKey
     private String owner;
 
     private Long uploadTime;
 
+    // AppKey Or AdminUsername
     private String creator;
 
     private Long size;
