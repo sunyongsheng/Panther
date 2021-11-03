@@ -3,6 +3,7 @@ package top.aengus.panther.controller.api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -64,8 +65,10 @@ public class ImageController extends ApiV1Controller {
      */
     @GetMapping("/images")
     public Response<Page<ImageDTO>> getAllImage(@RequestParam(value = "page", defaultValue = "0") int page,
-                                                @RequestParam(value = "page_size", defaultValue = "20") int pageSize) {
-        return new Response<Page<ImageDTO>>().success().data(imageService.findAll(page, pageSize));
+                                                @RequestParam(value = "page_size", defaultValue = "20") int pageSize,
+                                                @RequestParam(value = "direction", defaultValue = "DESC") Sort.Direction direction,
+                                                @RequestParam(value = "order_by", defaultValue = "uploadTime") String orderBy) {
+        return new Response<Page<ImageDTO>>().success().data(imageService.findAll(page, pageSize, direction, orderBy));
     }
 
     @GetMapping("/images/{owner}")

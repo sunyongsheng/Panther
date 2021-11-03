@@ -1,6 +1,7 @@
 package top.aengus.panther.service;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.multipart.MultipartFile;
 import top.aengus.panther.enums.ImageStatus;
 import top.aengus.panther.model.image.ImageDTO;
@@ -20,7 +21,7 @@ public interface ImageService {
 
     long countByAppKey(String appKey);
 
-    Page<ImageDTO> findAll(int page, int pageSize);
+    Page<ImageDTO> findAll(int page, int pageSize, Sort.Direction direction, String orderBy);
 
     List<ImageDTO> findAllByAppKey(String appKey);
 

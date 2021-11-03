@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import top.aengus.panther.core.Constants;
@@ -63,9 +64,14 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public Page<ImageDTO> findAll(int page, int pageSize) {
-        PageRequest pageRequest = PageRequest.of(page, pageSize);
+    public Page<ImageDTO> findAll(int page, int pageSize, Sort.Direction direction, String orderBy) {
+        PageRequest pageRequest = PageRequest.of(page, pageSize, Sort.by(direction, validateOrderBy(orderBy)));
         return imageRepository.findAll(pageRequest).map(this::convertToDto);
+    }
+
+    private String validateOrderBy(String orderBy) {
+        if (orderBy.equals("uploadTime") || orderBy.equals("size")) return orderBy;
+        return "uploadTime";
     }
 
     @Override
