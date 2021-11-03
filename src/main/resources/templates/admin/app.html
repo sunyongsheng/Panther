@@ -15,7 +15,7 @@
 </head>
 <body>
 <div id="app">
-    <el-container>
+    <el-container class="root-container">
         <div th:replace="admin/sidebar::admin-sidebar(index='app-manager')"></div>
 
         <el-container direction="vertical">
@@ -536,8 +536,12 @@
     })
 </script>
 <style>
-    body {
+    html, body, #app, .root-container, .el-container {
         font-family: Arial, sans-serif;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow-y: auto;
     }
     .el-header {
         display: flex;
