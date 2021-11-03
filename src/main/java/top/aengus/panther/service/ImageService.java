@@ -47,4 +47,8 @@ public interface ImageService {
     Page<ImageModel> findAllByStatus(ImageStatus status, int page, int pageSize);
 
     RefreshResult refreshDatabase();
+
+    RefreshResult refreshFiles();
+
+    void insertFromRefreshResult(List<RefreshResult.Item> files);
 }

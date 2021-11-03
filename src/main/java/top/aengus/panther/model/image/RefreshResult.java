@@ -22,5 +22,11 @@ public class RefreshResult {
 
         private String relativePath;
 
+        private String ownerApp;
+
+        private String ownerAppKey;
+
+        private Long size;
+
     }
 }

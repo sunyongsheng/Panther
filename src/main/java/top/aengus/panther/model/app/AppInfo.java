@@ -3,6 +3,7 @@ package top.aengus.panther.model.app;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import top.aengus.panther.core.Constants;
 import top.aengus.panther.enums.AppRole;
 
 import javax.persistence.*;
@@ -57,6 +58,24 @@ public class AppInfo {
 
     public boolean isSuperRole() {
         return AppRole.SUPER.getCode().equals(role);
+    }
+
+    private static volatile AppInfo EMPTY;
+
+    public static AppInfo empty() {
+        if (EMPTY == null) {
+            synchronized (AppInfo.class) {
+                if (EMPTY == null) {
+                    EMPTY = new AppInfo();
+                    EMPTY.setId(-1L);
+                    EMPTY.setAppKey(Constants.UNKNOWN_APP_KEY);
+                    EMPTY.setName("未知");
+                    EMPTY.setEnglishName(Constants.UNKNOWN_APP_KEY);
+                    EMPTY.setRole(AppRole.NORMAL.getCode());
+                }
+            }
+        }
+        return EMPTY;
     }
 
 }

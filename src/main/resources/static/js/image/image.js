@@ -11,13 +11,25 @@ async function undeleteImage(imageId) {
 }
 
 async function refreshImageDb() {
-    return axiosClient.get("/api/v1/image/db/refresh")
+    return axiosClient.get("/api/v1/image/refresh/db")
 }
 
-async function deleteForever(id, deleteFile) {
+async function deleteImageForever(id, deleteFile) {
     return axiosClient.delete(`/api/v1/admin/image?id=${id}&delete_file=${deleteFile}`)
 }
 
 async function refreshImageFile() {
-    return axiosClient.get("/api/v1/image/file/refresh")
+    return axiosClient.get("/api/v1/image/refresh/file")
+}
+
+async function deleteFileForever(absPath) {
+    return axiosClient.post("/api/v1/admin/file/delete", {
+        key: absPath
+    })
+}
+
+async function saveInvalidFiles(files) {
+    return axiosClient.post(`/api/v1/admin/file/save`, {
+        values: files
+    })
 }

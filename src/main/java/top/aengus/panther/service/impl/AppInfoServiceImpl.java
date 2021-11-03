@@ -1,12 +1,13 @@
 package top.aengus.panther.service.impl;
 
 import cn.hutool.core.util.IdUtil;
-import lombok.NonNull;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.*;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+import top.aengus.panther.core.Constants;
 import top.aengus.panther.dao.AppInfoRepository;
 import top.aengus.panther.enums.*;
 import top.aengus.panther.event.CreateAppEvent;
@@ -59,7 +60,9 @@ public class AppInfoServiceImpl implements AppInfoService {
     }
 
     @Override
+    @NonNull
     public AppInfo findByAppKey(String appKey) {
+        if (appKey.equals(Constants.UNKNOWN_APP_KEY)) return AppInfo.empty();
         return appInfoRepository.findByAppKey(appKey);
     }
 
@@ -70,7 +73,13 @@ public class AppInfoServiceImpl implements AppInfoService {
     }
 
     @Override
-    public List<AppDTO> findDTOByName(String name) {
+    @NonNull
+    public AppInfo findByEnglishName(String name) {
+        return appInfoRepository.findByEnglishName(name).orElse(AppInfo.empty());
+    }
+
+    @Override
+    public List<AppDTO> searchDTOByName(String name) {
         List<AppInfo> appInfo = appInfoRepository.findByNameContainsOrEnglishNameContains(name, name);
         if (appInfo == null) return Collections.emptyList();
         return appInfo.stream().map(this::convertToDto).collect(Collectors.toList());
@@ -86,6 +95,9 @@ public class AppInfoServiceImpl implements AppInfoService {
     public String createApp(CreateAppParam param, String owner) {
         if (StringUtil.isEmpty(param.getEnglishName()) || param.getEnglishName().contains(" ")) {
             throw new BadRequestException("英文名不能为空或含有空格！");
+        }
+        if (param.getEnglishName().equals(Constants.UNKNOWN_APP_KEY)) {
+            throw new BadRequestException("英文名非法！");
         }
         appInfoRepository.findByEnglishName(param.getEnglishName()).ifPresent(app -> {
             throw new BadRequestException("英文名有重复！");

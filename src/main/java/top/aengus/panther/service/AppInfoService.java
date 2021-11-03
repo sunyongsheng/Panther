@@ -1,6 +1,7 @@
 package top.aengus.panther.service;
 
 import org.springframework.data.domain.Page;
+import org.springframework.lang.NonNull;
 import top.aengus.panther.enums.AppStatus;
 import top.aengus.panther.model.app.AppDTO;
 import top.aengus.panther.model.app.AppInfo;
@@ -21,11 +22,15 @@ public interface AppInfoService {
 
     Page<AppInfo> findAllByStatus(AppStatus status, int page, int pageSize);
 
+    @NonNull
     AppInfo findByAppKey(String appKey);
+
+    @NonNull
+    AppInfo findByEnglishName(String name);
 
     AppDTO findDTOByAppKey(String appKey);
 
-    List<AppDTO> findDTOByName(String name);
+    List<AppDTO> searchDTOByName(String name);
 
     Page<AppDTO> findDTOsByOwner(String owner, int page, int pageSize);
 

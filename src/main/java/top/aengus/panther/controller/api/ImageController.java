@@ -3,10 +3,12 @@ package top.aengus.panther.controller.api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import top.aengus.panther.core.Constants;
 import top.aengus.panther.core.Response;
+import top.aengus.panther.model.CommonParam;
 import top.aengus.panther.model.image.ImageDTO;
 import top.aengus.panther.model.image.ImageModel;
 import top.aengus.panther.model.image.RefreshResult;
@@ -14,6 +16,7 @@ import top.aengus.panther.service.ImageService;
 import top.aengus.panther.service.PantherConfigService;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.util.List;
 
 @Slf4j
@@ -90,13 +93,30 @@ public class ImageController extends ApiV1Controller {
         return new Response<Void>().success().msg("删除成功");
     }
 
-    @GetMapping("/image/db/refresh")
+    @GetMapping("/image/refresh/db")
     public Response<RefreshResult> refreshImageDb() {
         return new Response<RefreshResult>().success().data(imageService.refreshDatabase());
     }
 
-    @GetMapping("/image/file/refresh")
+    @GetMapping("/image/refresh/file")
     public Response<RefreshResult> refreshImageFile() {
-        return null;
+        return new Response<RefreshResult>().success().data(imageService.refreshFiles());
+    }
+
+    @PostMapping("/admin/file/delete")
+    public Response<Void> deleteFileForever(@RequestBody @Validated CommonParam<String> param) {
+        Response<Void> response = new Response<>();
+        if (new File(param.getKey()).delete()) {
+            return response.success().msg("删除成功");
+        } else {
+            return response.unknownError().msg("删除失败");
+        }
+    }
+
+    @PostMapping("/admin/file/save")
+    public Response<Void> saveInvalidFile(@RequestBody @Validated CommonParam<RefreshResult.Item> param) {
+        Response<Void> response = new Response<>();
+        imageService.insertFromRefreshResult(param.getValues());
+        return response.success().msg("保存成功");
     }
 }

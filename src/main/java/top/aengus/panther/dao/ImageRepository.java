@@ -23,4 +23,6 @@ public interface ImageRepository extends PagingAndSortingRepository<ImageModel, 
     Page<ImageModel> findAllByOwner(String appKey, Pageable pageable);
 
     Page<ImageModel> findAllByStatus(Integer status, Pageable pageable);
+
+    ImageModel findByRelativePath(String path);
 }

@@ -4,13 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import top.aengus.panther.core.Response;
-import top.aengus.panther.enums.AppStatus;
 import top.aengus.panther.model.app.AppDTO;
 import top.aengus.panther.model.app.CreateAppParam;
 import top.aengus.panther.model.app.UpdateAppParam;
-import top.aengus.panther.model.image.ImageDTO;
 import top.aengus.panther.model.setting.UpdateAppSettingParam;
 import top.aengus.panther.service.AppInfoService;
 import top.aengus.panther.service.ImageService;
@@ -90,7 +87,7 @@ public class AppInfoController extends ApiV1Controller {
     @GetMapping("/app}")
     public Response<List<AppDTO>> searchApp(@RequestParam("query") String query) {
         Response<List<AppDTO>> response = new Response<>();
-        return response.success().data(appInfoService.findDTOByName(query));
+        return response.success().data(appInfoService.searchDTOByName(query));
     }
 
     @GetMapping("/apps")

@@ -17,6 +17,7 @@ import top.aengus.panther.enums.ImageStatus;
 import top.aengus.panther.enums.NamingStrategy;
 import top.aengus.panther.exception.BadRequestException;
 import top.aengus.panther.exception.NotFoundException;
+import top.aengus.panther.model.FileTree;
 import top.aengus.panther.model.app.AppInfo;
 import top.aengus.panther.model.image.RefreshResult;
 import top.aengus.panther.model.setting.AppSetting;
@@ -91,7 +92,7 @@ public class ImageServiceImpl implements ImageService {
         String saveDir = tryCheckDir(dir);
 
         AppInfo appInfo = appInfoService.findByAppKey(appKey);
-        if (appInfo == null) {
+        if (appInfo == AppInfo.empty()) {
             throw new NotFoundException("App不存在！请先创建App", appKey);
         }
         AppStatus appStatus = AppStatus.fromCode(appInfo.getStatus());
@@ -261,6 +262,9 @@ public class ImageServiceImpl implements ImageService {
                     item.setAbsolutePath(image.getAbsolutePath());
                     item.setRelativePath(image.getRelativePath());
                     item.setUrl(image.getUrl());
+                    item.setOwnerApp(appInfoService.findByAppKey(image.getOwner()).getName());
+                    item.setOwnerAppKey(image.getOwner());
+                    item.setSize(image.getSize());
                     invalidDb.add(item);
                 }
             });
@@ -271,6 +275,74 @@ public class ImageServiceImpl implements ImageService {
         }
         result.setInvalidItems(invalidDb);
         return result;
+    }
+
+    @Override
+    public RefreshResult refreshFiles() {
+        RefreshResult result = new RefreshResult();
+        List<RefreshResult.Item> invalidFiles = new ArrayList<>();
+        String rootPath = configService.getSaveRootPath();
+
+        FileTree rootTree = fileService.listFiles(rootPath, false);
+        String rootRePathPrefix = FileUtil.FILE_SEPARATOR;
+
+        rootTree.forEachFile(file -> handleFile(file, invalidFiles, rootRePathPrefix, null, false));
+
+        rootTree.forEachDir(firstLevelDir -> {
+            FileTree firstLevelDirTree = fileService.listFiles(firstLevelDir.getCurrFile().getAbsolutePath(), false);
+            String firstRePathPrefix = rootRePathPrefix + firstLevelDir.getCurrFile().getName() + FileUtil.FILE_SEPARATOR;
+
+            firstLevelDirTree.forEachFile(file -> handleFile(file, invalidFiles, firstRePathPrefix, null, false));
+
+            firstLevelDirTree.forEachDir(childDir -> {
+                String childDirname = childDir.getCurrFile().getName();
+                FileTree childDirTree = fileService.listFiles(childDir.getCurrFile().getAbsolutePath(), false);
+                String childRelativePathPrefix = firstRePathPrefix + childDirname + FileUtil.FILE_SEPARATOR;
+                childDirTree.forEachFile(file -> handleFile(file, invalidFiles, childRelativePathPrefix, childDirname, true));
+            });
+        });
+        result.setInvalidItems(invalidFiles);
+        return result;
+    }
+
+    private void handleFile(File file, List<RefreshResult.Item> invalidFiles, String relativePathPrefix, String dirname, boolean setAppName) {
+        String filename = file.getName();
+        String relativePath = relativePathPrefix + filename;
+        if (imageRepository.findByRelativePath(relativePath) == null) {
+            RefreshResult.Item item = new RefreshResult.Item();
+            item.setName(filename);
+            item.setAbsolutePath(file.getAbsolutePath());
+            item.setRelativePath(relativePath);
+            item.setUrl(generateUrl(relativePath));
+            if (setAppName) {
+                AppInfo appInfo = appInfoService.findByEnglishName(dirname);
+                item.setOwnerApp(appInfo.getName());
+                item.setOwnerAppKey(appInfo.getAppKey());
+            } else {
+                item.setOwnerApp("未知");
+                item.setOwnerAppKey(Constants.UNKNOWN_APP_KEY);
+            }
+            item.setSize(file.length());
+            invalidFiles.add(item);
+        }
+    }
+
+    @Override
+    public void insertFromRefreshResult(List<RefreshResult.Item> files) {
+        files.forEach(file -> {
+            ImageModel imageModel = new ImageModel();
+            imageModel.setUrl(file.getUrl());
+            imageModel.setOriginalName(file.getName());
+            imageModel.setSaveName(file.getName());
+            imageModel.setAbsolutePath(file.getAbsolutePath());
+            imageModel.setRelativePath(file.getRelativePath());
+            imageModel.setOwner(file.getOwnerAppKey());
+            imageModel.setUploadTime(System.currentTimeMillis());
+            imageModel.setCreator(configService.getAdminUsername());
+            imageModel.setSize(file.getSize());
+            imageModel.setStatus(ImageStatus.NORMAL.getCode());
+            imageRepository.save(imageModel);
+        });
     }
 
     private ImageModel findImageWithCheck(Long imageId) {
