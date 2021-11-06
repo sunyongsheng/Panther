@@ -30,6 +30,12 @@
     flex-direction: row;
 }
 
+.row-center-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
 .card-column-container {
     display: flex;
     flex-direction: column;

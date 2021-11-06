@@ -32,13 +32,17 @@
 <div th:fragment="admin-header">
     <el-header>
         <div></div>
-        <el-dropdown class="user-info">
-            <p style="margin-left: 10px" th:text="${username}"></p>
-            <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item>修改密码</el-dropdown-item>
-                <el-dropdown-item>退出登录</el-dropdown-item>
-            </el-dropdown-menu>
-        </el-dropdown>
+        <div class="row-center-container">
+            <i class="el-icon-setting" style="cursor: pointer" @click="onClickPantherSetting"></i>
+            <div class="space-row-10"></div>
+            <el-dropdown class="user-info" @command="onClickUsernameMenu">
+                <p style="margin-left: 10px" th:text="${username}"></p>
+                <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item command="changePassword">修改密码</el-dropdown-item>
+                    <el-dropdown-item command="logout">退出登录</el-dropdown-item>
+                </el-dropdown-menu>
+            </el-dropdown>
+        </div>
     </el-header>
 </div>
 </body>
