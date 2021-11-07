@@ -67,4 +67,9 @@ public class RouterController {
         return "admin/image";
     }
 
+    @RequestMapping("/home")
+    public String home() {
+        return "admin/home";
+    }
+
 }

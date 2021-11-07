@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>测试Home</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+    <script src="https://unpkg.com/element-ui@2.15.6/lib/index.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui@2.15.6/lib/theme-chalk/index.css">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/common.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/component.thymeleaf.css}">
+    <!-- axios必须引入且在request.js之前 -->
+    <script type="text/javascript" th:src="@{/js/axios.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/request.js}"></script>
+    <script type="text/javascript" th:src="@{/js/app/app.js}"></script>
+    <script type="text/javascript" th:src="@{/js/image/image.js}"></script>
+    <script type="text/javascript" th:src="@{/js/common/common.js}"></script>
+    <script type="text/javascript" th:src="@{/js/component.thymeleaf.js}"></script>
+    <script type="text/javascript" th:src="@{/js/component/overview.js}"></script>
+    <script type="text/javascript" th:src="@{/js/component/app.js}"></script>
+    <script type="text/javascript" th:src="@{/js/component/image.js}"></script>
+
+</head>
+<body>
+<div id="app">
+    <el-container class="root-container">
+        <el-aside>
+            <div class="aside-title">
+                <p>Panther</p>
+            </div>
+            <el-menu :default-active="$router.path" router>
+                <el-menu-item index="overview">
+                    <i class="el-icon-data-board"></i>
+                    <span slot="title">概览</span>
+                </el-menu-item>
+                <el-menu-item index="app-list">
+                    <i class="el-icon-mobile-phone"></i>
+                    <span slot="title">App管理</span>
+                </el-menu-item>
+                <el-menu-item index="image-list">
+                    <i class="el-icon-picture-outline"></i>
+                    <span slot="title">图片管理</span>
+                </el-menu-item>
+            </el-menu>
+        </el-aside>
+        <el-container direction="vertical">
+            <div th:replace="component.thymeleaf::admin-header"></div>
+            <router-view></router-view>
+        </el-container>
+    </el-container>
+</div>
+</body>
+<script>
+    const routes = [
+        { path: '/', redirect: '/overview'},
+        { path: '/overview', component: overview },
+        { path: '/app-list', component: appList },
+        { path: '/image-list', component: imageList },
+    ]
+    const router = new VueRouter({
+        routes
+    })
+    new Vue({
+        router
+    }).$mount('#app')
+</script>
+</html>
