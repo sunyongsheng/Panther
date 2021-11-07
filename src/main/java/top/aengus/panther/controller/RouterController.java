@@ -67,4 +67,16 @@ public class RouterController {
         return "admin/image";
     }
 
+    @RequestMapping("/admin/setting")
+    public String toSettingPage(Model model) {
+        model.addAttribute("username", configService.getAdminUsername());
+        return "admin/setting";
+    }
+
+    @RequestMapping("/admin/changePassword")
+    public String toChangePasswordPage(Model model) {
+        model.addAttribute("username", configService.getAdminUsername());
+        return "admin/password";
+    }
+
 }

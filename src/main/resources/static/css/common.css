@@ -66,3 +66,33 @@
     background-color: #FF7387;
     border-color: #FF7387;
 }
+
+/* --------------------------- 所有页面共同的样式 ---------------------------*/
+html, body, #app, .root-container, .el-container {
+    font-family: Arial, sans-serif;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+}
+.el-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin: 10px 30px
+}
+.el-main {
+    background-color: #F5F5FA;
+}
+.aside-title {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.user-info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}

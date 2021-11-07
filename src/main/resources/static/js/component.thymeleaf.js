@@ -3,12 +3,12 @@ function onSelectSideMenu(index, _) {
 }
 
 function onClickPantherSetting() {
-    console.log("setting")
+    window.location.href = "/admin/setting";
 }
 
 function onClickUsernameMenu(command) {
     if (command === 'changePassword') {
-        console.log("changePassword")
+        window.location.href = "/admin/changePassword";
     } else if (command === 'logout') {
         console.log("logout")
     }
