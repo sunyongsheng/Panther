@@ -10,15 +10,15 @@
     <!-- axios必须引入且在request.js之前 -->
     <script type="text/javascript" th:src="@{/js/axios.min.js}"></script>
     <script type="text/javascript" th:src="@{/js/request.js}"></script>
-    <script type="text/javascript" th:src="@{/js/component.thymeleaf.js}"></script>
+    <script type="text/javascript" th:src="@{/js/router.js}"></script>
 </head>
 <body>
 <div id="app">
     <el-container class="root-container">
-        <div th:replace="component.thymeleaf::admin-sidebar(index='overview')"></div>
+        <div th:replace="component/thymeleaf::admin-sidebar(index='overview')"></div>
 
         <el-container direction="vertical">
-            <div th:replace="component.thymeleaf::admin-header"></div>
+            <div th:replace="component/thymeleaf::admin-header"></div>
 
             <el-main>
                 <el-row :gutter="20">
