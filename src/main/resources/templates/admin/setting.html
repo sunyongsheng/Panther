@@ -5,12 +5,15 @@
     <title>设置 —— Panther</title>
     <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
     <script src="https://unpkg.com/element-ui@2.15.6/lib/index.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-md5/2.10.0/js/md5.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/element-ui@2.15.6/lib/theme-chalk/index.css">
     <link rel="stylesheet" type="text/css" th:href="@{/css/common.css}">
     <!-- axios必须引入且在request.js之前 -->
     <script type="text/javascript" th:src="@{/js/axios.min.js}"></script>
     <script type="text/javascript" th:src="@{/js/request.js}"></script>
     <script type="text/javascript" th:src="@{/js/router.js}"></script>
+    <script type="text/javascript" th:src="@{/js/store.js}"></script>
+    <script type="text/javascript" th:src="@{/js/api/common.js}"></script>
 </head>
 <body>
 <div id="app">
@@ -21,7 +24,19 @@
             <div th:replace="component/thymeleaf::admin-header"></div>
 
             <el-main>
-
+                <el-form ref="form" :rules="updateConfigRules" :model="updateConfigParam" label-width="120px">
+                    <el-form-item label="图床域名" label-position="left" prop="hostUrl">
+                        <el-input v-model="updateConfigParam.hostUrl" placeholder="上传图片后，域名将作为上传图片后的地址，安装后可以再次修改" prefix-icon="el-icon-discover"></el-input>
+                    </el-form-item>
+                    <el-form-item label="图片存储路径" label-position="left" prop="saveRootPath" v-popover:popover>
+                        <el-input v-model="updateConfigParam.saveRootPath" placeholder="图片存储的文件夹的绝对路径，请使用 / 作为路径分隔符" prefix-icon="el-icon-folder"></el-input>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-button type="primary" @click="onClickUpdateConfig" size="medium" >
+                            确 认
+                        </el-button>
+                    </el-form-item>
+                </el-form>
             </el-main>
         </el-container>
     </el-container>
@@ -32,10 +47,23 @@
         el: '#app',
         data() {
             return {
+                currUser,
+                updateConfigParam: {
+                    hostUrl: '',
+                    saveRootPath: ''
+                },
+                updateConfigRules: {
+
+                }
             }
         },
         methods: {
+            onClickUpdateConfig() {
 
+            }
+        },
+        created() {
+            initializeAdminInfo();
         }
     })
 </script>

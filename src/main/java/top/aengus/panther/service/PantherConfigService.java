@@ -17,6 +17,8 @@ public interface PantherConfigService {
 
     String getAdminPassword();
 
+    String getAdminEmail();
+
     String getRunningDuration();
 
     void updateSaveRootPath(String saveRootPath);

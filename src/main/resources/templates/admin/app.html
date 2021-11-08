@@ -5,12 +5,14 @@
     <title>App管理 —— Panther</title>
     <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
     <script src="https://unpkg.com/element-ui@2.15.6/lib/index.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-md5/2.10.0/js/md5.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/element-ui@2.15.6/lib/theme-chalk/index.css">
     <link rel="stylesheet" type="text/css" th:href="@{/css/common.css}">
     <!-- axios必须引入且在request.js之前 -->
     <script type="text/javascript" th:src="@{/js/axios.min.js}"></script>
     <script type="text/javascript" th:src="@{/js/request.js}"></script>
     <script type="text/javascript" th:src="@{/js/router.js}"></script>
+    <script type="text/javascript" th:src="@{/js/store.js}"></script>
     <script type="text/javascript" th:src="@{/js/util.js}"></script>
     <script type="text/javascript" th:src="@{/js/api/common.js}"></script>
     <script type="text/javascript" th:src="@{/js/api/app.js}"></script>
@@ -33,7 +35,16 @@
                     style="width: 100%;">
                     <el-table-column prop="name" label="名称" align="center"></el-table-column>
                     <el-table-column prop="englishName" label="英文名" align="center"></el-table-column>
-                    <el-table-column prop="createTimeFormatted" label="创建时间" align="center"></el-table-column>
+                    <el-table-column prop="createTimeFormatted" label="创建时间" v-popover:popoverCt align="center">
+                        <template slot-scope="scope">
+                            <el-popover trigger="hover" placement="top" ref="popoverCt">
+                                <p>{{ scope.row.createTimeFormattedDetail }}</p>
+                                <div slot="reference">
+                                    <p>{{ scope.row.createTimeFormatted }}</p>
+                                </div>
+                            </el-popover>
+                        </template>
+                    </el-table-column>
                     <el-table-column prop="totalImages" label="图片总数" align="center"></el-table-column>
                     <el-table-column label="状态" align="center" width="150">
                         <template slot-scope="scope">
@@ -58,7 +69,7 @@
                             </el-popover>
                         </template>
                     </el-table-column>
-                    <el-table-column label="操作" align="center">
+                    <el-table-column label="操作" align="center" width="180">
                         <template slot-scope="scope">
                             <el-button
                                     type="success"
@@ -222,6 +233,7 @@
         el: '#app',
         data() {
             return {
+                currUser,
                 totalPage: 1,
                 currPage: 1,
                 pageSize: 10,
@@ -283,7 +295,8 @@
                         app.superApp = app.role === 'SUPER';
                         app.locked = app.status === 'LOCKED';
                         app.deleted = app.status === 'DELETED';
-                        app.createTimeFormatted = formatDate(new Date(app.createTime), "yyyy-MM-dd hh:mm:ss");
+                        app.createTimeFormatted = formatDate(new Date(app.createTime), "yyyy-MM-dd")
+                        app.createTimeFormattedDetail = formatDate(new Date(app.createTime), "yyyy-MM-dd hh:mm:ss");
                         if (app.hasUploadToken1) {
                             app.updateToken1GenTimeFormatted = '生成于 ' + formatDate(new Date(app.updateToken1GenTime), "yyyy年MM月dd日 hh:mm:ss");
                         } else {
@@ -530,6 +543,7 @@
             }
         },
         created: function () {
+            initializeAdminInfo();
             this.fetchAppData();
         }
     })

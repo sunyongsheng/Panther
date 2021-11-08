@@ -34,9 +34,13 @@
         <div></div>
         <div class="row-center-container">
             <i class="el-icon-setting" style="cursor: pointer" @click="onClickPantherSetting"></i>
-            <div class="space-row-10"></div>
+            <div class="space-row-20"></div>
             <el-dropdown class="user-info" @command="onClickUsernameMenu">
-                <p style="margin-left: 10px" th:text="${username}"></p>
+                <div class="row-center-container">
+                    <el-avatar :src="currUser.avatar" :size="35"></el-avatar>
+                    <div class="space-row-10"></div>
+                    <p>{{ currUser.username }}</p>
+                </div>
                 <el-dropdown-menu slot="dropdown">
                     <el-dropdown-item command="changePassword">修改密码</el-dropdown-item>
                     <el-dropdown-item command="logout">退出登录</el-dropdown-item>

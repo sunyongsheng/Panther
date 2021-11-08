@@ -107,6 +107,12 @@ public class PantherConfigServiceImpl implements PantherConfigService {
     }
 
     @Override
+    public String getAdminEmail() {
+        preCheckInstall();
+        return pantherConfigRepository.findByConfigKey(KEY_ADMIN_EMAIL).getConfigValue();
+    }
+
+    @Override
     public String getRunningDuration() {
         PantherConfig config = pantherConfigRepository.findByConfigKey(KEY_INSTALL_TIME);
         if (config == null) {

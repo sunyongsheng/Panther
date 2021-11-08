@@ -12,3 +12,7 @@ async function upload(appKey, dir, file) {
     }
     return axiosClient.post("/api/v1/admin/image", formData, config);
 }
+
+async function getAdminInfo() {
+    return axiosClient.get(`/api/v1/admin/info`)
+}
