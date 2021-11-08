@@ -5,6 +5,7 @@ public class Constants {
     public static final int PAGE_SIZE = 20;
 
     public static final String UNKNOWN_APP_KEY = "unknown";
+    public static final String UNKNOWN_APP_NAME = "未知";
 
     /**
      * 图片及App在回收站中的保留时间

@@ -69,7 +69,7 @@ public class AppInfo {
                     EMPTY = new AppInfo();
                     EMPTY.setId(-1L);
                     EMPTY.setAppKey(Constants.UNKNOWN_APP_KEY);
-                    EMPTY.setName("未知");
+                    EMPTY.setName(Constants.UNKNOWN_APP_NAME);
                     EMPTY.setEnglishName(Constants.UNKNOWN_APP_KEY);
                     EMPTY.setRole(AppRole.NORMAL.getCode());
                 }

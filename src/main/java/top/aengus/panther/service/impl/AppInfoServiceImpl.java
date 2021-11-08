@@ -96,8 +96,11 @@ public class AppInfoServiceImpl implements AppInfoService {
         if (StringUtil.isEmpty(param.getEnglishName()) || param.getEnglishName().contains(" ")) {
             throw new BadRequestException("英文名不能为空或含有空格！");
         }
-        if (param.getEnglishName().equals(Constants.UNKNOWN_APP_KEY)) {
+        if (Constants.UNKNOWN_APP_KEY.equals(param.getEnglishName())) {
             throw new BadRequestException("英文名非法！");
+        }
+        if (Constants.UNKNOWN_APP_NAME.equals(param.getName())) {
+            throw new BadRequestException("App名称非法！");
         }
         appInfoRepository.findByEnglishName(param.getEnglishName()).ifPresent(app -> {
             throw new BadRequestException("英文名有重复！");

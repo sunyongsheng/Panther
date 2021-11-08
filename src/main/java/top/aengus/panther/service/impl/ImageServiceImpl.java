@@ -325,7 +325,7 @@ public class ImageServiceImpl implements ImageService {
                 item.setOwnerApp(appInfo.getName());
                 item.setOwnerAppKey(appInfo.getAppKey());
             } else {
-                item.setOwnerApp("未知");
+                item.setOwnerApp(Constants.UNKNOWN_APP_NAME);
                 item.setOwnerAppKey(Constants.UNKNOWN_APP_KEY);
             }
             item.setSize(file.length());
