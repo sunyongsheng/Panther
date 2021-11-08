@@ -30,6 +30,7 @@ public class PantherConfigServiceImpl implements PantherConfigService {
     private static final String KEY_SAVE_ROOT_PATH = "save_root_path";
     private static final String KEY_ADMIN_USERNAME = "admin_username";
     private static final String KEY_ADMIN_PASSWORD = "admin_password";
+    private static final String KEY_ADMIN_EMAIL = "admin_email";
     private static final String KEY_INSTALL_TIME = "install_time";
 
     private volatile String hostUrl;
@@ -241,6 +242,12 @@ public class PantherConfigServiceImpl implements PantherConfigService {
             adminPassword.setConfigValue(EncryptUtil.encrypt(param.getAdminPassword()));
             adminPassword.setUpdateTime(currTime);
             pantherConfigRepository.save(adminPassword);
+
+            PantherConfig adminEmailConfig = new PantherConfig();
+            adminEmailConfig.setConfigKey(KEY_ADMIN_EMAIL);
+            adminEmailConfig.setConfigValue(param.getAdminEmail());
+            adminEmailConfig.setUpdateTime(currTime);
+            pantherConfigRepository.save(adminEmailConfig);
 
             PantherConfig installTimeConfig = new PantherConfig();
             installTimeConfig.setConfigKey(KEY_INSTALL_TIME);

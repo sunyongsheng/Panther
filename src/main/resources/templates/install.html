@@ -36,6 +36,11 @@
                           minlength="6"
                           maxlength="20"></el-input>
             </el-form-item>
+            <el-form-item label="管理员邮箱" prop="adminEmail">
+                <el-input v-model="installParam.adminEmail"
+                          placeholder="请输入超级管理员邮箱"
+                          prefix-icon="el-icon-message"></el-input>
+            </el-form-item>
             <el-form-item label="图床域名" label-position="left" prop="hostUrl">
                 <el-input v-model="installParam.hostUrl" placeholder="上传图片后，域名将作为上传图片后的地址，安装后可以再次修改" prefix-icon="el-icon-discover"></el-input>
             </el-form-item>
@@ -99,6 +104,7 @@
                 installParam: {
                     adminUsername: "",
                     adminPassword: "",
+                    adminEmail: "",
                     hostUrl: "",
                     saveRootPath: "",
                     imgDirs: ["app", "common", "post"]
