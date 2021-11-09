@@ -6,7 +6,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import top.aengus.panther.core.Response;
 import top.aengus.panther.event.ShutdownEvent;
-import top.aengus.panther.model.ChangePasswordParam;
+import top.aengus.panther.model.admin.ChangePasswordParam;
 import top.aengus.panther.model.admin.AdminInfo;
 import top.aengus.panther.model.config.PantherConfigDTO;
 import top.aengus.panther.model.config.UpdateConfigParam;

@@ -1,4 +1,4 @@
-package top.aengus.panther.model;
+package top.aengus.panther.model.admin;
 
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
