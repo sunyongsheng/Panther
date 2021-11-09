@@ -2,6 +2,10 @@ function onSelectSideMenu(index, _) {
     window.location.href = "/admin/" + index;
 }
 
+function goBack() {
+    window.history.back();
+}
+
 function onClickPantherSetting() {
     window.location.href = "/admin/setting";
 }

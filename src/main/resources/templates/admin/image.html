@@ -24,7 +24,7 @@
         <div th:replace="component/thymeleaf::admin-sidebar(index='image-manager')"></div>
 
         <el-container direction="vertical">
-            <div th:replace="component/thymeleaf::admin-header"></div>
+            <div th:replace="component/thymeleaf::admin-header(pageTitle='图片管理')"></div>
 
             <el-main>
                 <el-button type="success" icon="el-icon-upload" size="medium" @click="onClickUpload">上传图片</el-button>

@@ -23,7 +23,7 @@
         <div th:replace="component/thymeleaf::admin-sidebar(index='app-manager')"></div>
 
         <el-container direction="vertical">
-            <div th:replace="component/thymeleaf::admin-header"></div>
+            <div th:replace="component/thymeleaf::admin-header(pageTitle='App管理')"></div>
 
             <el-main>
                 <el-button type="primary" icon="el-icon-plus" size="medium" @click="onClickCreate">创建App</el-button>

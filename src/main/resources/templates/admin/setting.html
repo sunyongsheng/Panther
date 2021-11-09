@@ -21,7 +21,7 @@
         <div th:replace="component/thymeleaf::admin-sidebar(index='setting')"></div>
 
         <el-container direction="vertical">
-            <div th:replace="component/thymeleaf::admin-header"></div>
+            <div th:replace="component/thymeleaf::admin-header(pageTitle='Panther设置')"></div>
 
             <el-main>
                 <el-form ref="form" :rules="updateConfigRules" :model="updateConfigParam" label-width="120px">

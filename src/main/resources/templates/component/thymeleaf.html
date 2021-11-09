@@ -31,7 +31,9 @@
 </div>
 <div th:fragment="admin-header">
     <el-header>
-        <div></div>
+        <div>
+            <el-page-header @back="goBack" th:content="${pageTitle}"></el-page-header>
+        </div>
         <div class="row-center-container">
             <i class="el-icon-setting" style="cursor: pointer" @click="onClickPantherSetting"></i>
             <div class="space-row-20"></div>

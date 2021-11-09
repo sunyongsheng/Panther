@@ -21,7 +21,7 @@
         <div th:replace="component/thymeleaf::admin-sidebar(index='overview')"></div>
 
         <el-container direction="vertical">
-            <div th:replace="component/thymeleaf::admin-header"></div>
+            <div th:replace="component/thymeleaf::admin-header(pageTitle='概览')"></div>
 
             <el-main>
                 <el-row :gutter="20">
