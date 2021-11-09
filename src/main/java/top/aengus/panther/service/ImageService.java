@@ -52,4 +52,16 @@ public interface ImageService {
     RefreshResult refreshFiles();
 
     void insertFromRefreshResult(List<RefreshResult.Item> files);
+
+    /**
+     * 更新图片的域名地址
+     * @param hostUrl 新的域名地址
+     */
+    void updateImageHostUrl(String hostUrl);
+
+    /**
+     * 更新图片的绝对路径并移动根目录
+     * @param rootPath 新的存储目录的绝对路径
+     */
+    void updateImageSavePath(String rootPath);
 }

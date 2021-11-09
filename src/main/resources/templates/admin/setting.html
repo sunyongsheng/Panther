@@ -24,16 +24,52 @@
             <div th:replace="component/thymeleaf::admin-header(pageTitle='Panther设置')"></div>
 
             <el-main>
-                <el-form ref="form" :rules="updateConfigRules" :model="updateConfigParam" label-width="120px">
+                <el-form ref="form" :rules="updateConfigRules" :model="updateConfigParam" label-width="120px" class="form-size">
+                    <el-form-item label="管理员用户名" label-position="left" prop="adminUsername">
+                        <el-input v-model="adminUsername" prefix-icon="el-icon-user" disabled></el-input>
+                    </el-form-item>
+                    <el-form-item label="管理员邮箱" label-position="left" prop="adminEmail">
+                        <el-input v-model="updateConfigParam.adminEmail" placeholder="请输入超级管理员邮箱地址" prefix-icon="el-icon-message"></el-input>
+                    </el-form-item>
                     <el-form-item label="图床域名" label-position="left" prop="hostUrl">
-                        <el-input v-model="updateConfigParam.hostUrl" placeholder="上传图片后，域名将作为上传图片后的地址，安装后可以再次修改" prefix-icon="el-icon-discover"></el-input>
+                        <el-input v-model="updateConfigParam.hostUrl"
+                                  placeholder="上传图片后，域名将作为上传图片后的地址"
+                                  prefix-icon="el-icon-discover"
+                                  :disabled="disableEditHostUrl"
+                                  @input="onChangeHostUrl"
+                                  v-popover:popover1>
+                            <el-tooltip effect="dark" :content="helpText.hostUrl" placement="top-end" slot="suffix">
+                                <i class="el-input__icon el-icon-question"></i>
+                            </el-tooltip>
+                        </el-input>
+                        <el-popover :disabled="!disableEditHostUrl"
+                                    placement="top"
+                                    content="检测到您修改了图片存储路径，请先更新完成图片存储路径或者将其恢复后再编辑此项"
+                                    trigger="hover"
+                                    ref="popover1">
+                        </el-popover>
                     </el-form-item>
                     <el-form-item label="图片存储路径" label-position="left" prop="saveRootPath" v-popover:popover>
-                        <el-input v-model="updateConfigParam.saveRootPath" placeholder="图片存储的文件夹的绝对路径，请使用 / 作为路径分隔符" prefix-icon="el-icon-folder"></el-input>
+                        <el-input v-model="updateConfigParam.saveRootPath"
+                                  placeholder="图片存储的文件夹的绝对路径，请使用 / 作为路径分隔符"
+                                  prefix-icon="el-icon-folder"
+                                  :disabled="disableEditSaveRootPath"
+                                  @input="onChangeSaveRootPath"
+                                  v-popover:popover2>
+                            <el-tooltip effect="dark" :content="helpText.saveRootPath" placement="top-end" slot="suffix">
+                                <i class="el-input__icon el-icon-question"></i>
+                            </el-tooltip>
+                        </el-input>
+                        <el-popover :disabled="!disableEditSaveRootPath"
+                                    placement="top"
+                                    content="检测到您修改了图床域名，请先更新完成图床域名或者将其恢复后再编辑此项"
+                                    trigger="hover"
+                                    ref="popover2">
+                        </el-popover>
                     </el-form-item>
                     <el-form-item>
                         <el-button type="primary" @click="onClickUpdateConfig" size="medium" >
-                            确 认
+                            更 新
                         </el-button>
                     </el-form-item>
                 </el-form>
@@ -48,25 +84,103 @@
         data() {
             return {
                 currUser,
+                adminUsername: '',
+                originalHolder: {
+                    adminEmail: '',
+                    hostUrl: '',
+                    saveRootPath: ''
+                },
                 updateConfigParam: {
+                    adminEmail: '',
                     hostUrl: '',
                     saveRootPath: ''
                 },
                 updateConfigRules: {
 
+                },
+                disableEditHostUrl: false,
+                disableEditSaveRootPath: false,
+                helpText: {
+                    hostUrl: '此地址将作为图片上传后的域名，请以 http:// 或 https:// 开头',
+                    saveRootPath: '图片存储在本机的绝对路径，一旦修改将会把原来的所有图片移动至新的目录下，请确保此目录一定存在'
                 }
             }
         },
         methods: {
-            onClickUpdateConfig() {
+            fetchPantherConfig() {
+                axiosClient.get(`/api/v1/admin/config`).then(response => {
+                    let config = response.data;
+                    this.adminUsername = config.adminUsername;
 
+                    this.originalHolder.adminEmail = config.adminEmail;
+                    this.originalHolder.hostUrl = config.hostUrl;
+                    this.originalHolder.saveRootPath = config.saveRootPath;
+
+                    this.updateConfigParam.adminEmail = config.adminEmail;
+                    this.updateConfigParam.hostUrl = config.hostUrl;
+                    this.updateConfigParam.saveRootPath = config.saveRootPath;
+                }).catch(e => {
+                    this.$message.error(e.msg);
+                });
+            },
+            onChangeHostUrl(_) {
+                this.disableEditSaveRootPath = this.originalHolder.hostUrl !== this.updateConfigParam.hostUrl;
+            },
+            onChangeSaveRootPath(_) {
+                this.disableEditHostUrl = this.originalHolder.saveRootPath !== this.updateConfigParam.saveRootPath;
+            },
+            onClickUpdateConfig() {
+                if (this.originalHolder.hostUrl !== this.updateConfigParam.hostUrl) {
+                    this.$confirm(`检测到您修改了图床域名，原已上传图片的域名也将随之更新，是否继续`, '提示', {
+                        confirmButtonText: '确认',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        axiosClient.put(`/api/v1/admin/config?changed=hostUrl`, {
+                            adminEmail: this.updateConfigParam.adminEmail,
+                            urlOrPath: this.updateConfigParam.hostUrl
+                        }).then(response => {
+                            this.$message.success(response.msg);
+                            this.originalHolder.adminEmail = this.updateConfigParam.adminEmail;
+                            this.originalHolder.hostUrl = this.updateConfigParam.hostUrl;
+                            this.disableEditSaveRootPath = false;
+                        }).catch(e => {
+                            this.$message.error(e.msg);
+                        });
+                    });
+                    return;
+                }
+                if (this.originalHolder.saveRootPath !== this.updateConfigParam.saveRootPath) {
+                    this.$confirm(`检测到您修改了图片存储路径，系统将会移动原来目录下所有的文件到新的目录下，可能会花费较长时间，移动完成后需要手动重启Panther服务，是否继续？`, '警告', {
+                        confirmButtonClass: 'delete-action-confirm',
+                        confirmButtonText: '确认',
+                        cancelButtonText: '取消',
+                        type: 'error'
+                    }).then(() => {
+                        axiosClient.put(`/api/v1/admin/config?changed=saveRootPath`, {
+                            adminEmail: this.updateConfigParam.adminEmail,
+                            urlOrPath: this.updateConfigParam.saveRootPath
+                        }).then(response => {
+                            this.$message.success(response.msg);
+                            this.originalHolder.adminEmail = this.updateConfigParam.adminEmail;
+                            this.originalHolder.saveRootPath = this.updateConfigParam.saveRootPath;
+                            this.disableEditHostUrl = false;
+                        }).catch(e => {
+                            this.$message.error(e.msg);
+                        });
+                    });
+                }
             }
         },
         created() {
             initializeAdminInfo();
+            this.fetchPantherConfig();
         }
     })
 </script>
 <style>
+    .form-size {
+        width: 1000px;
+    }
 </style>
 </html>

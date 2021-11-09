@@ -49,6 +49,8 @@ public interface FileService {
 
     void deleteFileSafely(String rootPath, String filename, String absolutePath);
 
+    void moveFile(String originalPath, String targetPath);
+
     /**
      * 列出所有文件
      */

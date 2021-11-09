@@ -68,6 +68,10 @@ public class FileUtil {
                 && !dirname.contains("|");
     }
 
+    public static boolean checkPath(String path) {
+        return !path.contains("\\");
+    }
+
     public static boolean checkAndCreateDir(File dir) {
         if (!dir.exists()) {
             if (!dir.mkdir()) {

@@ -150,6 +150,18 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    public void moveFile(String originalPath, String targetPath) {
+        File original = new File(originalPath);
+        if (!original.exists()) {
+            throw new BadRequestException("原始路径不存在！");
+        }
+        File target = new File(targetPath);
+        if (!original.renameTo(target)) {
+            log.error("移动目录 {} 到 {} 失败", original, target);
+        }
+    }
+
+    @Override
     public FileTree listFiles(String rootPath, boolean recursion) {
         File root = new File(rootPath);
         FileTree result = new FileTree(root);

@@ -36,6 +36,7 @@ public class PantherConfigServiceImpl implements PantherConfigService {
     private volatile String hostUrl;
     private volatile String saveRootPath;
     private volatile String adminUsername;
+    private volatile String adminEmail;
 
     private volatile boolean hasInstalled = false;
 
@@ -109,7 +110,18 @@ public class PantherConfigServiceImpl implements PantherConfigService {
     @Override
     public String getAdminEmail() {
         preCheckInstall();
-        return pantherConfigRepository.findByConfigKey(KEY_ADMIN_EMAIL).getConfigValue();
+        if (adminEmail == null) {
+            synchronized (this) {
+                if (adminEmail == null) {
+                    PantherConfig config = pantherConfigRepository.findByConfigKey(KEY_ADMIN_EMAIL);
+                    if (config == null) {
+                        throw new InternalException("出现异常，请检查数据库");
+                    }
+                    adminEmail = config.getConfigValue();
+                }
+            }
+        }
+        return adminEmail;
     }
 
     @Override
@@ -138,6 +150,9 @@ public class PantherConfigServiceImpl implements PantherConfigService {
     @Override
     public void updateSaveRootPath(String saveRootPath) {
         preCheckInstall();
+        if (!FileUtil.checkPath(saveRootPath)) {
+            throw new BadRequestException("请使用 / 作为路径分隔符！");
+        }
         saveRootPath = FileUtil.ensureNoSuffix(saveRootPath);
         PantherConfig config = findConfigWithCheck(KEY_SAVE_ROOT_PATH, saveRootPath);
         if (config != null) {
@@ -166,17 +181,6 @@ public class PantherConfigServiceImpl implements PantherConfigService {
     }
 
     @Override
-    public void updateAdminUsername(String superAdminUsername) {
-        preCheckInstall();
-        PantherConfig config = findConfigWithCheck(KEY_ADMIN_USERNAME, superAdminUsername);
-        if (config != null) {
-            config.setConfigValue(superAdminUsername);
-            config.setUpdateTime(System.currentTimeMillis());
-            pantherConfigRepository.save(config);
-        }
-    }
-
-    @Override
     public void updateAdminPassword(String superAdminPassword) {
         preCheckInstall();
         superAdminPassword = EncryptUtil.encrypt(superAdminPassword);
@@ -185,6 +189,18 @@ public class PantherConfigServiceImpl implements PantherConfigService {
             config.setConfigValue(superAdminPassword);
             config.setUpdateTime(System.currentTimeMillis());
             pantherConfigRepository.save(config);
+        }
+    }
+
+    @Override
+    public void updateAdminEmail(String superAdminEmail) {
+        preCheckInstall();
+        PantherConfig config = findConfigWithCheck(KEY_ADMIN_EMAIL, superAdminEmail);
+        if (config != null) {
+            config.setConfigValue(superAdminEmail);
+            config.setUpdateTime(System.currentTimeMillis());
+            pantherConfigRepository.save(config);
+            this.adminEmail = superAdminEmail;
         }
     }
 
@@ -216,7 +232,7 @@ public class PantherConfigServiceImpl implements PantherConfigService {
         try {
             if (StringUtil.isEmpty(param.getSaveRootPath())) {
                 param.setSaveRootPath(getFallbackPath());
-            } else if (param.getSaveRootPath().contains("\\")) {
+            } else if (FileUtil.checkPath(param.getSaveRootPath())) {
                 throw new BadRequestException("请使用 / 作为路径分隔符！");
             }
             File check = new File(param.getSaveRootPath());
@@ -263,6 +279,10 @@ public class PantherConfigServiceImpl implements PantherConfigService {
 
             fileService.initWorkspace(param.getSaveRootPath(), param.getImgDirs());
 
+            this.adminUsername = param.getAdminUsername();
+            this.adminEmail = param.getAdminEmail();
+            this.hostUrl = param.getHostUrl();
+            this.saveRootPath = param.getSaveRootPath();
             hasInstalled = true;
             return true;
         } catch (Exception e) {

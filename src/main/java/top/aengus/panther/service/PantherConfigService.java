@@ -27,7 +27,7 @@ public interface PantherConfigService {
 
     void updateAdminPassword(String superAdminPassword);
 
-    void updateAdminUsername(String superAdminUsername);
+    void updateAdminEmail(String superAdminEmail);
 
     boolean hasInstalled();
 

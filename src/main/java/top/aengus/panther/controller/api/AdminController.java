@@ -1,14 +1,16 @@
 package top.aengus.panther.controller.api;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import top.aengus.panther.core.Response;
+import top.aengus.panther.event.ShutdownEvent;
 import top.aengus.panther.model.ChangePasswordParam;
 import top.aengus.panther.model.admin.AdminInfo;
+import top.aengus.panther.model.config.PantherConfigDTO;
+import top.aengus.panther.model.config.UpdateConfigParam;
+import top.aengus.panther.service.ImageService;
 import top.aengus.panther.service.PantherConfigService;
 import top.aengus.panther.tool.EncryptUtil;
 
@@ -16,10 +18,14 @@ import top.aengus.panther.tool.EncryptUtil;
 public class AdminController extends ApiV1Controller {
 
     private final PantherConfigService configService;
+    private final ImageService imageService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Autowired
-    public AdminController(PantherConfigService configService) {
+    public AdminController(PantherConfigService configService, ApplicationEventPublisher eventPublisher, ImageService imageService) {
         this.configService = configService;
+        this.eventPublisher = eventPublisher;
+        this.imageService = imageService;
     }
 
     @PutMapping("/admin/password")
@@ -40,4 +46,36 @@ public class AdminController extends ApiV1Controller {
         info.setEmail(configService.getAdminEmail());
         return new Response<AdminInfo>().success().data(info);
     }
+
+    @GetMapping("/admin/config")
+    public Response<PantherConfigDTO> getPantherConfig() {
+        PantherConfigDTO configDTO = new PantherConfigDTO();
+        configDTO.setAdminUsername(configService.getAdminUsername());
+        configDTO.setAdminEmail(configService.getAdminEmail());
+        configDTO.setHostUrl(configService.getHostUrl());
+        configDTO.setSaveRootPath(configService.getSaveRootPath());
+        return new Response<PantherConfigDTO>().success().data(configDTO);
+    }
+
+    @PutMapping("/admin/config")
+    public Response<Void> updatePantherConfig(@RequestParam(value = "changed", defaultValue = "hostUrl") String changed,
+                                              @RequestBody @Validated UpdateConfigParam param) {
+        Response<Void> response = new Response<>();
+        configService.updateAdminEmail(param.getAdminEmail());
+        if ("hostUrl".equals(changed)) {
+            String newHostUrl = param.getUrlOrPath();
+            imageService.updateImageHostUrl(newHostUrl);
+            configService.updateHostUrl(newHostUrl);
+            return response.success().msg("更新图床域名成功");
+        } else if ("saveRootPath".equals(changed)) {
+            String newRootPath = param.getUrlOrPath();
+            imageService.updateImageSavePath(newRootPath);
+            configService.updateSaveRootPath(param.getUrlOrPath());
+
+            eventPublisher.publishEvent(new ShutdownEvent(this));
+            return response.success().msg("更新图片存储目录成功，Panther已自动停止，请手动启动Panther，否则新上传的图片将无法被访问！");
+        }
+        return response.badRequest().msg("请求不合法！");
+    }
+
 }

@@ -351,6 +351,50 @@ public class ImageServiceImpl implements ImageService {
         });
     }
 
+    @Override
+    public void updateImageHostUrl(String hostUrl) {
+        int currPage = 0;
+        while (true) {
+            Pageable pageable = PageRequest.of(currPage, Constants.PAGE_SIZE);
+            Page<ImageModel> images = imageRepository.findAll(pageable);
+            Page<ImageModel> newImages = images.map(image -> {
+                String newUrl = UrlUtil.ensureNoSuffix(hostUrl) + image.getRelativePath();
+                image.setUrl(newUrl);
+                return image;
+            });
+            imageRepository.saveAll(newImages);
+            if (images.getNumberOfElements() < Constants.PAGE_SIZE) {
+                break;
+            }
+            currPage++;
+        }
+    }
+
+    @Override
+    public void updateImageSavePath(String newRootPath) {
+        if (!FileUtil.checkPath(newRootPath)) {
+            throw new BadRequestException("请使用 / 作为路径分隔符");
+        }
+        String originalPath = configService.getSaveRootPath();
+        fileService.moveFile(originalPath, newRootPath);
+
+        int currPage = 0;
+        while (true) {
+            Pageable pageable = PageRequest.of(currPage, Constants.PAGE_SIZE);
+            Page<ImageModel> images = imageRepository.findAll(pageable);
+            Page<ImageModel> newImages = images.map(image -> {
+                String newPath = FileUtil.ensureNoSuffix(newRootPath) + image.getRelativePath();
+                image.setAbsolutePath(newPath);
+                return image;
+            });
+            imageRepository.saveAll(newImages);
+            if (images.getNumberOfElements() < Constants.PAGE_SIZE) {
+                break;
+            }
+            currPage++;
+        }
+    }
+
     private ImageModel findImageWithCheck(Long imageId) {
         Optional<ImageModel> original = imageRepository.findById(imageId);
         return original.orElseThrow(() -> new NotFoundException("图片不存在", imageId));
