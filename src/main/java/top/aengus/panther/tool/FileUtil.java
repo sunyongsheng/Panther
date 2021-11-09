@@ -72,6 +72,11 @@ public class FileUtil {
         return !path.contains("\\");
     }
 
+    public static String modifyPathSeparator(String path) {
+        if (StringUtil.isEmpty(path)) return "";
+        return path.replace("\\", "/");
+    }
+
     public static boolean checkAndCreateDir(File dir) {
         if (!dir.exists()) {
             if (!dir.mkdir()) {

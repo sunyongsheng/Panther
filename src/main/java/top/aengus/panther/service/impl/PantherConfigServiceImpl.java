@@ -317,17 +317,21 @@ public class PantherConfigServiceImpl implements PantherConfigService {
     private String getFallbackPath() {
         final String uploadDirName = "uploadImages";
         URL resource = Objects.requireNonNull(ClassUtils.getDefaultClassLoader()).getResource("");
+        File imagesDir;
         if (resource == null) {
             String userHome = System.getProperty("user.home");
             File pantherDir = new File(userHome, "panther");
             FileUtil.checkAndCreateDir(pantherDir);
-            File imagesDir = new File(pantherDir, uploadDirName);
-            FileUtil.checkAndCreateDir(imagesDir);
-            return imagesDir.getAbsolutePath();
+            imagesDir = new File(pantherDir, uploadDirName);
         } else {
-            File imagesDir = new File(resource.getPath(), uploadDirName);
-            FileUtil.checkAndCreateDir(imagesDir);
-            return imagesDir.getAbsolutePath();
+            imagesDir = new File(resource.getPath(), uploadDirName);
+        }
+        FileUtil.checkAndCreateDir(imagesDir);
+        String path = imagesDir.getAbsolutePath();
+        if (SystemUtil.isWindows()) {
+            return FileUtil.modifyPathSeparator(path);
+        } else {
+            return path;
         }
     }
 

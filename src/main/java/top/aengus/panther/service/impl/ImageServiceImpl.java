@@ -138,12 +138,19 @@ public class ImageServiceImpl implements ImageService {
     }
 
     private String generateAbsolutePath(AppInfo app, String dir, String name) {
+        File file;
         if (app.isSuperRole() && StringUtil.isNotEmpty(dir)) {
-            return new File(new File(configService.getSaveRootPath(), dir), name).getAbsolutePath();
+            file = new File(new File(configService.getSaveRootPath(), dir), name);
         } else {
             File appRoot = new File(configService.getSaveRootPath(), ImageDirUtil.NAME_APP);
             File appSpecial = new File(appRoot, app.getEnglishName());
-            return new File(appSpecial, name).getAbsolutePath();
+            file = new File(appSpecial, name);
+        }
+        String path = file.getAbsolutePath();
+        if (SystemUtil.isWindows()) {
+            return FileUtil.modifyPathSeparator(path);
+        } else {
+            return path;
         }
     }
 
@@ -317,7 +324,11 @@ public class ImageServiceImpl implements ImageService {
         if (imageRepository.findByRelativePath(relativePath) == null) {
             RefreshResult.Item item = new RefreshResult.Item();
             item.setName(filename);
-            item.setAbsolutePath(file.getAbsolutePath());
+            String absPath = file.getAbsolutePath();
+            if (SystemUtil.isWindows()) {
+                absPath = FileUtil.modifyPathSeparator(absPath);
+            }
+            item.setAbsolutePath(absPath);
             item.setRelativePath(relativePath);
             item.setUrl(generateUrl(relativePath));
             if (setAppName) {
