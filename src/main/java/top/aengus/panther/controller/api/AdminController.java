@@ -1,5 +1,7 @@
 package top.aengus.panther.controller.api;
 
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.lang.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.validation.annotation.Validated;
@@ -10,22 +12,51 @@ import top.aengus.panther.model.admin.ChangePasswordParam;
 import top.aengus.panther.model.admin.AdminInfo;
 import top.aengus.panther.model.config.PantherConfigDTO;
 import top.aengus.panther.model.config.UpdateConfigParam;
+import top.aengus.panther.service.AppInfoService;
 import top.aengus.panther.service.ImageService;
 import top.aengus.panther.service.PantherConfigService;
+import top.aengus.panther.tool.DateFormatter;
 import top.aengus.panther.tool.EncryptUtil;
+
+import java.util.*;
 
 @RestController
 public class AdminController extends ApiV1Controller {
 
     private final PantherConfigService configService;
     private final ImageService imageService;
+    private final AppInfoService appInfoService;
     private final ApplicationEventPublisher eventPublisher;
 
     @Autowired
-    public AdminController(PantherConfigService configService, ApplicationEventPublisher eventPublisher, ImageService imageService) {
+    public AdminController(PantherConfigService configService, ApplicationEventPublisher eventPublisher, ImageService imageService, AppInfoService appInfoService) {
         this.configService = configService;
         this.eventPublisher = eventPublisher;
         this.imageService = imageService;
+        this.appInfoService = appInfoService;
+    }
+
+    @GetMapping("/admin/overview/recent7day")
+    public Response<List<Pair<String, Long>>> getRecent7DaysSummary() {
+        Response<List<Pair<String, Long>>> response = new Response<>();
+        LinkedList<Pair<String, Long>> result = new LinkedList<>();
+        long endTime = System.currentTimeMillis();
+        for (int i = 0; i < 7; i++) {
+            long startTime = DateUtil.offsetDay(new Date(endTime), -1).getTime();
+            result.add(0, Pair.of(DateFormatter.monthDayFormat(endTime), imageService.countInTimePeriodByUploadTime(startTime, endTime)));
+            endTime = startTime;
+        }
+        return response.success().data(result);
+    }
+
+    @GetMapping("/admin/overview/top7upload")
+    public Response<List<Pair<String, Long>>> getTop7UploadApp() {
+        Response<List<Pair<String, Long>>> response = new Response<>();
+        LinkedList<Pair<String, Long>> result = new LinkedList<>();
+        imageService.findAppKeyOrderByUploadCount(7).forEach(uploadCount -> {
+            result.add(Pair.of(appInfoService.findByAppKey(uploadCount.getAppKey()).getName(), uploadCount.getAmount()));
+        });
+        return response.success().data(result);
     }
 
     @PutMapping("/admin/password")

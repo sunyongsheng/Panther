@@ -7,6 +7,7 @@ import top.aengus.panther.enums.ImageStatus;
 import top.aengus.panther.model.image.ImageDTO;
 import top.aengus.panther.model.image.ImageModel;
 import top.aengus.panther.model.image.RefreshResult;
+import top.aengus.panther.model.image.UploadCount;
 
 import java.util.List;
 
@@ -20,6 +21,10 @@ public interface ImageService {
     long countAll();
 
     long countByAppKey(String appKey);
+
+    long countInTimePeriodByUploadTime(Long startTime, Long endTime);
+
+    List<UploadCount> findAppKeyOrderByUploadCount(int limit);
 
     Page<ImageDTO> findAll(int page, int pageSize, Sort.Direction direction, String orderBy);
 

@@ -6,6 +6,8 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
     <script src="https://unpkg.com/element-ui@2.15.6/lib/index.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-md5/2.10.0/js/md5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
+    <script src="https://unpkg.com/vue-chartjs/dist/vue-chartjs.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/element-ui@2.15.6/lib/theme-chalk/index.css">
     <link rel="stylesheet" type="text/css" th:href="@{/css/common.css}">
     <!-- axios必须引入且在request.js之前 -->
@@ -53,6 +55,21 @@
                         </div>
                     </el-col>
                 </el-row>
+
+                <el-row :gutter="20">
+                    <el-col :span="12">
+                        <div class="upload-log-container">
+                            <canvas id="recent-7days-overview"></canvas>
+                        </div>
+                    </el-col>
+
+                    <el-col :span="12">
+                        <div class="upload-log-container">
+                            <canvas id="top7-app-upload-count"></canvas>
+                        </div>
+                    </el-col>
+                </el-row>
+
             </el-main>
         </el-container>
     </el-container>
@@ -67,12 +84,125 @@
             }
         },
         methods: {
-
+            initOverviewData() {
+                axiosClient.get('/api/v1/admin/overview/recent7day').then(response => {
+                    let labels = [];
+                    let data = [];
+                    response.data.forEach(pair => {
+                        labels.push(pair.key);
+                        data.push(pair.value);
+                    });
+                    chart7days.data.labels = labels;
+                    chart7days.data.datasets[0].data = data;
+                    chart7days.update();
+                }).catch(e => {
+                    this.$message.error(e.msg);
+                });
+                axiosClient.get('/api/v1/admin/overview/top7upload').then(response => {
+                    let labels = [];
+                    let data = [];
+                    response.data.forEach(pair => {
+                        labels.push(pair.key);
+                        data.push(pair.value);
+                    });
+                    chartTop7App.data.labels = labels;
+                    chartTop7App.data.datasets[0].data = data;
+                    chartTop7App.update();
+                }).catch(e => {
+                    this.$message.error(e.msg);
+                });
+            }
         },
         created() {
-            initializeAdminInfo()
+            initializeAdminInfo();
+            this.initOverviewData();
         }
     })
+</script>
+<script>
+    const ctx1 = document.getElementById('recent-7days-overview').getContext('2d');
+    const chart7days = new Chart(ctx1, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: '最近7天汇总',
+                data: [],
+                borderColor: ['rgb(68, 199, 198)'],
+                fill: false,
+                borderWidth: 2
+            }]
+        },
+        options: {
+            scales: {
+                xAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: '日期'
+                    }
+                }],
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true,
+                    },
+                    scaleLabel: {
+                        display: true,
+                        labelString: '数量'
+                    }
+                }]
+            }
+        }
+    });
+
+    const ctx2 = document.getElementById('top7-app-upload-count').getContext('2d');
+    const chartTop7App = new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: [],
+            datasets: [{
+                label: '上传图片Top',
+                data: [],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)',
+                    'rgba(105,255,64,0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)',
+                    'rgba(105,255,64,0.97)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                xAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: '名称'
+                    }
+                }],
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true,
+                    },
+                    scaleLabel: {
+                        display: true,
+                        labelString: '数量'
+                    }
+                }]
+            }
+        }
+    });
 </script>
 <style>
     .el-row {
@@ -120,6 +250,13 @@
     .overview-detail-value {
         font-size: 26px;
         font-weight: bold;
+    }
+    .upload-log-container {
+        display: flex;
+        flex-direction: column;
+        padding: 20px 40px;
+        border-radius: 4px;
+        background: #ffffff;
     }
 </style>
 </html>

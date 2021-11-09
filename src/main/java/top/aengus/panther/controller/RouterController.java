@@ -56,26 +56,22 @@ public class RouterController {
     }
 
     @RequestMapping("/admin/app-manager")
-    public String toAppManagerPage(Model model) {
-        model.addAttribute("username", configService.getAdminUsername());
+    public String toAppManagerPage() {
         return "admin/app";
     }
 
     @RequestMapping("/admin/image-manager")
-    public String toImageManagerPage(Model model) {
-        model.addAttribute("username", configService.getAdminUsername());
+    public String toImageManagerPage() {
         return "admin/image";
     }
 
     @RequestMapping("/admin/setting")
-    public String toSettingPage(Model model) {
-        model.addAttribute("username", configService.getAdminUsername());
+    public String toSettingPage() {
         return "admin/setting";
     }
 
     @RequestMapping("/admin/changePassword")
-    public String toChangePasswordPage(Model model) {
-        model.addAttribute("username", configService.getAdminUsername());
+    public String toChangePasswordPage() {
         return "admin/password";
     }
 

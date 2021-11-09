@@ -21,6 +21,7 @@ import top.aengus.panther.exception.NotFoundException;
 import top.aengus.panther.model.FileTree;
 import top.aengus.panther.model.app.AppInfo;
 import top.aengus.panther.model.image.RefreshResult;
+import top.aengus.panther.model.image.UploadCount;
 import top.aengus.panther.model.setting.AppSetting;
 import top.aengus.panther.model.image.ImageDTO;
 import top.aengus.panther.model.image.ImageModel;
@@ -61,6 +62,16 @@ public class ImageServiceImpl implements ImageService {
     @Override
     public long countByAppKey(String appKey) {
         return imageRepository.countAllByOwner(appKey);
+    }
+
+    @Override
+    public long countInTimePeriodByUploadTime(Long startTime, Long endTime) {
+        return imageRepository.countAllByUploadTimeAfterAndUploadTimeBefore(startTime, endTime);
+    }
+
+    @Override
+    public List<UploadCount> findAppKeyOrderByUploadCount(int limit) {
+        return imageRepository.findAppKeyOrderByUploadCount(limit);
     }
 
     @Override
