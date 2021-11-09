@@ -9,6 +9,7 @@ import top.aengus.panther.core.Constants;
 import top.aengus.panther.service.AppInfoService;
 import top.aengus.panther.service.ImageService;
 import top.aengus.panther.service.PantherConfigService;
+import top.aengus.panther.tool.DateFormatter;
 import top.aengus.panther.tool.TokenUtil;
 
 import javax.servlet.http.HttpServletRequest;
@@ -51,7 +52,9 @@ public class RouterController {
         model.addAttribute("username", configService.getAdminUsername());
         model.addAttribute("appCount", appInfoService.countAll());
         model.addAttribute("imageCount", imageService.countAll());
-        model.addAttribute("runTime", configService.getRunningDuration());
+        long installTime = configService.getInstallTime();
+        model.addAttribute("runTime", DateFormatter.formatTimeDesc(System.currentTimeMillis() - installTime));
+        model.addAttribute("installDesc", "安装于 " + DateFormatter.detailFormat(installTime));
         return "admin/overview";
     }
 

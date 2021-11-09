@@ -28,7 +28,7 @@
             <el-main>
                 <el-row :gutter="20">
                     <el-col :span="8">
-                        <div class="grid-content bg-teal">
+                        <div class="grid-content bg-teal" @click="onSelectSideMenu('app-manager')">
                             <i class="el-icon-receiving overview-prefix-icon"></i>
                             <div class="overview-detail">
                                 <div class="overview-detail-title">App总数</div>
@@ -37,7 +37,7 @@
                         </div>
                     </el-col>
                     <el-col :span="8">
-                        <div class="grid-content bg-red">
+                        <div class="grid-content bg-red"  @click="onSelectSideMenu('image-manager')">
                             <i class="el-icon-picture-outline-round overview-prefix-icon"></i>
                             <div class="overview-detail">
                                 <div class="overview-detail-title">图片数量</div>
@@ -46,13 +46,18 @@
                         </div>
                     </el-col>
                     <el-col :span="8">
-                        <div class="grid-content bg-purple">
+                        <div class="grid-content bg-purple" v-popover:popover>
                             <i class="el-icon-time overview-prefix-icon"></i>
                             <div class="overview-detail">
                                 <div class="overview-detail-title">运行时长</div>
                                 <div class="overview-detail-value" th:text="${runTime}"></div>
                             </div>
                         </div>
+                        <el-popover placement="bottom"
+                                    th:content="${installDesc}"
+                                    trigger="hover"
+                                    ref="popover">
+                        </el-popover>
                     </el-col>
                 </el-row>
 
@@ -147,7 +152,7 @@
                     },
                     scaleLabel: {
                         display: true,
-                        labelString: '数量'
+                        labelString: '上传数量'
                     }
                 }]
             }
@@ -188,7 +193,7 @@
                 xAxes: [{
                     scaleLabel: {
                         display: true,
-                        labelString: '名称'
+                        labelString: 'App名称'
                     }
                 }],
                 yAxes: [{
@@ -197,7 +202,7 @@
                     },
                     scaleLabel: {
                         display: true,
-                        labelString: '数量'
+                        labelString: '图片数量'
                     }
                 }]
             }
@@ -235,6 +240,7 @@
         align-items: center;
         justify-content: space-between;
         color: #f9fafc;
+        cursor: pointer;
     }
     .overview-prefix-icon {
         font-size: 30px;
