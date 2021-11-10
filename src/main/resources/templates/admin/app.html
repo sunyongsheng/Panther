@@ -103,9 +103,9 @@
             title="上传图片"
             :visible.sync="uploadDialogVisible"
             width="480px" center>
-        <div class="upload-container">
+        <div class="upload-container" @dragenter="(e) => e.preventDefault()" @dragover="(e) => e.preventDefault()" @drop="parseFileOnDrop">
             <label class="upload-button" for="upload-actual">选 择 图 片</label>
-            <el-empty description="请选择图片" v-if="previewImages.length === 0"></el-empty>
+            <el-empty description="请选择图片或拖拽上传" v-if="previewImages.length === 0"></el-empty>
             <div class="preview-container" v-else>
                 <template v-for="image in previewImages" >
                     <div class="preview-image-container">
@@ -338,11 +338,18 @@
                 Object.assign(this.currSelectApp, app);
             },
             parseFile(event) {
-                if (event.target.files.length > 0) {
+                this.handleFileList(event.target.files);
+            },
+            parseFileOnDrop(event) {
+                event.preventDefault();
+                this.handleFileList(event.dataTransfer.files);
+            },
+            handleFileList(fileList) {
+                if (fileList.length > 0) {
                     let that = this;
-                    let i = 0, len = event.target.files.length;
+                    let i = 0, len = fileList.length;
                     for (i, len; i < len; i++) {
-                        const file = event.target.files[i]
+                        const file = fileList[i]
                         this.selectedFiles.push(file);
                         const reader = new FileReader();
                         reader.onload = function (evt) {
@@ -359,19 +366,20 @@
                     this.selectedFiles.forEach(file => {
                         tasks.push(new Promise(((resolve, reject) => {
                             upload(this.currSelectApp.appKey, null, file).then(response => {
+                                this.$message.success(`上传${response.data.originalName}成功`);
                                 resolve.call(response);
                             }).catch((error) => {
+                                this.$message.error(error.msg)
                                 reject.call(error);
                             });
                         })));
                     });
-                    Promise.all(tasks).then((results) => {
-                        this.$message.success(`上传了${results.length}张图片`);
+                    Promise.all(tasks).then((_) => {
                         this.uploadDialogVisible = false;
                         this.selectedFiles = [];
                         this.previewImages = [];
                     }).catch(errors => {
-                        errors.forEach(error => this.$message.error(error.msg));
+                        console.error(errors);
                     }).finally(() => {
                         this.uploading = false;
                     });

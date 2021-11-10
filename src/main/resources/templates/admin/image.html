@@ -90,7 +90,7 @@
     <el-dialog title="上传图片"
                :visible.sync="uploadDialogVisible"
                width="650px" center>
-        <div class="upload-container">
+        <div class="upload-container" @dragenter="(e) => e.preventDefault()" @dragover="(e) => e.preventDefault()" @drop="parseFileOnDrop">
             <el-form :inline="true" :model="uploadData" class="demo-form-inline">
                 <el-form-item label="所属App">
                     <el-select v-model="uploadData.uploadApp"
@@ -122,7 +122,7 @@
                         content="只有超级App才可编辑此项目"></el-popover>
             </el-form>
             <label class="upload-button" for="upload-actual">选 择 图 片</label>
-            <el-empty description="请选择图片" v-if="selectedImagesPreview.length === 0"></el-empty>
+            <el-empty description="请选择图片或拖拽上传" v-if="selectedImagesPreview.length === 0"></el-empty>
             <div class="preview-container" v-else>
                 <template v-for="image in selectedImagesPreview" >
                     <div class="preview-image-container">
@@ -314,11 +314,18 @@
                 });
             },
             parseFile(event) {
-                if (event.target.files.length > 0) {
+                this.handleFileList(event.target.files);
+            },
+            parseFileOnDrop(event) {
+                event.preventDefault();
+                this.handleFileList(event.dataTransfer.files);
+            },
+            handleFileList(fileList) {
+                if (fileList.length > 0) {
                     let that = this;
-                    let i = 0, len = event.target.files.length;
+                    let i = 0, len = fileList.length;
                     for (i, len; i < len; i++) {
-                        const file = event.target.files[i]
+                        const file = fileList[i]
                         this.uploadData.selectedImages.push(file);
                         const reader = new FileReader();
                         reader.onload = function (evt) {
