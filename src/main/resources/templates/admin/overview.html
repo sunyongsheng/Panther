@@ -7,7 +7,6 @@
     <script src="https://unpkg.com/element-ui@2.15.6/lib/index.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-md5/2.10.0/js/md5.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
-    <script src="https://unpkg.com/vue-chartjs/dist/vue-chartjs.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/element-ui@2.15.6/lib/theme-chalk/index.css">
     <link rel="stylesheet" type="text/css" th:href="@{/css/common.css}">
     <!-- axios必须引入且在request.js之前 -->
@@ -135,7 +134,8 @@
                 data: [],
                 borderColor: ['rgb(68, 199, 198)'],
                 fill: false,
-                borderWidth: 2
+                borderWidth: 2,
+                lineTension: 0
             }]
         },
         options: {
