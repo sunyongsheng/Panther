@@ -21,7 +21,6 @@ import top.aengus.panther.exception.NotFoundException;
 import top.aengus.panther.model.FileTree;
 import top.aengus.panther.model.app.AppInfo;
 import top.aengus.panther.model.image.RefreshResult;
-import top.aengus.panther.model.image.UploadCount;
 import top.aengus.panther.model.setting.AppSetting;
 import top.aengus.panther.model.image.ImageDTO;
 import top.aengus.panther.model.image.ImageModel;
@@ -67,11 +66,6 @@ public class ImageServiceImpl implements ImageService {
     @Override
     public long countInTimePeriodByUploadTime(Long startTime, Long endTime) {
         return imageRepository.countAllByUploadTimeAfterAndUploadTimeBefore(startTime, endTime);
-    }
-
-    @Override
-    public List<UploadCount> findAppKeyOrderByUploadCount(int limit) {
-        return imageRepository.findAppKeyOrderByUploadCount(limit);
     }
 
     @Override
@@ -200,7 +194,7 @@ public class ImageServiceImpl implements ImageService {
 
     private String tryCheckDir(String dir) {
         if (StringUtil.isEmpty(dir)) return null;
-        if (!FileUtil.checkDirname(dir)) throw new BadRequestException("文件夹名不合法！");
+        if (FileUtil.isDirnameIllegal(dir)) throw new BadRequestException("文件夹名不合法！");
         if (dir.contains("\\")) throw new BadRequestException("目前不支持上传到子文件夹！" + dir);
         String correct = FileUtil.ensureNoPrefix(FileUtil.ensureNoSuffix(dir));
         if (correct.contains("/")) throw new BadRequestException("目前不支持上传到子文件夹！" + dir);
@@ -340,6 +334,7 @@ public class ImageServiceImpl implements ImageService {
 
     private void handleFile(File file, List<RefreshResult.Item> invalidFiles, String relativePathPrefix, String dirname, boolean setAppName) {
         String filename = file.getName();
+        if (!FileUtil.isPic(filename)) return;
         String relativePath = relativePathPrefix + filename;
         if (imageRepository.findByRelativePath(relativePath) == null) {
             RefreshResult.Item item = new RefreshResult.Item();

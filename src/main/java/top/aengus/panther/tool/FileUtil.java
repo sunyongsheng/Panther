@@ -59,13 +59,14 @@ public class FileUtil {
                 || ignoreCase.endsWith(".tiff"));
     }
 
-    public static boolean checkDirname(String dirname) {
-        if (StringUtil.isEmpty(dirname)) return false;
-        return !dirname.contains(".") && !dirname.contains("?")
-                && !dirname.contains("*") && !dirname.contains("=")
-                && !dirname.contains(">") && !dirname.contains("<")
-                && !dirname.contains(":") && !dirname.contains("\"")
-                && !dirname.contains("|");
+    public static boolean isDirnameIllegal(String dirname) {
+        if (StringUtil.isEmpty(dirname)) return true;
+        return dirname.contains(".") || dirname.contains("?")
+                || dirname.contains("*") || dirname.contains("=")
+                || dirname.contains(">") || dirname.contains("<")
+                || dirname.contains(":") || dirname.contains("\"")
+                || dirname.contains("|") || dirname.contains("/")
+                || dirname.contains("\\");
     }
 
     public static boolean checkPath(String path) {

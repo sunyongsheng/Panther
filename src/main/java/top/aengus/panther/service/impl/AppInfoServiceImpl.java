@@ -25,6 +25,7 @@ import top.aengus.panther.model.token.AppToken;
 import top.aengus.panther.service.AppInfoService;
 import top.aengus.panther.service.AppSettingService;
 import top.aengus.panther.service.AppTokenService;
+import top.aengus.panther.tool.FileUtil;
 import top.aengus.panther.tool.StringUtil;
 
 import java.util.Collections;
@@ -100,6 +101,9 @@ public class AppInfoServiceImpl implements AppInfoService {
     public String createApp(CreateAppParam param, String owner) {
         if (StringUtil.isEmpty(param.getEnglishName()) || param.getEnglishName().contains(" ")) {
             throw new BadRequestException("英文名不能为空或含有空格！");
+        }
+        if (FileUtil.isDirnameIllegal(param.getEnglishName())) {
+            throw new BadRequestException("英文名不能包含特殊符号！");
         }
         if (Constants.UNKNOWN_APP_KEY.equals(param.getEnglishName())) {
             throw new BadRequestException("英文名非法！");
