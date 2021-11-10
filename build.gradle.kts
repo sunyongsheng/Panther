@@ -17,6 +17,10 @@ version = "0.0.1"
 description = "panther"
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
+springBoot {
+    buildInfo()
+}
+
 dependencies {
     annotationProcessor(Libs.lombok)
     annotationProcessor(Libs.Spring.processor)

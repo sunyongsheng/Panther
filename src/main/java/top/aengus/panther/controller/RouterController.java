@@ -2,6 +2,7 @@ package top.aengus.panther.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,12 +23,14 @@ public class RouterController {
     private final PantherConfigService configService;
     private final AppInfoService appInfoService;
     private final ImageService imageService;
+    private final BuildProperties buildProperties;
 
     @Autowired
-    public RouterController(PantherConfigService configService, AppInfoService appInfoService, ImageService imageService) {
+    public RouterController(PantherConfigService configService, AppInfoService appInfoService, ImageService imageService, BuildProperties buildProperties) {
         this.configService = configService;
         this.appInfoService = appInfoService;
         this.imageService = imageService;
+        this.buildProperties = buildProperties;
     }
 
 
@@ -55,26 +58,32 @@ public class RouterController {
         long installTime = configService.getInstallTime();
         model.addAttribute("runTime", DateFormatter.formatTimeDesc(System.currentTimeMillis() - installTime));
         model.addAttribute("installDesc", "安装于 " + DateFormatter.detailFormat(installTime));
+
+        model.addAttribute("version", buildProperties.getVersion());
         return "admin/overview";
     }
 
     @RequestMapping("/admin/app-manager")
-    public String toAppManagerPage() {
+    public String toAppManagerPage(Model model) {
+        model.addAttribute("version", buildProperties.getVersion());
         return "admin/app";
     }
 
     @RequestMapping("/admin/image-manager")
-    public String toImageManagerPage() {
+    public String toImageManagerPage(Model model) {
+        model.addAttribute("version", buildProperties.getVersion());
         return "admin/image";
     }
 
     @RequestMapping("/admin/setting")
-    public String toSettingPage() {
+    public String toSettingPage(Model model) {
+        model.addAttribute("version", buildProperties.getVersion());
         return "admin/setting";
     }
 
     @RequestMapping("/admin/changePassword")
-    public String toChangePasswordPage() {
+    public String toChangePasswordPage(Model model) {
+        model.addAttribute("version", buildProperties.getVersion());
         return "admin/password";
     }
 

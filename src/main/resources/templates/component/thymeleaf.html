@@ -9,8 +9,8 @@
 </head>
 <body>
 <div th:fragment="admin-sidebar">
-    <el-aside>
-        <div class="aside-title">
+    <el-aside class="admin-sidebar">
+        <div class="admin-sidebar-header">
             <p>Panther</p>
         </div>
         <el-menu th:default-active="${index}" @select="onSelectSideMenu">
@@ -27,6 +27,9 @@
                 <span slot="title">图片管理</span>
             </el-menu-item>
         </el-menu>
+        <div class="admin-sidebar-footer">
+            <p th:text="${'v ' + version}"></p>
+        </div>
     </el-aside>
 </div>
 <div th:fragment="admin-header">
@@ -37,11 +40,13 @@
         <div class="row-center-container">
             <i class="el-icon-setting" style="cursor: pointer" @click="onClickPantherSetting"></i>
             <div class="space-row-20"></div>
-            <el-dropdown class="user-info" @command="onClickUsernameMenu">
+            <el-dropdown class="admin-header-user-info" @command="onClickUsernameMenu">
                 <div class="row-center-container">
                     <el-avatar :src="currUser.avatar" :size="35"></el-avatar>
                     <div class="space-row-10"></div>
-                    <p>{{ currUser.username }}</p>
+                    <span class="el-dropdown-link">
+                        {{ currUser.username }}<i class="el-icon-arrow-down el-icon--right"></i>
+                    </span>
                 </div>
                 <el-dropdown-menu slot="dropdown">
                     <el-dropdown-item command="changePassword">修改密码</el-dropdown-item>
@@ -52,12 +57,4 @@
     </el-header>
 </div>
 </body>
-<style>
-    .aside-title {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-    }
-</style>
 </html>
