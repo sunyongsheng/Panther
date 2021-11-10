@@ -4,19 +4,17 @@
 
 一、创建Panther数据库：`CREATE DATABASE panther CHARACTER SET utf8mb4;`
 
-二、运行 `use panther;`，并分别创建 `src/main/resources/sql` 文件夹下的数据库表；
+二、二选一：
 
-三、二选一：
-
-a. 修改 `application.properties` 中的数据库用户名和密码；
+a. 修改 `application.properties` 中的数据库用户名和密码**以及**根目录下的`build.gradle.kts`中的`flyway`的用户名及密码；
 
 b. MySQL中运行：
 ```mysql
-CREATE USER 'pantherAdmin'@localhost IDENTIFIED by 'pantherJF=A77922';
-GRANT ALL ON panther.* TO 'pantherAdmin'@localhost;
+CREATE USER 'pantherAdmin'@'%' IDENTIFIED by 'pantherJF=A77922';
+GRANT ALL ON panther.* TO 'pantherAdmin'@'%';
 ```
 
-四、访问 `http://localhost:8088/admin` 进行安装，安装后手动重启；
+三、访问 `http://localhost:8088/install` 进行安装，安装后手动重启；
 
 ## 流程
 | Description | Method | API | Header | Param | Body | Return |

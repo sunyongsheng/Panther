@@ -22,4 +22,5 @@ object Libs {
     const val mysql = "mysql:mysql-connector-java:8.0.16"
     const val xmlBind = "javax.xml.bind:jaxb-api:2.3.0"
     const val jwt = "io.jsonwebtoken:jjwt:0.9.0"
+    const val flyway = "org.flywaydb:flyway-core:8.0.3"
 }
