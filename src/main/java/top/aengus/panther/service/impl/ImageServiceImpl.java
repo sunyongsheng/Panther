@@ -274,12 +274,16 @@ public class ImageServiceImpl implements ImageService {
     public RefreshResult refreshDatabase() {
         RefreshResult result = new RefreshResult();
         List<RefreshResult.Item> invalidDb = new ArrayList<>();
+        String saveRootPath = configService.getSaveRootPath();
         int currPage = 0;
         while (true) {
             Pageable pageable = PageRequest.of(currPage, Constants.PAGE_SIZE);
             Page<ImageModel> images = imageRepository.findAllByStatus(ImageStatus.NORMAL.getCode(), pageable);
             images.forEach(image -> {
-                if (!new File(image.getAbsolutePath()).exists()) {
+                String absPath = image.getAbsolutePath();
+                boolean pathIllegal = !absPath.startsWith(saveRootPath);
+                boolean fileNotExists = !new File(absPath).exists();
+                if (pathIllegal || fileNotExists) {
                     RefreshResult.Item item = new RefreshResult.Item();
                     item.setId(image.getId());
                     item.setName(image.getSaveName());
@@ -289,6 +293,11 @@ public class ImageServiceImpl implements ImageService {
                     item.setOwnerApp(appInfoService.findByAppKey(image.getOwner()).getName());
                     item.setOwnerAppKey(image.getOwner());
                     item.setSize(image.getSize());
+                    if (pathIllegal) {
+                        item.setDesc("不在指定存储路径下");
+                    } else {
+                        item.setDesc("文件不存在");
+                    }
                     invalidDb.add(item);
                 }
             });

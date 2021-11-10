@@ -28,5 +28,7 @@ public class RefreshResult {
 
         private Long size;
 
+        private String desc;
+
     }
 }
