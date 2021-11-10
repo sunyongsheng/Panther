@@ -29,10 +29,10 @@ public class AppInfo {
     @Column(name = "role", columnDefinition = "TINYINT NOT NULL DEFAULT 0")
     private Integer role;
 
-    @Column(name = "name_zh")
+    @Column(name = "app_name")
     private String name;
 
-    @Column(name = "name_en")
+    @Column(name = "app_name_en")
     private String englishName;
 
     @Column(name = "avatar_url")
