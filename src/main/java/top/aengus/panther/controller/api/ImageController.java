@@ -80,7 +80,7 @@ public class ImageController extends ApiV1Controller {
     public Response<Void> delete(@PathVariable("id") Long imageId) {
         Response<Void> response = new Response<>();
         ImageModel model = imageService.deleteImage(imageId, configService.getAdminUsername());
-        return response.success().msg(model.getSaveName() + " 删除成功");
+        return response.success().msg(model.getSaveName() + " 已移动至回收站");
     }
 
     @PostMapping("/image/undelete/{id}")
