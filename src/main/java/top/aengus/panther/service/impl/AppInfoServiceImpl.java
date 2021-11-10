@@ -54,6 +54,11 @@ public class AppInfoServiceImpl implements AppInfoService {
     }
 
     @Override
+    public Iterable<AppInfo> findAll() {
+        return appInfoRepository.findAll();
+    }
+
+    @Override
     public Page<AppInfo> findAllByStatus(AppStatus status, int page, int pageSize) {
         Pageable request = PageRequest.of(page, pageSize);
         return appInfoRepository.findAllByStatus(status.getCode(), request);

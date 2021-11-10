@@ -19,6 +19,7 @@ import top.aengus.panther.tool.DateFormatter;
 import top.aengus.panther.tool.EncryptUtil;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 public class AdminController extends ApiV1Controller {
@@ -53,10 +54,13 @@ public class AdminController extends ApiV1Controller {
     public Response<List<Pair<String, Long>>> getTop7UploadApp() {
         Response<List<Pair<String, Long>>> response = new Response<>();
         LinkedList<Pair<String, Long>> result = new LinkedList<>();
-        imageService.findAppKeyOrderByUploadCount(7).forEach(uploadCount -> {
-            result.add(Pair.of(appInfoService.findByAppKey(uploadCount.getAppKey()).getName(), uploadCount.getAmount()));
-        });
-        return response.success().data(result);
+        appInfoService.findAll().forEach(appInfo -> result.add(Pair.of(appInfo.getName(), imageService.countByAppKey(appInfo.getAppKey()))));
+        return response.success().data(result.stream().sorted((o1, o2) -> {
+            long i = o1.getValue() - o2.getValue();
+            if (i > 0) return -1;
+            else if (i < 0) return 1;
+            else return 0;
+        }).collect(Collectors.toList()));
     }
 
     @PutMapping("/admin/password")

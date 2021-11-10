@@ -20,6 +20,8 @@ public interface AppInfoService {
 
     long countAll();
 
+    Iterable<AppInfo> findAll();
+
     Page<AppInfo> findAllByStatus(AppStatus status, int page, int pageSize);
 
     @NonNull
