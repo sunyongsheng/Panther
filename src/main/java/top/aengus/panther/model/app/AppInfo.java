@@ -41,9 +41,6 @@ public class AppInfo {
     @Column(name = "create_time")
     private Long createTime;
 
-    @Column(name = "phone")
-    private String phone;
-
     @Column(name = "email")
     private String email;
 
