@@ -25,5 +25,6 @@ function logout() {
             document.cookie = keys[i] + '=0;path=/;expires=' + new Date(0).toUTCString();
         }
     }
+    window.localStorage.clear();
     window.location.href = "/login";
 }
