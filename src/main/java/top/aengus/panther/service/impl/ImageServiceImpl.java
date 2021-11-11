@@ -398,7 +398,7 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public void updateImageSavePath(String newRootPath) {
-        if (!FileUtil.checkPath(newRootPath)) {
+        if (FileUtil.isPathIllegal(newRootPath)) {
             throw new BadRequestException("请使用 / 作为路径分隔符");
         }
         String originalPath = configService.getSaveRootPath();

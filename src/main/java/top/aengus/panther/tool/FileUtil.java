@@ -69,8 +69,8 @@ public class FileUtil {
                 || dirname.contains("\\");
     }
 
-    public static boolean checkPath(String path) {
-        return !path.contains("\\");
+    public static boolean isPathIllegal(String path) {
+        return path.contains("\\");
     }
 
     public static String modifyPathSeparator(String path) {

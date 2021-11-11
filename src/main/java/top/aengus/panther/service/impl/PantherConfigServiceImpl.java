@@ -134,7 +134,7 @@ public class PantherConfigServiceImpl implements PantherConfigService {
     @Override
     public void updateSaveRootPath(String saveRootPath) {
         preCheckInstall();
-        if (!FileUtil.checkPath(saveRootPath)) {
+        if (FileUtil.isPathIllegal(saveRootPath)) {
             throw new BadRequestException("请使用 / 作为路径分隔符！");
         }
         saveRootPath = FileUtil.ensureNoSuffix(saveRootPath);
@@ -216,7 +216,7 @@ public class PantherConfigServiceImpl implements PantherConfigService {
         try {
             if (StringUtil.isEmpty(param.getSaveRootPath())) {
                 param.setSaveRootPath(getFallbackPath());
-            } else if (FileUtil.checkPath(param.getSaveRootPath())) {
+            } else if (FileUtil.isPathIllegal(param.getSaveRootPath())) {
                 throw new BadRequestException("请使用 / 作为路径分隔符！");
             }
             File check = new File(param.getSaveRootPath());
