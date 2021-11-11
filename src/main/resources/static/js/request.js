@@ -1,4 +1,3 @@
-axios.defaults.baseURL = 'http://127.0.0.1:8088';
 axios.defaults.headers['Content-Type'] = 'application/json';
 
 // 添加请求拦截器
