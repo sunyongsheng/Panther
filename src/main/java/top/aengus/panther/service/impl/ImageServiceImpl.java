@@ -28,6 +28,8 @@ import top.aengus.panther.service.*;
 import top.aengus.panther.tool.*;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -286,6 +288,7 @@ public class ImageServiceImpl implements ImageService {
                     item.setUrl(image.getUrl());
                     item.setOwnerApp(appInfoService.findByAppKey(image.getOwner()).getName());
                     item.setOwnerAppKey(image.getOwner());
+                    item.setUploadTime(image.getUploadTime());
                     item.setSize(image.getSize());
                     if (pathIllegal) {
                         item.setDesc("不在指定存储路径下");
@@ -355,6 +358,11 @@ public class ImageServiceImpl implements ImageService {
                 item.setOwnerAppKey(Constants.UNKNOWN_APP_KEY);
             }
             item.setSize(file.length());
+            try {
+                item.setUploadTime(Files.readAttributes(file.toPath(), BasicFileAttributes.class).creationTime().toMillis());
+            } catch (Exception ignore) {
+                item.setUploadTime(System.currentTimeMillis());
+            }
             invalidFiles.add(item);
         }
     }
@@ -369,7 +377,7 @@ public class ImageServiceImpl implements ImageService {
             imageModel.setAbsolutePath(file.getAbsolutePath());
             imageModel.setRelativePath(file.getRelativePath());
             imageModel.setOwner(file.getOwnerAppKey());
-            imageModel.setUploadTime(System.currentTimeMillis());
+            imageModel.setUploadTime(file.getUploadTime());
             imageModel.setCreator(configService.getAdminUsername());
             imageModel.setSize(file.getSize());
             imageModel.setStatus(ImageStatus.NORMAL.getCode());

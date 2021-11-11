@@ -18,6 +18,8 @@ public class RefreshResult {
 
         private String url;
 
+        private Long uploadTime;
+
         private String absolutePath;
 
         private String relativePath;
