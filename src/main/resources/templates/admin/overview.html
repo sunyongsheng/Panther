@@ -15,6 +15,7 @@
     <script type="text/javascript" th:src="@{/js/router.js}"></script>
     <script type="text/javascript" th:src="@{/js/store.js}"></script>
     <script type="text/javascript" th:src="@{/js/api/common.js}"></script>
+    <script type="text/javascript" th:src="@{/js/api/admin.js}"></script>
 </head>
 <body>
 <div id="app">
@@ -89,7 +90,7 @@
         },
         methods: {
             initOverviewData() {
-                axiosClient.get('/api/v1/admin/overview/recent7day').then(response => {
+                getRecent7daysSummary().then(response => {
                     let labels = [];
                     let data = [];
                     response.data.forEach(pair => {
@@ -102,7 +103,7 @@
                 }).catch(e => {
                     this.$message.error(e.msg);
                 });
-                axiosClient.get('/api/v1/admin/overview/top7upload').then(response => {
+                getTop7uploadApp().then(response => {
                     let labels = [];
                     let data = [];
                     response.data.forEach(pair => {

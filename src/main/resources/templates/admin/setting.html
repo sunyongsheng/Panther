@@ -14,6 +14,7 @@
     <script type="text/javascript" th:src="@{/js/router.js}"></script>
     <script type="text/javascript" th:src="@{/js/store.js}"></script>
     <script type="text/javascript" th:src="@{/js/api/common.js}"></script>
+    <script type="text/javascript" th:src="@{/js/api/admin.js}"></script>
 </head>
 <body>
 <div id="app">
@@ -108,7 +109,7 @@
         },
         methods: {
             fetchPantherConfig() {
-                axiosClient.get(`/api/v1/admin/config`).then(response => {
+                getPantherConfig().then(response => {
                     let config = response.data;
                     this.adminUsername = config.adminUsername;
 
@@ -136,10 +137,7 @@
                         cancelButtonText: '取消',
                         type: 'warning'
                     }).then(() => {
-                        axiosClient.put(`/api/v1/admin/config?changed=hostUrl`, {
-                            adminEmail: this.updateConfigParam.adminEmail,
-                            urlOrPath: this.updateConfigParam.hostUrl
-                        }).then(response => {
+                        updateHostUrl(this.updateConfigParam.adminEmail, this.updateConfigParam.hostUrl).then(response => {
                             this.$message.success(response.msg);
                             this.originalHolder.adminEmail = this.updateConfigParam.adminEmail;
                             this.originalHolder.hostUrl = this.updateConfigParam.hostUrl;
@@ -157,10 +155,7 @@
                         cancelButtonText: '取消',
                         type: 'error'
                     }).then(() => {
-                        axiosClient.put(`/api/v1/admin/config?changed=saveRootPath`, {
-                            adminEmail: this.updateConfigParam.adminEmail,
-                            urlOrPath: this.updateConfigParam.saveRootPath
-                        }).then(response => {
+                        updateSaveRootPath(this.updateConfigParam.adminEmail, this.updateConfigParam.saveRootPath).then(response => {
                             this.$message.success(response.msg);
                             this.originalHolder.adminEmail = this.updateConfigParam.adminEmail;
                             this.originalHolder.saveRootPath = this.updateConfigParam.saveRootPath;
