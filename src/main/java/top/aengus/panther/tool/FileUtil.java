@@ -15,25 +15,102 @@ public class FileUtil {
     private static final Logger logger = LoggerFactory.getLogger(FileUtil.class);
 
     public static final String FILE_SEPARATOR = "/";
+    public static final char FILE_SEPARATOR_CHAR = '/';
 
+    /**
+     * 确保开头只有一个 /
+     */
     public static String ensurePrefix(String string) {
         if (string == null || string.isEmpty()) return FILE_SEPARATOR;
-        return string.startsWith(FILE_SEPARATOR) ? string : FILE_SEPARATOR + string;
+        int length = string.length();
+        if (length == 1) {
+            if (string.charAt(0) == FILE_SEPARATOR_CHAR) return string;
+            else return FILE_SEPARATOR + string;
+        } else {
+            if (string.charAt(0) == FILE_SEPARATOR_CHAR) {
+                int beginIndex = 0;
+                for (int i = 1; i < length; i++) {
+                    if (string.charAt(i) == FILE_SEPARATOR_CHAR) {
+                        beginIndex++;
+                    } else break;
+                }
+                return string.substring(beginIndex);
+            } else {
+                return FILE_SEPARATOR + string;
+            }
+        }
     }
 
+    /**
+     * 确保开头没有 /
+     */
     public static String ensureNoPrefix(String string) {
         if (string == null || string.isEmpty()) return "";
-        return string.startsWith(FILE_SEPARATOR) ? string.substring(1) : string;
+        int length = string.length();
+        if (length == 1) {
+            if (string.charAt(0) == FILE_SEPARATOR_CHAR) return "";
+            else return string;
+        } else {
+            if (string.charAt(0) == FILE_SEPARATOR_CHAR) {
+                int beginIndex = 1;
+                for (int i = 1; i < length; i++) {
+                    if (string.charAt(i) == FILE_SEPARATOR_CHAR) {
+                        beginIndex++;
+                    } else break;
+                }
+                return string.substring(beginIndex);
+            } else {
+                return string;
+            }
+        }
     }
 
+    /**
+     * 确保结尾只有一个 /
+     */
     public static String ensureSuffix(String string) {
         if (string == null || string.isEmpty()) return FILE_SEPARATOR;
-        return string.endsWith(FILE_SEPARATOR) ? string : string + FILE_SEPARATOR;
+        int length = string.length();
+        if (length == 1) {
+            if (string.charAt(0) == FILE_SEPARATOR_CHAR) return string;
+            else return string + FILE_SEPARATOR;
+        } else {
+            if (string.charAt(length - 1) == FILE_SEPARATOR_CHAR) {
+                int endIndex = length;
+                for (int i = length - 2; i >= 0; i--) {
+                    if (string.charAt(i) == FILE_SEPARATOR_CHAR) {
+                        endIndex--;
+                    } else break;
+                }
+                return string.substring(0, endIndex);
+            } else {
+                return string + FILE_SEPARATOR;
+            }
+        }
     }
 
+    /**
+     * 确保结尾没有 /
+     */
     public static String ensureNoSuffix(String string) {
         if (string == null || string.isEmpty()) return "";
-        return string.endsWith(FILE_SEPARATOR) ? string.substring(0, string.length() - 1) : string;
+        int length = string.length();
+        if (length == 1) {
+            if (string.charAt(0) == FILE_SEPARATOR_CHAR) return "";
+            else return string;
+        } else {
+            if (string.charAt(length - 1) == FILE_SEPARATOR_CHAR) {
+                int endIndex = length - 1;
+                for (int i = length - 2; i >= 0; i--) {
+                    if (string.charAt(i) == FILE_SEPARATOR_CHAR) {
+                        endIndex--;
+                    } else break;
+                }
+                return string.substring(0, endIndex);
+            } else {
+                return string;
+            }
+        }
     }
 
     public static String getExtension(String filename) {
@@ -65,8 +142,7 @@ public class FileUtil {
                 || dirname.contains("*") || dirname.contains("=")
                 || dirname.contains(">") || dirname.contains("<")
                 || dirname.contains(":") || dirname.contains("\"")
-                || dirname.contains("|") || dirname.contains("/")
-                || dirname.contains("\\");
+                || dirname.contains("|") || dirname.contains("\\");
     }
 
     public static boolean isPathIllegal(String path) {
