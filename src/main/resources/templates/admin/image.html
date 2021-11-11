@@ -171,7 +171,22 @@
             <el-table-column property="name" label="名称" width="150"></el-table-column>
             <el-table-column property="url" label="图片URL" width="200"></el-table-column>
             <el-table-column property="relativePath" label="存储路径"></el-table-column>
-            <el-table-column property="ownerApp" label="所属App"></el-table-column>
+            <el-table-column property="ownerApp" label="所属App">
+                <template slot-scope="scope">
+                    <el-select v-model="scope.row.ownerAppKey"
+                               placeholder="请选择图片的App"
+                               value-key="appKey"
+                               :loading="searching"
+                               remote filterable
+                               :remote-method="getAppData"
+                               @focus="getAppData('')">
+                        <el-option v-for="app in appData"
+                                   :key="app.id"
+                                   :label="app.name"
+                                   :value="app.appKey"></el-option>
+                    </el-select>
+                </template>
+            </el-table-column>
             <el-table-column label="操作" align="center">
                 <template slot-scope="scope">
                     <el-button type="danger" size="mini" @click="clickDeleteInvalidFile(scope.row)">
@@ -440,6 +455,7 @@
                 });
             },
             clickSaveInvalidFile() {
+                // 对于没有数据库记录并且不在app目录下的文件，保存时可以将其ownerApp设置为普通App
                 this.$confirm('未删除的图片将在数据库中生成记录，对于未知归属App的图片建议手动创建App或者将其移动至正确的文件目录下再进行此操作', '提示', {
                     confirmButtonText: '确认',
                     cancelButtonText: '取消',
