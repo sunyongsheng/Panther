@@ -68,10 +68,15 @@ public interface ImageService {
     Page<ImageModel> findAllByStatus(ImageStatus status, int page, int pageSize);
 
     /**
-     * 将图片保存到指定目录[dir]下或者App专属目录下
-     * <p>1. 若{@link AppInfo#getRole()} == {@link top.aengus.panther.enums.AppRole#SUPER}且[dir]不空，则将其保存到目录[dir]中</p>
-     * <p>2. 若{@link AppInfo#getRole()} == {@link top.aengus.panther.enums.AppRole#SUPER}且[dir]为空，则将其保存到App目录中</p>
-     * <p>3. 若{@link AppInfo#getRole()} == {@link top.aengus.panther.enums.AppRole#NORMAL}，则忽略[dir]，只将其保存到App目录中</p>
+     * 将图片保存到指定目录[dir]下或者App默认存储目录下
+     * <p>1. 若{@link AppInfo#getRole()} == {@link top.aengus.panther.enums.AppRole#SUPER}且[dir]不空，并且[dir]不是其他App的专属目录，则将其保存到目录[dir]中</p>
+     * <p>2. 若{@link AppInfo#getRole()} == {@link top.aengus.panther.enums.AppRole#SUPER}且[dir]为空，则将其保存到App默认目录中</p>
+     * <p>3. 若{@link AppInfo#getRole()} == {@link top.aengus.panther.enums.AppRole#NORMAL}，则忽略[dir]，只将其保存到App默认目录中</p>
+     *
+     * <p>
+     * App默认存储目录指{@link AppSetting#getKey()} == {@link top.aengus.panther.enums.AppSettingKey#DEFAULT_SAVE_DIR}
+     * 所对应的值，只有超级App可修改
+     * </p>
      *
      * <p>
      * 保存图片的文件名将根据{@link AppSetting#getKey()} == {@link top.aengus.panther.enums.AppSettingKey#IMG_NAMING_STRATEGY}
@@ -79,7 +84,7 @@ public interface ImageService {
      * </p>
      *
      * @param image 要保存的图片
-     * @param dir 要保存的目录名，可空，只能为一级目录，比如 common/post
+     * @param dir 要保存的目录名，可空，可以是非app目录下的任意目录
      * @param appKey 图片所属的App的appKey，不可空
      * @param isAdmin 是否是管理员上传，若为{@code true}，则ImageModel#creator为管理员用户名，否则为appKey
      * @return 保存完成的ImageDTO
