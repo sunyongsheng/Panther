@@ -1,4 +1,5 @@
 import top.aengus.panther.buildSrc.Libs
+import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
     id("java")
@@ -48,6 +49,12 @@ dependencies {
     runtimeOnly(Libs.mysql)
 }
 
-tasks.withType(JavaCompile::class.java) {
+tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
+}
+
+tasks.withType<BootJar> {
+    doLast {
+        println("SpringBoot Jar build finish. Jar path is ${archiveFile.get().asFile.absolutePath}")
+    }
 }
