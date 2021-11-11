@@ -105,6 +105,7 @@
             width="480px" center>
         <div class="upload-container" @dragenter="(e) => e.preventDefault()" @dragover="(e) => e.preventDefault()" @drop="parseFileOnDrop">
             <label class="upload-button" for="upload-actual">选 择 图 片</label>
+            <div class="upload-dialog-hint-text">图片将保存在 {{ currSelectApp.defaultSaveDir }} 目录下</div>
             <el-empty description="请选择图片或拖拽上传" v-if="previewImages.length === 0"></el-empty>
             <div class="preview-container" v-else>
                 <template v-for="image in previewImages" >
@@ -161,7 +162,7 @@
 
     <el-dialog title="App设置"
         :visible.sync="settingDialogVisible"
-        width="40%"
+        width="45%"
         center destroy-on-close>
         <div class="setting-form">
             <div class="setting-form-item">
@@ -574,6 +575,10 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+    }
+    .upload-dialog-hint-text {
+        color: #868686;
+        font-size: 15px;
     }
     .preview-container {
         height: 350px;
