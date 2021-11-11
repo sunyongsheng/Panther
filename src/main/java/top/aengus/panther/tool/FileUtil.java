@@ -164,4 +164,12 @@ public class FileUtil {
         return true;
     }
 
+    /**
+     * 所有App只能上传到/app目录下自己的文件夹内
+     * @return 若非法，返回{@code true}
+     */
+    public static boolean isAppDirIllegal(String dir, String englishName) {
+        return dir.startsWith("/app/") && !dir.startsWith("/app/" + englishName + "/");
+    }
+
 }

@@ -179,6 +179,16 @@
                 </div>
             </div>
             <div class="setting-form-item">
+                <div class="setting-form-item-title">默认保存目录</div>
+                <div class="setting-form-item-content">
+                    <div class="column-container">
+                        <el-input v-model="settingForm.defaultSaveDir" :disabled="currSelectApp.role !== 'SUPER'"></el-input>
+                        <div class="space-column-6"></div>
+                        <div class="setting-hint-text">上传图片时图片默认的保存目录，只有超级App可以设置，以 / 开头</div>
+                    </div>
+                </div>
+            </div>
+            <div class="setting-form-item">
                 <div class="setting-form-item-title">Token管理</div>
                 <div class="setting-form-item-content">
                     <div class="column-container">
@@ -270,6 +280,7 @@
                 tokenValue: '',
                 settingForm: {
                     namingStrategy: 'UUID',
+                    defaultSaveDir: ''
                 },
                 allNamingStrategySample,
 
@@ -335,6 +346,7 @@
             onClickSetting(app) {
                 this.settingDialogVisible = true;
                 this.settingForm.namingStrategy = app.namingStrategy;
+                this.settingForm.defaultSaveDir = app.defaultSaveDir;
                 Object.assign(this.currSelectApp, app);
             },
             parseFile(event) {
@@ -498,7 +510,8 @@
             clickSaveSetting() {
                 this.updating = true;
                 updateSetting(this.currSelectApp.appKey, {
-                    namingStrategy: this.settingForm.namingStrategy
+                    namingStrategy: this.settingForm.namingStrategy,
+                    defaultSaveDir: this.settingForm.defaultSaveDir
                 }).then(_ => {
                     this.settingDialogVisible = false;
                     this.$message.success("保存成功");

@@ -30,6 +30,13 @@ public interface FileService {
     void initAppWorkspace(String rootPath, String appName);
 
     /**
+     * 获取App工作目录，为相对路径
+     * @param appName App英文名称
+     * @return App工作目录
+     */
+    String getAppWorkspaceDir(String appName);
+
+    /**
      * 将文件保存到磁盘上
      * @param file 待保存文件
      * @param absolutePath 文件的绝对路径

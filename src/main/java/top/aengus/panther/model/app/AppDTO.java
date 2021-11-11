@@ -44,4 +44,6 @@ public class AppDTO {
     // Setting
     private NamingStrategy namingStrategy;
 
+    private String defaultSaveDir;
+
 }

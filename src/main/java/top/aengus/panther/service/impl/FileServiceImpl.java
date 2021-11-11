@@ -62,6 +62,11 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    public String getAppWorkspaceDir(String appName) {
+        return FileUtil.FILE_SEPARATOR + NAME_APP + FileUtil.FILE_SEPARATOR + appName;
+    }
+
+    @Override
     public void saveToFile(MultipartFile file, String absolutePath) {
         File dest = new File(absolutePath);
         if (dest.exists()) {

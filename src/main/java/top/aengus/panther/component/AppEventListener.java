@@ -39,18 +39,20 @@ public class AppEventListener {
     public void handleCreateAppEvent(CreateAppEvent event) {
         if (event.getSource() instanceof AppInfoService) {
             AppInfo appInfo = event.getApp();
-            initializeAppSetting(appInfo.getId());
+            initializeAppSetting(appInfo);
             generateAppSpace(appInfo.getEnglishName());
         }
     }
 
-    private void initializeAppSetting(Long appId) {
+    private void initializeAppSetting(AppInfo app) {
         for (AppSettingKey key : AppSettingKey.values()) {
             CreateAppSettingParam param = new CreateAppSettingParam();
-            param.setAppId(appId);
+            param.setAppId(app.getId());
             param.setKey(key.getCode());
             if (key == AppSettingKey.IMG_NAMING_STRATEGY) {
                 param.setValue(NamingStrategy.UUID.name());
+            } else if (key == AppSettingKey.DEFAULT_SAVE_DIR) {
+                param.setValue(fileService.getAppWorkspaceDir(app.getEnglishName()));
             } else {
                 continue;
             }

@@ -174,6 +174,7 @@
             <el-table-column property="ownerApp" label="所属App">
                 <template slot-scope="scope">
                     <el-select v-model="scope.row.ownerAppKey"
+                               :name="scope.row.ownerApp"
                                placeholder="请选择图片的App"
                                value-key="appKey"
                                :loading="searching"
@@ -466,9 +467,21 @@
                         this.refreshFileDialogVisible = false;
                         this.fetchImageData();
                     }).catch(e => {
-                        this.$message.error(e.msg);
+                        this.$notify.error({
+                            title: "错误",
+                            message: e.msg,
+                            duration: 0
+                        });
+                        this.refreshFileDialogVisible = false;
+                        setTimeout(() => {
+                            this.$notify({
+                                title: '提示',
+                                message: "由于可能有脏数据，对话框已关闭，请重新刷新查看剩余文件",
+                                type: 'warning',
+                            });
+                        }, 100)
                     }).finally(() => {
-                        this.processing = true;
+                        this.processing = false;
                     });
                 });
             },

@@ -6,7 +6,8 @@ package top.aengus.panther.enums;
  * date 2021/8/29
  */
 public enum AppSettingKey {
-    IMG_NAMING_STRATEGY("img_naming_strategy", "图片上传策略");
+    IMG_NAMING_STRATEGY("img_naming_strategy", "图片上传策略"),
+    DEFAULT_SAVE_DIR("default_save_dir", "默认上传目录");
 
     private final String code;
     private final String desc;

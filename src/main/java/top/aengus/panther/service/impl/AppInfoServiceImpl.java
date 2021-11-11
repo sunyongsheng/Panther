@@ -19,12 +19,12 @@ import top.aengus.panther.model.app.AppDTO;
 import top.aengus.panther.model.app.AppInfo;
 import top.aengus.panther.model.app.CreateAppParam;
 import top.aengus.panther.model.app.UpdateAppParam;
-import top.aengus.panther.model.setting.AppSetting;
 import top.aengus.panther.model.setting.UpdateAppSettingParam;
 import top.aengus.panther.model.token.AppToken;
 import top.aengus.panther.service.AppInfoService;
 import top.aengus.panther.service.AppSettingService;
 import top.aengus.panther.service.AppTokenService;
+import top.aengus.panther.service.FileService;
 import top.aengus.panther.tool.FileUtil;
 import top.aengus.panther.tool.StringUtil;
 
@@ -40,13 +40,15 @@ public class AppInfoServiceImpl implements AppInfoService {
     private final ApplicationEventPublisher eventPublisher;
     private final AppTokenService appTokenService;
     private final AppSettingService appSettingService;
+    private final FileService fileService;
 
     @Autowired
-    public AppInfoServiceImpl(AppInfoRepository appInfoRepository, ApplicationEventPublisher eventPublisher, AppTokenService appTokenService, AppSettingService appSettingService) {
+    public AppInfoServiceImpl(AppInfoRepository appInfoRepository, ApplicationEventPublisher eventPublisher, AppTokenService appTokenService, AppSettingService appSettingService, FileService fileService) {
         this.appInfoRepository = appInfoRepository;
         this.eventPublisher = eventPublisher;
         this.appTokenService = appTokenService;
         this.appSettingService = appSettingService;
+        this.fileService = fileService;
     }
 
     @Override
@@ -102,7 +104,7 @@ public class AppInfoServiceImpl implements AppInfoService {
         if (StringUtil.isEmpty(param.getEnglishName()) || param.getEnglishName().contains(" ")) {
             throw new BadRequestException("英文名不能为空或含有空格！");
         }
-        if (FileUtil.isDirnameIllegal(param.getEnglishName())) {
+        if (param.getEnglishName().contains("/") || FileUtil.isDirnameIllegal(param.getEnglishName())) {
             throw new BadRequestException("英文名不能包含特殊符号！");
         }
         if (Constants.UNKNOWN_APP_KEY.equals(param.getEnglishName())) {
@@ -190,7 +192,7 @@ public class AppInfoServiceImpl implements AppInfoService {
     @Override
     public void updateAppSetting(String appKey, UpdateAppSettingParam param) {
         AppInfo appInfo = findAppWithCheck(appKey, true);
-        appSettingService.updateAppSetting(appInfo.getId(), param);
+        appSettingService.updateAppSetting(appInfo, param);
     }
 
     @Override
@@ -208,8 +210,11 @@ public class AppInfoServiceImpl implements AppInfoService {
         appDTO.setHasUploadToken1(appToken != null);
         appDTO.setUpdateToken1GenTime(appToken == null ? 0 : appToken.getGenerateTime());
 
-        AppSetting appSetting = appSettingService.findAppSetting(appInfo.getId(), AppSettingKey.IMG_NAMING_STRATEGY.getCode());
-        appDTO.setNamingStrategy(appSetting == null ? NamingStrategy.UUID : NamingStrategy.valueOf(appSetting.getValue()));
+        String namingStrategy = appSettingService.findAppSettingValue(appInfo, AppSettingKey.IMG_NAMING_STRATEGY);
+        appDTO.setNamingStrategy(NamingStrategy.valueOf(namingStrategy));
+
+        String defaultSaveDir = appSettingService.findAppSettingValue(appInfo, AppSettingKey.DEFAULT_SAVE_DIR);
+        appDTO.setDefaultSaveDir(defaultSaveDir);
 
         return appDTO;
     }

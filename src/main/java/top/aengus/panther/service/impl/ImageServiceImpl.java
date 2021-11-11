@@ -21,7 +21,6 @@ import top.aengus.panther.exception.NotFoundException;
 import top.aengus.panther.model.FileTree;
 import top.aengus.panther.model.app.AppInfo;
 import top.aengus.panther.model.image.RefreshResult;
-import top.aengus.panther.model.setting.AppSetting;
 import top.aengus.panther.model.image.ImageDTO;
 import top.aengus.panther.model.image.ImageModel;
 import top.aengus.panther.service.*;
@@ -115,16 +114,12 @@ public class ImageServiceImpl implements ImageService {
             throw new BadRequestException("App已被删除！请联系管理员");
         }
 
-        AppSetting setting = appSettingService.findAppSetting(appInfo.getId(), AppSettingKey.IMG_NAMING_STRATEGY.getCode());
-        NamingStrategy rule;
-        if (setting == null) {
-            rule = NamingStrategy.UUID;
-        } else {
-            rule = NamingStrategy.valueOf(setting.getValue());
-        }
-        String saveName = generateName(rule, originName);
-        String absolutePath = generateAbsolutePath(appInfo, saveDir, saveName);
-        String relativePath = generateRelativePath(appInfo, saveDir, saveName);
+        NamingStrategy namingStrategy = NamingStrategy.valueOf(appSettingService.findAppSettingValue(appInfo, AppSettingKey.IMG_NAMING_STRATEGY));
+        String saveName = generateName(namingStrategy, originName);
+
+        String defaultSaveDir = appSettingService.findAppSettingValue(appInfo, AppSettingKey.DEFAULT_SAVE_DIR);
+        String relativePath = generateRelativePath(appInfo, saveDir, saveName, defaultSaveDir);
+        String absolutePath = generateAbsolutePath(relativePath);
         ImageModel imageModel = new ImageModel();
         imageModel.setOriginalName(originName);
         imageModel.setSaveName(saveName);
@@ -144,30 +139,25 @@ public class ImageServiceImpl implements ImageService {
         return convertToDto(imageRepository.save(imageModel));
     }
 
-    private String generateAbsolutePath(AppInfo app, String dir, String name) {
-        File file;
+    private String generateRelativePath(AppInfo app, String dir, String name, String defaultSaveDir) {
         if (app.isSuperRole() && StringUtil.isNotEmpty(dir)) {
-            file = new File(new File(configService.getSaveRootPath(), dir), name);
+            String correctDir =  FileUtil.ensureSuffix(FileUtil.ensurePrefix(dir));
+            if (FileUtil.isAppDirIllegal(correctDir, app.getEnglishName())) {
+                throw new BadRequestException("不允许上传到app目录下其他文件夹中");
+            }
+            return correctDir + name;
         } else {
-            File appRoot = new File(configService.getSaveRootPath(), ImageDirUtil.NAME_APP);
-            File appSpecial = new File(appRoot, app.getEnglishName());
-            file = new File(appSpecial, name);
+            return FileUtil.ensureSuffix(FileUtil.ensurePrefix(defaultSaveDir)) + name;
         }
+    }
+
+    private String generateAbsolutePath(String relativePath) {
+        File file = new File(configService.getSaveRootPath(), relativePath);
         String path = file.getAbsolutePath();
         if (SystemUtil.isWindows()) {
             return FileUtil.modifyPathSeparator(path);
         } else {
             return path;
-        }
-    }
-
-    private String generateRelativePath(AppInfo app, String dir, String name) {
-        if (app.isSuperRole() && StringUtil.isNotEmpty(dir)) {
-            return FileUtil.ensureSuffix(FileUtil.ensurePrefix(dir)) + name;
-        } else {
-            return FileUtil.FILE_SEPARATOR + ImageDirUtil.NAME_APP +
-                    FileUtil.FILE_SEPARATOR + app.getEnglishName() +
-                    FileUtil.FILE_SEPARATOR + name;
         }
     }
 
@@ -194,13 +184,12 @@ public class ImageServiceImpl implements ImageService {
         return UrlUtil.ensureNoSuffix(configService.getHostUrl()) + relativePath;
     }
 
+    // 返回 /xxx/xx/x 格式
     private String tryCheckDir(String dir) {
         if (StringUtil.isEmpty(dir)) return null;
+        if (FileUtil.isPathIllegal(dir)) throw new BadRequestException("请使用 / 作为路径分隔符！");
         if (FileUtil.isDirnameIllegal(dir)) throw new BadRequestException("文件夹名不合法！");
-        if (dir.contains("\\")) throw new BadRequestException("目前不支持上传到子文件夹！" + dir);
-        String correct = FileUtil.ensureNoPrefix(FileUtil.ensureNoSuffix(dir));
-        if (correct.contains("/")) throw new BadRequestException("目前不支持上传到子文件夹！" + dir);
-        return correct;
+        return FileUtil.ensurePrefix(FileUtil.ensureNoSuffix(dir));
     }
 
     @Override
@@ -370,6 +359,12 @@ public class ImageServiceImpl implements ImageService {
     @Override
     public void insertFromRefreshResult(List<RefreshResult.Item> files) {
         files.forEach(file -> {
+            AppInfo app = appInfoService.findByAppKey(file.getOwnerAppKey());
+            if (app != AppInfo.empty()) {
+                if (FileUtil.isAppDirIllegal(file.getRelativePath(), app.getEnglishName())) {
+                    throw new BadRequestException("此图片在app目录下，其所属App的英文名必须和文件名相同，请手动创建App或者移动图片");
+                }
+            }
             ImageModel imageModel = new ImageModel();
             imageModel.setUrl(file.getUrl());
             imageModel.setOriginalName(file.getName());
