@@ -2,6 +2,7 @@ package top.aengus.panther.tool;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import top.aengus.panther.core.Constants;
 
 import java.io.File;
 
@@ -14,8 +15,8 @@ public class FileUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(FileUtil.class);
 
-    public static final String FILE_SEPARATOR = "/";
-    public static final char FILE_SEPARATOR_CHAR = '/';
+    private static final String FILE_SEPARATOR = Constants.FILE_SEPARATOR;
+    private static final char FILE_SEPARATOR_CHAR = '/';
 
     /**
      * 确保开头只有一个 /
@@ -169,7 +170,7 @@ public class FileUtil {
      * @return 若非法，返回{@code true}
      */
     public static boolean isAppDirIllegal(String dir, String englishName) {
-        return dir.startsWith("/app/") && !dir.startsWith("/app/" + englishName + "/");
+        return dir.startsWith(Constants.PATH_APP) && !dir.startsWith(Constants.PATH_APP + englishName + Constants.FILE_SEPARATOR);
     }
 
 }

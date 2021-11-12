@@ -4,6 +4,7 @@ import cn.hutool.core.collection.ListUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import top.aengus.panther.core.Constants;
 import top.aengus.panther.exception.BadRequestException;
 import top.aengus.panther.exception.InternalException;
 import top.aengus.panther.exception.NotFoundException;
@@ -40,30 +41,30 @@ public class FileServiceImpl implements FileService {
         }
         File rootFile = new File(rootPath);
         if (!FileUtil.checkAndCreateDir(rootFile)) {
-            throw new BadRequestException("创建「" + rootFile.getAbsolutePath() + "」文件夹失败，请手动创建");
+            throw new InternalException("创建「" + rootFile.getAbsolutePath() + "」文件夹失败，请手动创建");
         }
         File deleted = getDeletedFile(rootPath);
         if (!FileUtil.checkAndCreateDir(deleted)) {
-            throw new BadRequestException("创建「" + deleted.getAbsolutePath() + "」文件夹失败，请手动创建");
+            throw new InternalException("创建「" + deleted.getAbsolutePath() + "」文件夹失败，请手动创建");
         }
         for (String dir : imgDirs) {
             File dirFile = new File(rootPath, dir);
             if (!FileUtil.checkAndCreateDir(dirFile)) {
-                throw new BadRequestException("创建「" + dirFile.getAbsolutePath() + "」文件夹失败，请手动创建");
+                throw new InternalException("创建「" + dirFile.getAbsolutePath() + "」文件夹失败，请手动创建");
             }
         }
     }
 
     @Override
     public void initAppWorkspace(String rootPath, String appName) {
-        File appFile = new File(rootPath, NAME_APP);
+        File appFile = new File(rootPath, Constants.DIRNAME_APP);
         File appSpecial = new File(appFile, appName);
         FileUtil.checkAndCreateDir(appSpecial);
     }
 
     @Override
     public String getAppWorkspaceDir(String appName) {
-        return FileUtil.FILE_SEPARATOR + NAME_APP + FileUtil.FILE_SEPARATOR + appName;
+        return Constants.FILE_SEPARATOR + Constants.DIRNAME_APP + Constants.FILE_SEPARATOR + appName;
     }
 
     @Override

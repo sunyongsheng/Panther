@@ -303,20 +303,20 @@ public class ImageServiceImpl implements ImageService {
         String rootPath = configService.getSaveRootPath();
 
         FileTree rootTree = fileService.listFiles(rootPath, false);
-        String rootRePathPrefix = FileUtil.FILE_SEPARATOR;
+        String rootRePathPrefix = Constants.FILE_SEPARATOR;
 
         rootTree.forEachFile(file -> handleFile(file, invalidFiles, rootRePathPrefix, null, false));
 
         rootTree.forEachDir(firstLevelDir -> {
             FileTree firstLevelDirTree = fileService.listFiles(firstLevelDir.getCurrFile().getAbsolutePath(), false);
-            String firstRePathPrefix = rootRePathPrefix + firstLevelDir.getCurrFile().getName() + FileUtil.FILE_SEPARATOR;
+            String firstRePathPrefix = rootRePathPrefix + firstLevelDir.getCurrFile().getName() + Constants.FILE_SEPARATOR;
 
             firstLevelDirTree.forEachFile(file -> handleFile(file, invalidFiles, firstRePathPrefix, null, false));
 
             firstLevelDirTree.forEachDir(childDir -> {
                 String childDirname = childDir.getCurrFile().getName();
                 FileTree childDirTree = fileService.listFiles(childDir.getCurrFile().getAbsolutePath(), false);
-                String childRelativePathPrefix = firstRePathPrefix + childDirname + FileUtil.FILE_SEPARATOR;
+                String childRelativePathPrefix = firstRePathPrefix + childDirname + Constants.FILE_SEPARATOR;
                 childDirTree.forEachFile(file -> handleFile(file, invalidFiles, childRelativePathPrefix, childDirname, true));
             });
         });

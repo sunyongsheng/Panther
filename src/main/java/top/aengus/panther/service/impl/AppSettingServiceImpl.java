@@ -80,7 +80,7 @@ public class AppSettingServiceImpl implements AppSettingService {
                     throw new BadRequestException("请以 / 作为路径分隔符！");
                 }
                 String correctDir = FileUtil.ensureNoSuffix(FileUtil.ensurePrefix(param.getDefaultSaveDir()));
-                if (FileUtil.isAppDirIllegal(correctDir + "/", app.getEnglishName())) {
+                if (FileUtil.isAppDirIllegal(FileUtil.ensureSuffix(correctDir), app.getEnglishName())) {
                     throw new BadRequestException("不允许上传到app目录下其他文件夹中");
                 }
                 appSetting.setValue(correctDir);
