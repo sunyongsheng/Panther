@@ -25,19 +25,13 @@ import java.util.List;
 @Service
 public class FileServiceImpl implements FileService {
 
-    public static final String DELETED = ".deleted";
-    public static final String NAME_APP = "app";
-    public static final String NAME_COMMON = "common";
-    public static final String NAME_POST = "post";
-    public static final String NAME_TRAVEL = "travel";
-    public static final String NAME_SCREENSHOTS = "screenshots";
-
+    private static final String DELETED = ".deleted";
     private static volatile File DELETED_FILE;
 
     @Override
     public void initWorkspace(String rootPath, List<String> imgDirs) {
-        if (!imgDirs.containsAll(ListUtil.of(NAME_APP, NAME_COMMON))) {
-            throw new BadRequestException("app与common文件夹为必选项");
+        if (!imgDirs.containsAll(ListUtil.of(Constants.DIRNAME_APP))) {
+            throw new BadRequestException("app文件夹为必选项");
         }
         File rootFile = new File(rootPath);
         if (!FileUtil.checkAndCreateDir(rootFile)) {
