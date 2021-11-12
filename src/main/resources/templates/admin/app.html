@@ -396,8 +396,7 @@
                         this.uploading = false;
                     });
                 } else {
-                    this.$message.error('请先选择图片');
-                }
+                    this.$message.error('请先选择图片');                }
             },
             onClickUploadRemove(image) {
                 let toRemoveIndex = -1;
@@ -577,7 +576,8 @@
     }
     .upload-dialog-hint-text {
         color: #868686;
-        font-size: 15px;
+        font-size: 14px;
+        margin-bottom: 10px;
     }
     .preview-container {
         height: 350px;
@@ -593,7 +593,7 @@
         color: #fff;
         border-radius: 4px;
         background-color: #7EBF50;
-        margin-bottom: 20px;
+        margin-bottom: 6px;
         cursor: pointer;
         transition: .2s;
     }
