@@ -40,7 +40,6 @@ public class AppInfoServiceImpl implements AppInfoService {
     private final ApplicationEventPublisher eventPublisher;
     private final AppTokenService appTokenService;
     private final AppSettingService appSettingService;
-    private final FileService fileService;
 
     @Autowired
     public AppInfoServiceImpl(AppInfoRepository appInfoRepository, ApplicationEventPublisher eventPublisher, AppTokenService appTokenService, AppSettingService appSettingService, FileService fileService) {
@@ -48,7 +47,6 @@ public class AppInfoServiceImpl implements AppInfoService {
         this.eventPublisher = eventPublisher;
         this.appTokenService = appTokenService;
         this.appSettingService = appSettingService;
-        this.fileService = fileService;
     }
 
     @Override
@@ -178,7 +176,7 @@ public class AppInfoServiceImpl implements AppInfoService {
         if (AppStatus.LOCKED != AppStatus.fromCode(appInfo.getStatus())) {
             throw new BadRequestException("App未被锁定，无法解锁！");
         }
-        appInfo.setStatus(AppStatus.LOCKED.getCode());
+        appInfo.setStatus(AppStatus.NORMAL.getCode());
         appInfo.setUpdateTime(System.currentTimeMillis());
         appInfoRepository.save(appInfo);
     }
