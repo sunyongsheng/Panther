@@ -16,7 +16,7 @@ async function searchApp(query) {
 }
 
 async function generateUploadToken(appKey) {
-    return axiosClient.post(`api/v1/app/uploadToken?app_key=${appKey}`)
+    return axiosClient.post(`/api/v1/app/uploadToken?app_key=${appKey}`)
 }
 
 async function updateAppInfo(appKey, param) {
