@@ -100,6 +100,9 @@ public class ImageServiceImpl implements ImageService {
         if (!FileUtil.isPic(originName)) {
             throw new BadRequestException(originName + " 非图片文件！");
         }
+        if (originName.length() > 200) {
+            throw new BadRequestException("图片名长度超过200字符，请重命名");
+        }
 
         String saveDir = tryCheckDir(dir);
 
