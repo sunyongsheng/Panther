@@ -134,7 +134,8 @@ public class FileUtil {
                 || ignoreCase.endsWith(".svg")
                 || ignoreCase.endsWith(".bmp")
                 || ignoreCase.endsWith(".ico")
-                || ignoreCase.endsWith(".tiff"));
+                || ignoreCase.endsWith(".tiff")
+                || ignoreCase.endsWith(".webp"));
     }
 
     public static boolean isDirnameIllegal(String dirname) {
