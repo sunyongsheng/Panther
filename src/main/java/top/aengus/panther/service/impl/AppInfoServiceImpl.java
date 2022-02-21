@@ -24,7 +24,6 @@ import top.aengus.panther.model.token.AppToken;
 import top.aengus.panther.service.AppInfoService;
 import top.aengus.panther.service.AppSettingService;
 import top.aengus.panther.service.AppTokenService;
-import top.aengus.panther.service.FileService;
 import top.aengus.panther.tool.FileUtil;
 import top.aengus.panther.tool.StringUtil;
 
@@ -42,7 +41,7 @@ public class AppInfoServiceImpl implements AppInfoService {
     private final AppSettingService appSettingService;
 
     @Autowired
-    public AppInfoServiceImpl(AppInfoRepository appInfoRepository, ApplicationEventPublisher eventPublisher, AppTokenService appTokenService, AppSettingService appSettingService, FileService fileService) {
+    public AppInfoServiceImpl(AppInfoRepository appInfoRepository, ApplicationEventPublisher eventPublisher, AppTokenService appTokenService, AppSettingService appSettingService) {
         this.appInfoRepository = appInfoRepository;
         this.eventPublisher = eventPublisher;
         this.appTokenService = appTokenService;

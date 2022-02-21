@@ -12,10 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import top.aengus.panther.core.Constants;
 import top.aengus.panther.dao.ImageRepository;
-import top.aengus.panther.enums.AppSettingKey;
-import top.aengus.panther.enums.AppStatus;
-import top.aengus.panther.enums.ImageStatus;
-import top.aengus.panther.enums.NamingStrategy;
+import top.aengus.panther.enums.*;
 import top.aengus.panther.exception.BadRequestException;
 import top.aengus.panther.exception.NotFoundException;
 import top.aengus.panther.model.FileTree;
@@ -143,7 +140,7 @@ public class ImageServiceImpl implements ImageService {
     }
 
     private String generateRelativePath(AppInfo app, String dir, String name, String defaultSaveDir) {
-        if (app.isSuperRole() && StringUtil.isNotEmpty(dir)) {
+        if (AppRole.SUPER.getCode().equals(app.getRole()) && StringUtil.isNotEmpty(dir)) {
             String correctDir =  FileUtil.ensureSuffix(FileUtil.ensurePrefix(dir));
             if (FileUtil.isAppDirIllegal(correctDir, app.getEnglishName())) {
                 throw new BadRequestException("不允许上传到app目录下其他文件夹中");
@@ -308,16 +305,21 @@ public class ImageServiceImpl implements ImageService {
         FileTree rootTree = fileService.listFiles(rootPath, false);
         String rootRePathPrefix = Constants.FILE_SEPARATOR;
 
+        // 根目录下的所有文件， 如 /a.png，这些文件默认不归属于某个App
         rootTree.forEachFile(file -> handleFile(file, invalidFiles, rootRePathPrefix, null, false));
 
+        // 根目录下的所有文件夹，如 /app、/common
         rootTree.forEachDir(firstLevelDir -> {
             FileTree firstLevelDirTree = fileService.listFiles(firstLevelDir.getCurrFile().getAbsolutePath(), false);
             String firstRePathPrefix = rootRePathPrefix + firstLevelDir.getCurrFile().getName() + Constants.FILE_SEPARATOR;
 
+            // 一级目录下的所有文件，如 /common/avatar.png，这些文件默认不归属于某个App
             firstLevelDirTree.forEachFile(file -> handleFile(file, invalidFiles, firstRePathPrefix, null, false));
 
+            // 一级目录下的所有文件夹，如 /app/testApp
             firstLevelDirTree.forEachDir(childDir -> {
                 String childDirname = childDir.getCurrFile().getName();
+                // 只查找文件，如果有文件夹也忽略；按照默认规则，应该只有 /app/xx 目录下有文件
                 FileTree childDirTree = fileService.listFiles(childDir.getCurrFile().getAbsolutePath(), false);
                 String childRelativePathPrefix = firstRePathPrefix + childDirname + Constants.FILE_SEPARATOR;
                 childDirTree.forEachFile(file -> handleFile(file, invalidFiles, childRelativePathPrefix, childDirname, true));
@@ -327,7 +329,7 @@ public class ImageServiceImpl implements ImageService {
         return result;
     }
 
-    private void handleFile(File file, List<RefreshResult.Item> invalidFiles, String relativePathPrefix, String dirname, boolean setAppName) {
+    private void handleFile(File file, List<RefreshResult.Item> invalidFiles, String relativePathPrefix, String dirname, boolean considerAsAppImage) {
         String filename = file.getName();
         if (!FileUtil.isPic(filename)) return;
         String relativePath = relativePathPrefix + filename;
@@ -341,7 +343,7 @@ public class ImageServiceImpl implements ImageService {
             item.setAbsolutePath(absPath);
             item.setRelativePath(relativePath);
             item.setUrl(generateUrl(relativePath));
-            if (setAppName) {
+            if (considerAsAppImage) {
                 AppInfo appInfo = appInfoService.findByEnglishName(dirname);
                 item.setOwnerApp(appInfo.getName());
                 item.setOwnerAppKey(appInfo.getAppKey());

@@ -53,10 +53,8 @@ public class AppInfo {
     @Column(name = "update_time")
     private Long updateTime;
 
-    public boolean isSuperRole() {
-        return AppRole.SUPER.getCode().equals(role);
-    }
 
+    @Transient
     private static volatile AppInfo EMPTY;
 
     public static AppInfo empty() {
