@@ -7,9 +7,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.UrlPathHelper;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Aengus Sun (sys6511@126.com)
@@ -27,6 +25,9 @@ public abstract class AbstractRequestFilter extends OncePerRequestFilter {
     public AbstractRequestFilter() {
         this.antPathMatcher = new AntPathMatcher();
         this.urlPathHelper = new UrlPathHelper();
+
+        interceptUrls.addAll(getInterceptUrl());
+        excludeUrls.addAll(getExcludeUrl());
     }
 
     @Override
@@ -39,12 +40,12 @@ public abstract class AbstractRequestFilter extends OncePerRequestFilter {
         return interceptUrls.stream().noneMatch(url -> antPathMatcher.match(url, requestUrl));
     }
 
-    protected void addInterceptUrl(String... urls) {
-        interceptUrls.addAll(Arrays.asList(urls));
+    protected List<String> getInterceptUrl() {
+        return Collections.emptyList();
     }
 
-    protected void addExcludeUrl(String... urls) {
-        excludeUrls.addAll(Arrays.asList(urls));
+    protected List<String> getExcludeUrl() {
+        return Collections.emptyList();
     }
 
 }

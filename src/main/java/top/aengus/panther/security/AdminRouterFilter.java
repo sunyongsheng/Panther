@@ -1,5 +1,6 @@
 package top.aengus.panther.security;
 
+import cn.hutool.core.collection.ListUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.lang.NonNull;
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 @Slf4j
 @Component
@@ -24,7 +26,6 @@ public class AdminRouterFilter extends AbstractRequestFilter {
 
     public AdminRouterFilter(PantherConfigService configService) {
         this.configService = configService;
-        addInterceptUrl("/admin/**");
     }
 
     @Override
@@ -45,5 +46,10 @@ public class AdminRouterFilter extends AbstractRequestFilter {
             return;
         }
         filterChain.doFilter(request, response);
+    }
+
+    @Override
+    protected List<String> getInterceptUrl() {
+        return ListUtil.of("/admin/**");
     }
 }

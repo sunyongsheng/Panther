@@ -1,5 +1,6 @@
 package top.aengus.panther.security;
 
+import cn.hutool.core.collection.ListUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @author Aengus Sun (sys6511@126.com)
@@ -32,9 +34,6 @@ public class AdminRequestFilter extends AbstractRequestFilter {
     @Autowired
     public AdminRequestFilter(PantherConfigService configService) {
         this.configService = configService;
-
-        addInterceptUrl("/api/**");
-        addExcludeUrl("/api/v1/image");
     }
 
     @Override
@@ -47,5 +46,15 @@ public class AdminRequestFilter extends AbstractRequestFilter {
             return;
         }
         filterChain.doFilter(request, response);
+    }
+
+    @Override
+    protected List<String> getInterceptUrl() {
+        return ListUtil.of("/api/**");
+    }
+
+    @Override
+    protected List<String> getExcludeUrl() {
+        return ListUtil.of("/api/v1/image");
     }
 }
