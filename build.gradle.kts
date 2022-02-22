@@ -4,7 +4,6 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 plugins {
     id("java")
     id("org.springframework.boot") version "2.5.4"
-    id("org.flywaydb.flyway") version "8.0.3"
 }
 
 repositories {
@@ -21,12 +20,6 @@ java.sourceCompatibility = JavaVersion.VERSION_1_8
 
 springBoot {
     buildInfo()
-}
-
-flyway {
-    url = "jdbc:mysql://127.0.0.1:3306/panther?serverTimezone=GMT%2B8"
-    user = "pantherAdmin"
-    password = "pantherJF=A77922"
 }
 
 dependencies {
