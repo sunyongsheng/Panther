@@ -1,12 +1,20 @@
 # Panther
 
+## 建议使用OSS进行图片存储，不建议存储在服务器中；本项目主要用作学习
+
+- 图片管理系统，可用作图床使用；
+- SpringBoot + Thymeleaf + Vue，非前后端分离；
+- App 管理；
+- 图片上传及统计；
+- 图片删除及恢复；
+
 ## 安装
 
 一、创建Panther数据库：`CREATE DATABASE panther CHARACTER SET utf8mb4;`
 
 二、二选一：
 
-a. 修改 `application.properties` 中的数据库用户名和密码**以及**根目录下的`build.gradle.kts`中的`flyway`的用户名及密码；
+a. 修改 `application.properties` 中的数据库用户名和密码**以及**`flyway`的用户名及密码为自己的账号密码；
 
 b. MySQL中运行：
 ```mysql
@@ -25,9 +33,26 @@ GRANT ALL ON panther.* TO 'pantherAdmin'@'%';
 4. 超级App：相较于其他App，可以自定义上传目录的App，但无法上传到其他App目录；
 
 ## 流程
-| Description | Method | API | Header | Param | Body | Return |
-| --- | --- | --- | --- | --- | --- | --- |
-| 管理员登录，获取管理员Token | GET | `/adminLogin` | - | username;password | - | token |
-| 创建App，获取AppKey | POST | `/api/v1/app` | Authorization=$token | - | CreateAppParam | appKey |
-| 生成App上传Token | POST | `/api/v1/app/uploadToken` | Authorization=$token | app_key=$appKey | - | uploadToken |
-| 上传图片 | POST | `/api/v1/image` | Upload-Token=$uploadToken | file | - | ImageDTO |
+| Description      | Method | API                       | Header                    | Param             | Body           | Return      |
+|------------------|--------|---------------------------|---------------------------|-------------------|----------------|-------------|
+| 管理员登录，获取管理员Token | GET    | `/adminLogin`             | -                         | username;password | -              | token       |
+| 创建App，获取AppKey   | POST   | `/api/v1/app`             | Authorization=$token      | -                 | CreateAppParam | appKey      |
+| 生成App上传Token     | POST   | `/api/v1/app/uploadToken` | Authorization=$token      | app_key=$appKey   | -              | uploadToken |
+| 上传图片             | POST   | `/api/v1/image`           | Upload-Token=$uploadToken | file              | -              | ImageDTO    |
+
+## 截图
+
+![管理后台](./screenshots/screenshot-admin-dashboard.png)
+
+![App管理后台](./screenshots/screenshot-admin-app.png)
+
+![图片管理后台](./screenshots/screenshot-admin-image.png)
+
+![图片上传1](./screenshots/screenshot-admin-upload1.png)
+
+![图片上传2](./screenshots/screenshot-admin-upload2.png)
+
+![Panther设置](./screenshots/screenshot-admin-setting.png)
+
+![App设置](./screenshots/screenshot-admin-app-setting.png)
+
